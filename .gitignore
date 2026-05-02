@@ -1,0 +1,163 @@
+
+
+# --- IDE / Editor ---
+.idea/
+.vscode/
+*.iml
+*.iws
+out/
+/shelf/
+/workspace.xml
+/httpRequests/
+/dataSources/
+/dataSources.local.xml
+.claude/
+CLAUDE.md
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+.venv/
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+*.egg
+
+# --- Node ---
+node_modules/
+
+# --- Logs and Cache ---
+*.log
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# --- Model weights (large binaries) ---
+*.pt
+*.pth
+*.onnx
+*.engine
+*.pb
+*.tflite
+*.joblib
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# --- Data files ---
+*.csv
+*.parquet
+*.json
+!requirements.json
+!package.json
+!package-lock.json
+!tsconfig.json
+!ir_gui/ui/public/manifest.json
+!ir_gui/settings.json
+!ir_gui/fusion_settings.json
+!classifier/config.yaml
+!configs/*.yaml
+!configs/**/*.yaml
+
+# --- Images / Plots ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.webp
+*.pdf
+*.eps
+
+# SVGs are blocked globally EXCEPT the icon assets needed by PySide
+*.svg
+!ir_gui/assets/icons/*.svg
+!ir_gui/ui/public/vite.svg
+
+# --- Videos ---
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+*.webm
+*.part
+
+# --- Archives ---
+*.zip
+*.tar
+*.tar.gz
+*.gz
+*.rar
+*.7z
+
+# --- Markdown docs (thesis-only, not needed to run) ---
+*.md
+!README.md
+
+# --- Training runs / outputs ---
+runs/
+datasets/
+models/
+archive/
+backup/
+benchmarks/
+
+# --- YOLO / training results ---
+RGB model/Yolo26n_*/
+RGB model/*.yaml
+
+# --- Classifier artifacts ---
+classifier/runs/
+classifier/fusion_models/
+
+# --- Demo outputs (downloaded YT videos, benchmark renders) ---
+ir_gui/demo_outputs/
+ir_gui/saved_alert_windows/
+
+# --- Flet legacy test scripts ---
+ir_gui/flet_app/_test_image*.py
+
+# --- Scratch / debug scripts (underscore prefix) ---
+_check_*.py
+_debug_*.py
+_verify.py
+classifier/_check_*.py
+classifier/_debug_*.py
+check.txt
+
+# --- Config backups ---
+*.bak
+*.bak_*
+*.pre_finetune.bak
+
+# --- Notebook outputs ---
+notebooks/cache/
+notebooks/figures/
+notebooks/*.ipynb
+
+# --- Misc ---
+bash.exe.stackdump
+youtube_cookies.txt
+video_benchmark_outputs/
+**/pred_labels/
+**/error_stems.txt
+**/error_summary.json
+.review_progress.json
+report/images/
+temp_labels/
+scripts/dataset/
+scripts/export/
+label_reviewer/
+generate_professor_plots.py

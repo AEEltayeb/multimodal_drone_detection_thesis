@@ -1,0 +1,37 @@
+
+run_name: "IR_final_cleaned"
+modality: "IR"
+dataset_version: "final_cleaned"
+dataset_yaml: "/workspace/IR_dset_final/dataset.yaml"
+
+# ── Model (from scratch) ──
+pretrained_weights: "yolo26n.pt"
+
+# ── Training schedule ──
+epochs: 70
+batch_size: 48
+optimizer: "AdamW"
+learning_rate: 0.001
+lr_final_fraction: 0.01
+weight_decay: 0.0005
+warmup_epochs: 3
+close_mosaic: 20
+patience: 15
+amp: true
+seed: 0
+device: "0"
+
+# ── Augmentation ──
+mosaic: 0.33
+scale: 0.5
+translate: 0.1
+erasing: 0.4
+fliplr: 0.5
+copy_paste: 0.0
+mixup: 0.0
+hsv_h: 0.0
+hsv_s: 0.0
+hsv_v: 0.4
+
+# ── IR-specific ──
+polarity_flip: 0.3

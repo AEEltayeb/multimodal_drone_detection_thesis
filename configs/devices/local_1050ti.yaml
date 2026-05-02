@@ -1,0 +1,24 @@
+# ══════════════════════════════════════════════════════════════
+# local_1050ti.yaml — Device profile for GTX 1050 Ti (4 GB VRAM)
+# ══════════════════════════════════════════════════════════════
+# Layer this on top of any experiment config using:
+#   python scripts/train.py --config configs/rgb_baseline.yaml --device-profile configs/devices/local_1050ti.yaml
+#
+# Or set device_profile in the experiment config:
+#   device_profile: "configs/devices/local_1050ti.yaml"
+#
+# IMPORTANT: Any run using a device profile that changes batch_size
+# is automatically marked as run_grade: EXP (pilot), because changing
+# batch size alters optimization dynamics.
+
+# ── Device overrides ──
+run_grade: "EXP"                        # forced — local GPU runs are pilot/exploratory only
+batch_size: 8                           # 1050 Ti can't fit 48 at 640x640
+device: "0"
+amp: true                              # essential for 4 GB VRAM
+
+# ── Notes ──
+# - GTX 1050 Ti: 4 GB VRAM, Maxwell/Pascal architecture
+# - batch_size 8 is conservative; try 12 if memory allows
+# - These runs are for sanity checks and debugging only
+# - Publication-grade runs (PUB) must be done on cloud GPU (vast.ai)

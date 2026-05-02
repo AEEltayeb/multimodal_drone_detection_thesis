@@ -1,0 +1,28 @@
+
+run_name: "IR_FT_final_cleaned_s0"
+modality: "IR"
+dataset_version: "final_cleaned"
+dataset_yaml: "G:/drone/IR_dset_final/dataset.yaml"
+
+# ── Model ──
+pretrained_weights: "models/IR_final_cleaned/weights/best.pt"
+image_size: 640
+
+# ── Evaluation ──
+run_grade: "PUB"
+iou_threshold: 0.7
+matching_iou: 0.5
+
+# ── Threshold sweep ──
+sweep_start: 0.01
+sweep_end: 0.99
+sweep_step: 0.01
+
+# ── Size buckets (pixels²) ──
+size_buckets:
+  tiny_max: 1024
+  medium_max: 9216
+
+# ── Paths ──
+output_dir: "runs/${run_name}"
+device: "0"

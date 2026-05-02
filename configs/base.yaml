@@ -1,0 +1,71 @@
+# ══════════════════════════════════════════════════════════════
+# base.yaml — Shared defaults for all experiments
+# ══════════════════════════════════════════════════════════════
+# Override per-experiment in modality-specific configs (e.g. rgb_baseline.yaml).
+# Scripts read this first, then layer the experiment config on top.
+# Optional device profile (e.g. configs/devices/local_1050ti.yaml) is applied last.
+
+# ── Run grade ──
+# EXP = exploratory/pilot (local GPU, non-canonical batch, etc.)
+# PUB = publication-grade (canonical hyperparams, cloud GPU)
+run_grade: "PUB"                       # EXP | PUB
+device_profile: null                   # path to device override yaml, e.g. "configs/devices/local_1050ti.yaml"
+
+# ── Experiment identity ──
+run_name: null                        # MUST be set in experiment config
+modality: null                        # RGB | IR | AUDIO | FUSION
+stage: "FT"                           # PRE | FT | CAL
+
+# ── Dataset ──
+dataset_yaml: null                     # path to YOLO dataset .yaml (set per experiment)
+dataset_version: null                  # e.g. "dsetV1"
+label_quality: "silver"                # silver | gold | mix
+
+# ── Model ──
+model_arch: "yolo26n"                  # architecture identifier
+pretrained_weights: "yolo26n.pt"       # base weights or prior checkpoint
+image_size: 640
+single_class: true
+
+# ── Training ──
+batch_size: 48
+epochs: 70
+optimizer: "AdamW"
+learning_rate: 0.001
+lr_final_fraction: 0.01               # lrf
+weight_decay: 0.0005                   # AdamW weight decay
+warmup_epochs: 3
+amp: true                              # automatic mixed precision
+close_mosaic: 20                       # disable mosaic for last N epochs (epoch 50+ for 70-epoch run)
+augmentation_id: "aug0"                # references an augmentation profile
+seed: 0
+device: "0"                            # GPU index or "cpu"
+
+# ── Evaluation ──
+precision_floor: 0.978                 # matches baseline DEV precision; configurable per experiment
+rgb_recall_tolerance_pp: 1             # max acceptable recall drop in pp
+rgb_fppi_tolerance_pct: 5              # max acceptable FPPI increase (%) vs best prior RGB
+iou_threshold: 0.7                     # NMS IoU
+confidence_threshold: null             # null = determined from DEV sweep
+matching_iou: 0.5                      # IoU threshold for TP/FP matching
+
+# ── Threshold sweep ──
+sweep_start: 0.01
+sweep_end: 0.99
+sweep_step: 0.01
+
+# ── Size buckets (pixels²) ──
+size_buckets:
+  tiny_max: 1024                       # area < 32² = 1024
+  medium_max: 9216                     # area < 96² = 9216
+
+# ── Paths ──
+output_dir: "runs/${run_name}"
+
+# ── Augmentation profiles ──
+# aug0 = ultralytics defaults (no custom augmentation)
+# Additional profiles (aug1, aug2, ...) will be defined as experiments progress.
+augmentation_profiles:
+  aug0:
+    description: "Ultralytics defaults — no custom augmentation changes"
+    # No overrides; use YOLO default augmentation

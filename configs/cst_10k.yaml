@@ -1,0 +1,7 @@
+path: G:/drone/CST_selected_10k
+train: images
+val: images
+test: images
+nc: 1
+names:
+  0: drone
