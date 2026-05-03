@@ -11,14 +11,78 @@ import cv2
 import numpy as np
 
 
-def compute_global_features(img_gray):
-    """7 scene-level features from a grayscale image."""
+_TRAIN_MEANS = {
+    "rgb": {"img_mean": 96.964, "img_std": 25.559, "img_dynamic_range": 71.883,
+            "img_entropy": 4.943, "sky_ground_ratio": 1.288,
+            "edge_density": 0.007581, "blurriness": 231.512},
+    "ir":  {"img_mean": 85.290, "img_std": 50.707, "img_dynamic_range": 188.590,
+            "img_entropy": 6.880, "sky_ground_ratio": 0.653,
+            "edge_density": 0.025516, "blurriness": 882.696},
+}
+
+
+def compute_global_features(img_gray, feature_mode="all", modality="rgb", max_h=480):
+    """7 scene-level features from a grayscale image.
+
+    feature_mode:
+        'all'            – full computation (downsampled for speed)
+        'skip_expensive' – partial compute + mean-fill the rest (legacy)
+        'detections_only'– all globals mean-filled (legacy)
+    modality:
+        'rgb' | 'ir' — which set of training-set means to use for fills.
+        Caller must pass this explicitly; the function does not infer it.
+    max_h:
+        Target height for the downsample step. Lower = faster, less detail
+        on small targets in Canny/Laplacian. Default 480 matches the
+        training pipeline.
+
+    Note: GlobalFeatureCache below is the production path — it caches
+    full-quality globals and recomputes on stride/scene-cut. Direct
+    callers (offline scripts) keep using this function.
+    """
+    if modality not in _TRAIN_MEANS:
+        raise ValueError(f"modality must be 'rgb' or 'ir', got {modality!r}")
+    _defaults = _TRAIN_MEANS[modality]
+
+    if feature_mode == "detections_only":
+        return {
+            "img_mean": _defaults["img_mean"],
+            "img_std": _defaults["img_std"],
+            "img_dynamic_range": _defaults["img_dynamic_range"],
+            "img_entropy": _defaults["img_entropy"],
+            "sky_ground_ratio": _defaults["sky_ground_ratio"],
+            "edge_density": _defaults["edge_density"],
+            "blurriness": _defaults["blurriness"],
+        }
+
     h, w = img_gray.shape[:2]
+    # Downsample for speed — global stats don't need full resolution
+    if h > max_h:
+        scale = max_h / h
+        img_gray = cv2.resize(img_gray, (int(w * scale), max_h), interpolation=cv2.INTER_AREA)
+        h, w = img_gray.shape[:2]
     img_area = h * w
     img_f = img_gray.astype(np.float32)
 
     img_mean = float(img_f.mean())
     img_std = float(img_f.std())
+
+    top_mean = float(img_f[:h // 2].mean())
+    bot_mean = float(img_f[h // 2:].mean())
+    sky_ground_ratio = top_mean / max(bot_mean, 1.0)
+
+    if feature_mode == "skip_expensive":
+        return {
+            "img_mean": round(img_mean, 3),
+            "img_std": round(img_std, 3),
+            "img_dynamic_range": _defaults["img_dynamic_range"],
+            "img_entropy": _defaults["img_entropy"],
+            "sky_ground_ratio": round(sky_ground_ratio, 4),
+            "edge_density": _defaults["edge_density"],
+            "blurriness": _defaults["blurriness"],
+        }
+
+    # Full computation
     p2 = float(np.percentile(img_gray, 2))
     p98 = float(np.percentile(img_gray, 98))
     img_dynamic_range = p98 - p2
@@ -27,10 +91,6 @@ def compute_global_features(img_gray):
     hist = hist[hist > 0].astype(np.float64)
     p = hist / hist.sum()
     img_entropy = float(-np.sum(p * np.log2(p)))
-
-    top_mean = float(img_f[:h // 2].mean())
-    bot_mean = float(img_f[h // 2:].mean())
-    sky_ground_ratio = top_mean / max(bot_mean, 1.0)
 
     edges = cv2.Canny(img_gray, 50, 150)
     edge_density = float(edges.sum()) / (img_area * 255.0)
@@ -98,3 +158,66 @@ TARGET_NAMES = [
     "log_bbox_area", "aspect_ratio", "pos_x", "pos_y",
     "dist_to_center", "local_contrast", "target_bg_delta",
 ]
+
+
+class GlobalFeatureCache:
+    """Stride-cached scene features per modality.
+
+    Scene globals (img_mean/std/entropy/edge_density/...) change on the
+    timescale of camera motion, not target motion. Computing every frame
+    is wasteful; mean-filling lies to the model. This cache recomputes
+    every Nth call and reuses the last real value otherwise.
+
+    A cheap scene-cut probe (img_mean delta vs cached) forces a
+    recompute when the scene changes between stride boundaries.
+    """
+
+    def __init__(self, stride: int = 5, max_h: int = 480,
+                 scene_cut_delta: float = 15.0):
+        self.stride = max(1, int(stride))
+        self.max_h = int(max_h)
+        self.scene_cut_delta = float(scene_cut_delta)
+        self._idx = {"rgb": 0, "ir": 0}
+        self._cache = {"rgb": None, "ir": None}
+
+    def reset(self):
+        self._idx = {"rgb": 0, "ir": 0}
+        self._cache = {"rgb": None, "ir": None}
+
+    def configure(self, stride=None, max_h=None, scene_cut_delta=None):
+        """Update params without resetting state. Reset() to clear cache."""
+        if stride is not None:
+            new = max(1, int(stride))
+            if new != self.stride:
+                self.stride = new
+                self.reset()
+        if max_h is not None:
+            new = int(max_h)
+            if new != self.max_h:
+                self.max_h = new
+                self.reset()
+        if scene_cut_delta is not None:
+            self.scene_cut_delta = float(scene_cut_delta)
+
+    def get(self, img_gray, modality: str) -> dict:
+        if modality not in ("rgb", "ir"):
+            raise ValueError(modality)
+        idx = self._idx[modality]
+        cached = self._cache[modality]
+
+        on_stride = (idx % self.stride == 0)
+        force = (cached is None) or on_stride
+
+        # Cheap scene-cut probe between stride boundaries.
+        if (not force) and (cached is not None) and img_gray.size > 0:
+            quick_mean = float(img_gray.mean())
+            if abs(quick_mean - cached["img_mean"]) > self.scene_cut_delta:
+                force = True
+
+        if force:
+            cached = compute_global_features(
+                img_gray, "all", modality=modality, max_h=self.max_h)
+            self._cache[modality] = cached
+
+        self._idx[modality] = idx + 1
+        return cached

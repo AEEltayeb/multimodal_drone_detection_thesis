@@ -50,8 +50,8 @@ def extract_fusion_features(rgb_gray, ir_gray, rgb_dets, ir_dets):
                           f"{prefix}_max_conf": round(max(confs), 6),
                           f"{prefix}_mean_conf": round(float(np.mean(confs)), 6),
                           f"{prefix}_detected": 1})
-    g_rgb = compute_global_features(rgb_gray)
-    g_ir = compute_global_features(ir_gray)
+    g_rgb = compute_global_features(rgb_gray, modality="rgb")
+    g_ir = compute_global_features(ir_gray, modality="ir")
     feats.update({f"rgb_{k}": v for k, v in g_rgb.items()})
     feats.update({f"ir_{k}": v for k, v in g_ir.items()})
     for prefix, dets, gray, gw, gh in (

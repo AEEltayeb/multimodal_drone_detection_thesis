@@ -24,7 +24,10 @@ import joblib
 import numpy as np
 from ultralytics import YOLO
 
-from .features import TARGET_NAMES, compute_global_features, compute_target_features
+from .features import (
+    TARGET_NAMES, compute_global_features, compute_target_features,
+    GlobalFeatureCache,
+)
 
 _WORKSPACE = Path(__file__).resolve().parents[2]
 if str(_WORKSPACE) not in sys.path:
@@ -92,6 +95,8 @@ class FusionEngine:
         use_patch_verifier: bool = True,
         grayscale_run_ir_filter: bool = True,
         cascade_order: str = "filter_then_classifier",
+        feature_stride: int = 5,
+        feature_max_height: int = 480,
         # kept for back-compat; ignored (ir_conf is shared across modes)
         ir_conf_grayscale: Optional[float] = None,
     ):
@@ -104,6 +109,10 @@ class FusionEngine:
         self.nms_iou = nms_iou
         self.imgsz = imgsz
         self.device = device
+
+        # Strided cache for scene globals (shared by paired + grayscale paths).
+        self.feature_cache = GlobalFeatureCache(
+            stride=feature_stride, max_h=feature_max_height)
 
         # Load YOLO models
         print(f"[Fusion] Loading RGB YOLO: {rgb_weights}")
@@ -124,7 +133,11 @@ class FusionEngine:
         self.rgb_verifier = None
         self.ir_verifier = None
         if use_patch_verifier and PatchVerifier is not None:
-            patch_device = f"cuda:{device}" if isinstance(device, int) else device
+            if isinstance(device, int):
+                import torch
+                patch_device = f"cuda:{device}" if torch.cuda.is_available() else "cpu"
+            else:
+                patch_device = str(device)
             if rgb_patch_weights and Path(rgb_patch_weights).exists():
                 print(f"[Fusion] Loading RGB patch verifier: {rgb_patch_weights}")
                 self.rgb_verifier = PatchVerifier(rgb_patch_weights, patch_device)
@@ -182,8 +195,9 @@ class FusionEngine:
         tf = compute_target_features(img_gray, best.box, img_w, img_h)
         return {f"{prefix}_best_{k}": v for k, v in tf.items()}
 
-    def extract_features(self, rgb_dets, ir_dets, rgb_gray, ir_gray):
-        """Build 40-feature dict from detections and frames."""
+    def extract_features(self, rgb_dets, ir_dets, rgb_gray, ir_gray,
+                          feature_mode="all"):
+        """Build feature dict from detections and frames."""
         rgb_h, rgb_w = rgb_gray.shape[:2]
         ir_h, ir_w = ir_gray.shape[:2]
 
@@ -194,8 +208,10 @@ class FusionEngine:
         feats.update(self._det_stats(ir_dets, "ir"))
 
         # Scene features
-        rgb_global = compute_global_features(rgb_gray)
-        ir_global = compute_global_features(ir_gray)
+        # feature_mode is accepted for back-compat but ignored — the cache
+        # always returns full-quality globals (recomputed every Nth call).
+        rgb_global = self.feature_cache.get(rgb_gray, "rgb")
+        ir_global = self.feature_cache.get(ir_gray, "ir")
         feats.update({f"rgb_{k}": v for k, v in rgb_global.items()})
         feats.update({f"ir_{k}": v for k, v in ir_global.items()})
 

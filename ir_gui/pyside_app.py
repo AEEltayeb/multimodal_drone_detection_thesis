@@ -15,8 +15,37 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QLabel, QPushButton, QFileDialog, QLineEdit, QSlider,
     QFrame, QSizePolicy, QTextEdit, QCheckBox, QScrollArea,
-    QStackedWidget,
+    QStackedWidget, QStyle, QStyleOptionSlider,
 )
+
+
+class ClickJumpSlider(QSlider):
+    """QSlider that jumps to the clicked position instead of paging."""
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            opt = QStyleOptionSlider()
+            self.initStyleOption(opt)
+            handle = self.style().subControlRect(
+                QStyle.ComplexControl.CC_Slider, opt,
+                QStyle.SubControl.SC_SliderHandle, self)
+            if not handle.contains(event.position().toPoint()):
+                if self.orientation() == Qt.Orientation.Horizontal:
+                    new_val = QStyle.sliderValueFromPosition(
+                        self.minimum(), self.maximum(),
+                        int(event.position().x() - handle.width() / 2),
+                        self.width() - handle.width())
+                else:
+                    new_val = QStyle.sliderValueFromPosition(
+                        self.minimum(), self.maximum(),
+                        int(event.position().y() - handle.height() / 2),
+                        self.height() - handle.height())
+                self.setValue(new_val)
+                self.sliderPressed.emit()
+                self.sliderReleased.emit()
+                event.accept()
+                return
+        super().mousePressEvent(event)
 
 _WS = Path(__file__).resolve().parents[1]
 _IR = Path(__file__).resolve().parent
@@ -26,7 +55,7 @@ for _p in (_WS, _IR):
 
 from pyside_engine import TalosEngine
 from flet_app.settings_dialog import load_settings, save_settings, SETTINGS_PATH
-from flet_app.settings_dialog import DEFAULTS, FLOAT_KEYS, INT_KEYS, BOOL_KEYS, CHOICE_KEYS, LABELS, SECTIONS
+from flet_app.settings_dialog import DEFAULTS, FLOAT_KEYS, INT_KEYS, BOOL_KEYS, CHOICE_KEYS, CHOICE_INT_KEYS, LABELS, SECTIONS
 
 TRUST_COLORS = {0: "#ff4444", 1: "#44ff88", 2: "#44ddff", 3: "#66ff66"}
 TRUST_LABELS = {0: "REJECT BOTH", 1: "TRUST RGB", 2: "TRUST IR", 3: "TRUST BOTH"}
@@ -60,7 +89,6 @@ class TalosWindow(QMainWindow):
         if self.current_mode not in MODES:
             self.current_mode = MODES[0]
         self.single_model_type = "rgb"   # "rgb" or "ir"
-        self.speed_val = 1.0
         self.temporal_on = False
         self._prev_alert = False
         self._prev_warning = False
@@ -68,6 +96,9 @@ class TalosWindow(QMainWindow):
         self.dark_mode = True
         self._is_fullscreen = False
         self._pre_fs_geometry = None
+        self._path_history = []  # list of (frame, rgb_cx, rgb_cy, ir_cx, ir_cy, trust, alert, warning)
+        self._path_frame_w = 0
+        self._path_frame_h = 0
         self._seeking = False
 
         self._build_ui()
@@ -197,7 +228,26 @@ class TalosWindow(QMainWindow):
         right.addStretch()
         grid.addLayout(right)
 
-        lay.addLayout(grid, 1)
+        lay.addLayout(grid)
+
+        # Drone Path visualization card
+        path_card = QFrame(); path_card.setObjectName("card")
+        pc_lay = QVBoxLayout(path_card); pc_lay.setContentsMargins(14, 14, 14, 14); pc_lay.setSpacing(8)
+        path_hdr = QHBoxLayout()
+        path_hdr.addWidget(QLabel("DRONE PATH"))
+        path_hdr.addStretch()
+        self.path_save_btn = QPushButton("Save")
+        self.path_save_btn.setObjectName("text_btn")
+        self.path_save_btn.clicked.connect(self._save_path_image)
+        self.path_save_btn.setEnabled(False)
+        path_hdr.addWidget(self.path_save_btn)
+        pc_lay.addLayout(path_hdr)
+        self.path_image_label = QLabel("Run a video to generate the drone flight path")
+        self.path_image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.path_image_label.setMinimumHeight(300)
+        self.path_image_label.setStyleSheet("color:#555; font-size:12px;")
+        pc_lay.addWidget(self.path_image_label, 1)
+        lay.addWidget(path_card, 1)
         return page
 
     def _build_sidebar(self):
@@ -380,7 +430,7 @@ class TalosWindow(QMainWindow):
         lay.addWidget(video_container, 1)
 
         # Seekable progress slider
-        self.progress = QSlider(Qt.Orientation.Horizontal)
+        self.progress = ClickJumpSlider(Qt.Orientation.Horizontal)
         self.progress.setMinimum(0); self.progress.setMaximum(1000)
         self.progress.setValue(0)
         self.progress.setFixedHeight(16)
@@ -415,16 +465,6 @@ class TalosWindow(QMainWindow):
 
         lay.addWidget(self.play_btn)
         lay.addWidget(self.stop_btn)
-
-        # Speed buttons
-        self.speed_btns = []
-        for lbl, val in [("1x",1.0),("2x",2.0),("4x",4.0),("Max",0.0)]:
-            b = QPushButton(lbl); b.setFixedWidth(40)
-            b.setCheckable(True); b.setChecked(val == 1.0)
-            b.setObjectName("speed_btn")
-            b.clicked.connect(lambda c, v=val: self._set_speed(v))
-            self.speed_btns.append((b, val))
-            lay.addWidget(b)
 
         skip = QPushButton("Skip 30s"); skip.clicked.connect(self._on_skip)
         lay.addWidget(skip)
@@ -818,12 +858,6 @@ class TalosWindow(QMainWindow):
         self.yt_download_btn.setEnabled(True)
         self._switch_tab(0)  # auto-switch to Detection view
 
-    def _set_speed(self, val):
-        self.speed_val = val
-        self.engine.playback_speed = val
-        for b, v in self.speed_btns:
-            b.setChecked(v == val)
-
     def _browse_rgb(self):
         p, _ = QFileDialog.getOpenFileName(self, "Select Video", "",
                     "Video (*.mp4 *.avi *.mkv *.mov);;All (*)")
@@ -910,6 +944,11 @@ class TalosWindow(QMainWindow):
                 base = os.path.splitext(os.path.basename(path))[0]
                 sp = os.path.join(out_dir, base + "_output.mp4")
 
+        # Reset path tracking for new run
+        self._path_history = []
+        self._path_frame_w = 0
+        self._path_frame_h = 0
+
         self.engine.start(path, ir_path, self.current_mode,
                           run_settings, self.temporal_on, sp)
 
@@ -924,12 +963,6 @@ class TalosWindow(QMainWindow):
         self.status_label.setText("Idle")
         self._add_log("Stopped")
         self._update_icons()
-
-    def _set_speed(self, speed):
-        for btn, val in self.speed_btns:
-            btn.setChecked(val == speed)
-        self.engine.playback_speed = speed
-        self._add_log(f"Speed set to {speed}x" if speed > 0 else "Speed set to Max")
 
     def _on_skip(self):
         self.engine.skip_forward(30); self._add_log("Skipped 30s")
@@ -1009,6 +1042,24 @@ class TalosWindow(QMainWindow):
         self.an_alerts.setText(str(stats.get("a_events", 0)))
         self.an_mode.setText(self.current_mode)
 
+        # Accumulate drone path data
+        rgb_c = stats.get("rgb_center")
+        ir_c = stats.get("ir_center")
+        trust = stats.get("trust", 0)
+        is_alert = bool(stats.get("alert"))
+        is_warn = bool(stats.get("warning")) and not is_alert
+        self._path_history.append((
+            f,
+            rgb_c[0] if rgb_c else None, rgb_c[1] if rgb_c else None,
+            ir_c[0] if ir_c else None, ir_c[1] if ir_c else None,
+            trust, is_alert, is_warn,
+        ))
+        fw = stats.get("frame_w", 0)
+        fh = stats.get("frame_h", 0)
+        if fw > 0 and fh > 0:
+            self._path_frame_w = fw
+            self._path_frame_h = fh
+
         # Confuser filter -- alert-gate architecture
         v = stats.get("verifier") or {}
         suppressed = stats.get("confuser_suppressed", False)
@@ -1084,6 +1135,151 @@ class TalosWindow(QMainWindow):
         self._add_log("Done")
         # Finalize analytics
         self.an_video.setText(os.path.basename(self.rgb_path.text()) if self.rgb_path.text() else "--")
+        # Generate drone path image
+        self._generate_path_image()
+
+    # -- DRONE PATH GENERATOR ----------------------------
+    def _generate_path_image(self):
+        """Render the accumulated detection centers as a drone flight path image."""
+        if not self._path_history or self._path_frame_w == 0:
+            self.path_image_label.setText("No detection data to generate path")
+            self.path_save_btn.setEnabled(False)
+            return
+
+        fw, fh = self._path_frame_w, self._path_frame_h
+        # Canvas size: match source aspect ratio, capped at 1280 wide
+        scale = min(1280 / fw, 720 / fh, 1.0)
+        cw, ch = int(fw * scale), int(fh * scale)
+
+        # Dark canvas
+        canvas = np.zeros((ch, cw, 3), dtype=np.uint8)
+        canvas[:] = (12, 12, 12)
+
+        # Draw subtle grid
+        grid_color = (30, 30, 30)
+        grid_step = max(40, cw // 16)
+        for gx in range(0, cw, grid_step):
+            cv2.line(canvas, (gx, 0), (gx, ch), grid_color, 1)
+        for gy in range(0, ch, grid_step):
+            cv2.line(canvas, (0, gy), (cw, gy), grid_color, 1)
+
+        # Collect RGB and IR path points
+        rgb_pts = []  # (x, y, t_norm, is_alert, is_warning)
+        ir_pts = []
+        total = len(self._path_history)
+        for i, (frame, rcx, rcy, icx, icy, trust, is_alert, is_warn) in enumerate(self._path_history):
+            t = i / max(total - 1, 1)  # 0..1 time progress
+            if rcx is not None and rcy is not None:
+                x = int(rcx * scale)
+                y = int(rcy * scale)
+                rgb_pts.append((x, y, t, is_alert, is_warn))
+            if icx is not None and icy is not None:
+                x = int(icx * scale)
+                y = int(icy * scale)
+                ir_pts.append((x, y, t, is_alert, is_warn))
+
+        def _lerp_color(c1, c2, t):
+            return tuple(int(a + (b - a) * t) for a, b in zip(c1, c2))
+
+        def _draw_path(pts, color_start, color_end, label, offset_y):
+            if len(pts) < 2:
+                return
+            # Draw connected segments with time-gradient color
+            gap_thresh = max(cw, ch) * 0.15  # gap if points jump > 15% of frame
+            for j in range(1, len(pts)):
+                x0, y0, t0, _, _ = pts[j - 1]
+                x1, y1, t1, a1, w1 = pts[j]
+                dist = ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
+                if dist > gap_thresh:
+                    continue  # gap — don't connect
+                color = _lerp_color(color_start, color_end, t1)
+                thickness = max(1, int(2 - t1 + 1))  # thicker at start
+                cv2.line(canvas, (x0, y0), (x1, y1), color, thickness, cv2.LINE_AA)
+
+            # Draw markers: alerts (red circles), warnings (yellow diamonds)
+            for x, y, t, is_alert, is_warn in pts:
+                if is_alert:
+                    cv2.circle(canvas, (x, y), 6, (0, 0, 255), 2, cv2.LINE_AA)
+                elif is_warn:
+                    # Small diamond
+                    d = 4
+                    diamond = np.array([[x, y - d], [x + d, y], [x, y + d], [x - d, y]], np.int32)
+                    cv2.polylines(canvas, [diamond], True, (0, 200, 255), 1, cv2.LINE_AA)
+
+            # Start marker (green circle with S)
+            sx, sy = pts[0][0], pts[0][1]
+            cv2.circle(canvas, (sx, sy), 8, (0, 220, 100), 2, cv2.LINE_AA)
+            cv2.putText(canvas, "S", (sx - 4, sy + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.35, (0, 220, 100), 1, cv2.LINE_AA)
+            # End marker (red circle with E)
+            ex, ey = pts[-1][0], pts[-1][1]
+            cv2.circle(canvas, (ex, ey), 8, (80, 80, 255), 2, cv2.LINE_AA)
+            cv2.putText(canvas, "E", (ex - 4, ey + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.35, (80, 80, 255), 1, cv2.LINE_AA)
+
+            # Legend label
+            cv2.putText(canvas, label, (12, offset_y), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5, _lerp_color(color_start, color_end, 0.5), 1, cv2.LINE_AA)
+
+        # Draw IR first (underneath), then RGB on top
+        _draw_path(ir_pts, (180, 120, 40), (40, 160, 255), "IR path", ch - 20)
+        _draw_path(rgb_pts, (200, 180, 0), (220, 0, 180), "RGB path", ch - 40)
+
+        # Title overlay
+        video_name = os.path.basename(self.rgb_path.text()) if self.rgb_path.text() else "video"
+        title = f"Drone Path  -  {video_name}  ({total} samples)"
+        cv2.putText(canvas, title, (12, 24), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.55, (180, 180, 180), 1, cv2.LINE_AA)
+
+        # Legend: alert/warning markers
+        legend_y = 48
+        cv2.circle(canvas, (18, legend_y), 5, (0, 0, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Alert", (28, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        cv2.circle(canvas, (80, legend_y), 4, (0, 200, 255), 1, cv2.LINE_AA)
+        cv2.putText(canvas, "Warning", (90, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        cv2.circle(canvas, (155, legend_y), 5, (0, 220, 100), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "Start", (165, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        cv2.circle(canvas, (210, legend_y), 5, (80, 80, 255), 2, cv2.LINE_AA)
+        cv2.putText(canvas, "End", (220, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+
+        # Cache for save
+        self._path_canvas = canvas.copy()
+
+        # Convert to QPixmap and display
+        rgb_canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+        h, w, ch_c = rgb_canvas.shape
+        qimg = QImage(rgb_canvas.data, w, h, w * ch_c, QImage.Format.Format_RGB888)
+        lw = self.path_image_label.width()
+        lh = self.path_image_label.height()
+        pixmap = QPixmap.fromImage(qimg).scaled(
+            max(lw, 400), max(lh, 300),
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+        self.path_image_label.setPixmap(pixmap)
+        self.path_save_btn.setEnabled(True)
+        self._add_log(f"Drone path generated ({len(rgb_pts)} RGB, {len(ir_pts)} IR points)")
+
+    def _save_path_image(self):
+        """Save the generated drone path image to file."""
+        if not hasattr(self, '_path_canvas') or self._path_canvas is None:
+            return
+        default_name = "drone_path.png"
+        if self.rgb_path.text():
+            base = os.path.splitext(os.path.basename(self.rgb_path.text()))[0]
+            default_name = f"{base}_drone_path.png"
+        # Save to demo_outputs by default
+        out_dir = str(Path(__file__).resolve().parent / "demo_outputs")
+        os.makedirs(out_dir, exist_ok=True)
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save Drone Path", os.path.join(out_dir, default_name),
+            "PNG Image (*.png);;All Files (*)")
+        if path:
+            cv2.imwrite(path, self._path_canvas)
+            self._add_log(f"Path image saved: {os.path.basename(path)}")
 
     # -- SETTINGS ----------------------------------------
     def _open_settings(self):
@@ -1136,7 +1332,8 @@ class TalosWindow(QMainWindow):
     def _save_settings(self, refs, dlg):
         for k, ctrl in refs.items():
             if k in CHOICE_KEYS:
-                self.settings[k] = ctrl.currentText()
+                val = ctrl.currentText()
+                self.settings[k] = int(val) if k in CHOICE_INT_KEYS else val
             elif k in FLOAT_KEYS:
                 try: self.settings[k] = float(ctrl.text())
                 except: pass

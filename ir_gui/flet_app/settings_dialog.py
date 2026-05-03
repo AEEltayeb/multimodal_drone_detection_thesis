@@ -9,6 +9,7 @@ DEFAULTS = {
     "rgb_model": "", "ir_model": "", "fusion_model": "",
     "rgb_conf": 0.30, "ir_conf_real": 0.40, "ir_conf_gray": 0.05,
     "nms_iou": 0.45, "imgsz": 640, "gpu_device": 0, "infer_fps": 5,
+    "feature_stride": 5, "feature_max_height": 480,
     "warning_window_frames": 10, "warning_require_hits": 9,
     "alert_window_frames": 10, "alert_require_hits": 9,
     "alert_avg_conf_threshold": 0.0,
@@ -31,23 +32,31 @@ DEFAULTS = {
 FLOAT_KEYS = {"rgb_conf", "ir_conf_real", "ir_conf_gray", "nms_iou",
               "alert_avg_conf_threshold", "warning_cooldown_s",
               "alert_cooldown_s", "roi_expand", "patch_threshold"}
-INT_KEYS = {"imgsz", "gpu_device", "infer_fps", "warning_window_frames",
+INT_KEYS = {"gpu_device", "infer_fps", "warning_window_frames",
             "warning_require_hits", "alert_window_frames",
-            "alert_require_hits", "roi_ttl"}
+            "alert_require_hits", "roi_ttl",
+            "feature_stride"}
 BOOL_KEYS = {"show_troi", "show_gate", "show_source_tags",
              "use_patch_verifier", "grayscale_run_ir_filter",
               "save_output_enabled", "confuser_filter_history",
               "suppress_helicopter", "suppress_airplane", "suppress_bird"}
 CHOICE_KEYS = {
+    "imgsz": ["320", "480", "640", "960", "1280"],
+    "feature_max_height": ["240", "320", "480", "720", "1080"],
     "confuser_suppress_mode": ["primary_only", "primary_and_avg", "any_above"],
     "cascade_order": ["filter_then_classifier", "classifier_then_filter"],
 }
+
+# CHOICE_KEYS that should be saved as int, not string
+CHOICE_INT_KEYS = {"imgsz", "feature_max_height"}
 
 LABELS = {
     "rgb_model": "RGB Model Path", "ir_model": "IR Model Path",
     "fusion_model": "Fusion Classifier", "rgb_conf": "RGB Confidence",
     "ir_conf_real": "IR Confidence (paired)", "ir_conf_gray": "IR Confidence (gray)",
-    "nms_iou": "NMS IoU", "imgsz": "Image Size", "gpu_device": "GPU Device",
+    "nms_iou": "NMS IoU", "imgsz": "YOLO Input Size", "gpu_device": "GPU Device",
+    "feature_stride": "Scene Feature Stride (frames)",
+    "feature_max_height": "Scene Feature Resolution (px)",
     "infer_fps": "Temporal Infer FPS",
     "warning_window_frames": "Warning Window (M)",
     "warning_require_hits": "Warning Hits (N)",
@@ -78,7 +87,8 @@ SECTIONS = [
     ("Models", ["rgb_model", "ir_model", "fusion_model",
                 "rgb_patch_weights", "ir_patch_weights"]),
     ("Detection", ["rgb_conf", "ir_conf_real", "ir_conf_gray",
-                    "nms_iou", "imgsz", "gpu_device"]),
+                    "nms_iou", "imgsz", "gpu_device",
+                    "feature_stride", "feature_max_height"]),
     ("Temporal", ["infer_fps", "warning_window_frames", "warning_require_hits",
                   "alert_window_frames", "alert_require_hits",
                   "alert_avg_conf_threshold", "warning_cooldown_s",

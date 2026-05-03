@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+from concurrent.futures import ThreadPoolExecutor
 
 _WS = Path(__file__).resolve().parents[1]
 _IR = Path(__file__).resolve().parent
@@ -70,12 +71,13 @@ class TalosEngine:
         self.lock = threading.Lock()
         self.frame_num = 0
         self.total_frames = 0
-        self.playback_speed = 1.0
         self._stride = 1
         self.on_frame = None  # callback(jpeg_bytes, stats_dict)
         # Det count cache (works even when temporal state is None)
         self._last_n_rgb = 0
         self._last_n_ir = 0
+        self._last_verifier = None
+        self._last_confuser_vetoed = False
 
     def load_engine(self, settings, mode, status_cb=None):
         """Load FusionEngine from settings dict."""
@@ -83,6 +85,13 @@ class TalosEngine:
             if status_cb: status_cb(m)
         log("Loading models...")
         s = settings
+        # Auto-detect device: fall back to CPU if no CUDA GPU available
+        device = s.get("gpu_device", 0)
+        if isinstance(device, int):
+            import torch
+            if not torch.cuda.is_available():
+                log("No CUDA GPU detected — falling back to CPU")
+                device = "cpu"
         kwargs = dict(
             rgb_weights=s["rgb_model"], ir_weights=s.get("ir_model", s["rgb_model"]),
             fusion_model_path=s.get("fusion_model", ""),
@@ -90,13 +99,15 @@ class TalosEngine:
             ir_conf=float(s.get("ir_conf_real", 0.40)),
             nms_iou=float(s.get("nms_iou", 0.45)),
             imgsz=int(s.get("imgsz", 640)),
-            device=s.get("gpu_device", 0),
+            device=device,
             rgb_patch_weights=s.get("rgb_patch_weights", ""),
             ir_patch_weights=s.get("ir_patch_weights", ""),
             patch_threshold=float(s.get("patch_threshold", 0.70)),
             use_patch_verifier=bool(s.get("use_patch_verifier", True)),
             grayscale_run_ir_filter=bool(s.get("grayscale_run_ir_filter", True)),
             cascade_order=str(s.get("cascade_order", "filter_then_classifier")),
+            feature_stride=int(s.get("feature_stride", 5)),
+            feature_max_height=int(s.get("feature_max_height", 480)),
         )
         if mode == "Single Model":
             kwargs["ir_weights"] = kwargs["rgb_weights"]
@@ -116,6 +127,14 @@ class TalosEngine:
         s = settings
         infer_fps = int(s.get("infer_fps", 5))
         self._stride = max(1, int(round(fps / infer_fps)))
+
+        # New stream → drop cached scene globals.
+        if self.fe is not None and hasattr(self.fe, "feature_cache"):
+            # Pick up any settings changes since load_engine.
+            self.fe.feature_cache.configure(
+                stride=int(s.get("feature_stride", 5)),
+                max_h=int(s.get("feature_max_height", 480)))
+            self.fe.feature_cache.reset()
 
         def _mk():
             return PerModalityTemporalState(
@@ -219,11 +238,13 @@ class TalosEngine:
             if self.on_frame:
                 self.on_frame(buf.tobytes(), self._stats(mode, trust, probs, last_ms, rt, it, fe))
 
-            speed = self.playback_speed
-            if speed > 0:
-                elapsed = time.perf_counter() - t0
-                wait = (frame_period / speed) - elapsed
-                if wait > 0: time.sleep(wait)
+            # Realtime pacing: cap at frame_period per source frame. On slow
+            # hardware (inference > frame_period) this never fires and we
+            # run engine-bound; on fast hardware it caps playback at
+            # realtime so it doesn't blur past.
+            elapsed = time.perf_counter() - t0
+            wait = frame_period - elapsed
+            if wait > 0: time.sleep(wait)
 
         self.running = False
         self._cleanup()
@@ -252,12 +273,18 @@ class TalosEngine:
         return vis, 3 if dets else 0, [0,0,0,1] if dets else [1,0,0,0]
 
     def _infer_paired(self, rgb, ir, s, fe, rt, it, ts):
-        rgb_dets, rgb_src, rgb_troi = _run_with_roi(fe.rgb_model, rgb, fe.rgb_conf, fe, rt)
-        ir_dets, ir_src, ir_troi = _run_with_roi(fe.ir_model, ir, fe.ir_conf, fe, it)
+        t0 = time.perf_counter()
+        with ThreadPoolExecutor(2) as ex:
+            f_rgb = ex.submit(_run_with_roi, fe.rgb_model, rgb, fe.rgb_conf, fe, rt)
+            f_ir  = ex.submit(_run_with_roi, fe.ir_model,  ir,  fe.ir_conf, fe, it)
+            rgb_dets, rgb_src, rgb_troi = f_rgb.result()
+            ir_dets,  ir_src,  ir_troi  = f_ir.result()
+        t_yolo = time.perf_counter()
         rgb_gray = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
         ir_gray = cv2.cvtColor(ir, cv2.COLOR_BGR2GRAY) if len(ir.shape)==3 else ir
         feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), rgb_gray, ir_gray)
         trust, probs = fe.classify(feats)
+        t_clf = time.perf_counter()
         orig_trust = trust
         rgp, irp, _v = [], [], False
         use_history = bool(s.get("confuser_filter_history", False))
@@ -265,23 +292,35 @@ class TalosEngine:
             ir_bgr = ir if len(ir.shape)==3 else cv2.cvtColor(ir, cv2.COLOR_GRAY2BGR)
             trust, rgp, irp, _v = fe.patch_veto(trust, _wrap(rgb_dets), _wrap(ir_dets), rgb, ir_bgr,
                 ir_is_real_thermal=True, suppressed_classes=_build_suppressed_classes(s))
+        t_vrf = time.perf_counter()
+        self._last_confuser_vetoed = (orig_trust != trust)
         trust_prob = float(probs[orig_trust])
-        if rt: rt.last_verifier = self._verifier_diag(fe, orig_trust, trust, rgp, irp, _v, rgb_dets, ir_dets, rgb, s)
+        self._last_verifier = self._verifier_diag(fe, orig_trust, trust, rgp, irp, _v, rgb_dets, ir_dets, rgb, s)
+        if rt: rt.last_verifier = self._last_verifier
 
         self._last_n_rgb = len(rgb_dets)
         self._last_n_ir = len(ir_dets)
         vis = self._compose_dual(rgb, ir, rgb_dets, ir_dets, rgb_src, ir_src, orig_trust, trust_prob,
                                   rt, it, rgb_troi, ir_troi, rgp, irp, ts, fe, s,
                                   tag="", ir_is_real_thermal=True)
+        t_end = time.perf_counter()
+        if self.frame_num % 50 == 0:
+            print(f"[PAIRED f={self.frame_num}] YOLO={1000*(t_yolo-t0):.0f}ms  clf={1000*(t_clf-t_yolo):.0f}ms  vrf={1000*(t_vrf-t_clf):.0f}ms  draw={1000*(t_end-t_vrf):.0f}ms  TOTAL={1000*(t_end-t0):.0f}ms")
         return vis, orig_trust, probs
 
     def _infer_grayscale(self, rgb, s, fe, rt, it, ts):
-        rgb_dets, rgb_src, rgb_troi = _run_with_roi(fe.rgb_model, rgb, fe.rgb_conf, fe, rt)
+        t0 = time.perf_counter()
         gray = cv2.cvtColor(rgb, cv2.COLOR_BGR2GRAY)
         gray3 = cv2.merge([gray, gray, gray])
-        ir_dets, ir_src, ir_troi = _run_with_roi(fe.ir_model, gray3, fe.ir_conf, fe, it)
+        with ThreadPoolExecutor(2) as ex:
+            f_rgb = ex.submit(_run_with_roi, fe.rgb_model, rgb,   fe.rgb_conf, fe, rt)
+            f_ir  = ex.submit(_run_with_roi, fe.ir_model,  gray3, fe.ir_conf,  fe, it)
+            rgb_dets, rgb_src, rgb_troi = f_rgb.result()
+            ir_dets,  ir_src,  ir_troi  = f_ir.result()
+        t_yolo = time.perf_counter()
         feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), gray, gray)
         trust, probs = fe.classify(feats)
+        t_clf = time.perf_counter()
         orig_trust = trust
         rgp, irp, _v = [], [], False
         use_history = bool(s.get("confuser_filter_history", False))
@@ -290,14 +329,20 @@ class TalosEngine:
             trust, rgp, irp, _v = fe.patch_veto(trust, _wrap(rgb_dets), _wrap(ir_dets), rgb, gray3,
                 ir_is_real_thermal=False, ir_verifier_enabled=gs_run, skip_ir_ood_gate=True,
                 suppressed_classes=_build_suppressed_classes(s))
+        t_vrf = time.perf_counter()
+        self._last_confuser_vetoed = (orig_trust != trust)
         trust_prob = float(probs[orig_trust])
-        if rt: rt.last_verifier = self._verifier_diag(fe, orig_trust, trust, rgp, irp, _v, rgb_dets, ir_dets, rgb, s)
+        self._last_verifier = self._verifier_diag(fe, orig_trust, trust, rgp, irp, _v, rgb_dets, ir_dets, rgb, s)
+        if rt: rt.last_verifier = self._last_verifier
 
         self._last_n_rgb = len(rgb_dets)
         self._last_n_ir = len(ir_dets)
         vis = self._compose_dual(rgb, gray3, rgb_dets, ir_dets, rgb_src, ir_src, orig_trust, trust_prob,
                                   rt, it, rgb_troi, ir_troi, rgp, irp, ts, fe, s,
                                   tag=" [grayscale]", ir_is_real_thermal=False)
+        t_end = time.perf_counter()
+        if self.frame_num % 50 == 0:
+            print(f"[GRAY f={self.frame_num}] YOLO={1000*(t_yolo-t0):.0f}ms  clf={1000*(t_clf-t_yolo):.0f}ms  vrf={1000*(t_vrf-t_clf):.0f}ms  draw={1000*(t_end-t_vrf):.0f}ms  TOTAL={1000*(t_end-t0):.0f}ms")
         return vis, orig_trust, probs
 
     def _compose_dual(self, rgb, ir_frame, rgb_dets, ir_dets, rgb_src, ir_src,
@@ -428,12 +473,32 @@ class TalosEngine:
             "ir_labels": list(fe.ir_verifier.last_labels) if fe.ir_verifier and irp else [],
         }
 
+    @staticmethod
+    def _best_center(dets):
+        """Return (cx, cy) of the highest-confidence detection, or None."""
+        if not dets:
+            return None
+        best = max(dets, key=lambda d: d[4])
+        cx = (best[0] + best[2]) / 2.0
+        cy = (best[1] + best[3]) / 2.0
+        return (cx, cy)
+
     def _stats(self, mode, trust, probs, ms, rt, it, fe):
         # In single mode, show "single_model" instead of fusion trust labels
         if mode == "Single Model":
             trust_label = "single_model"
         else:
             trust_label = TRUST_LABELS.get(trust, "")
+
+        # Detection centers for drone path tracking
+        rgb_dets = rt.last_dets if rt else []
+        ir_dets = it.last_dets if it else []
+        rgb_center = self._best_center(rgb_dets)
+        ir_center = self._best_center(ir_dets)
+        # Frame dimensions (from last read capture)
+        frame_w = int(self.cap_left.get(cv2.CAP_PROP_FRAME_WIDTH)) if self.cap_left else 0
+        frame_h = int(self.cap_left.get(cv2.CAP_PROP_FRAME_HEIGHT)) if self.cap_left else 0
+
         return {
             "frame": self.frame_num, "total": self.total_frames,
             "fps": round(1000/max(ms,1), 1), "trust": trust,
@@ -445,15 +510,20 @@ class TalosEngine:
             "n_rgb": self._last_n_rgb,
             "n_ir": self._last_n_ir,
             "infer_ms": round(ms, 1),
-            "confuser_suppressed": (rt.confuser_suppressed if rt else False) or (it.confuser_suppressed if it else False),
+            "confuser_suppressed": self._last_confuser_vetoed or (rt.confuser_suppressed if rt else False) or (it.confuser_suppressed if it else False),
             "confuser_labels": {
                 "rgb": list(fe.rgb_verifier.last_labels)[:1] if fe.rgb_verifier and hasattr(fe.rgb_verifier,'last_labels') and fe.rgb_verifier.last_labels else [],
                 "ir": list(fe.ir_verifier.last_labels)[:1] if fe.ir_verifier and hasattr(fe.ir_verifier,'last_labels') and fe.ir_verifier.last_labels else [],
             },
-            "verifier": getattr(rt, "last_verifier", None) if rt else None,
+            "verifier": self._last_verifier,
             "w_events": (rt.count_warning_events if rt else 0) + (it.count_warning_events if it else 0),
             "a_events": (rt.count_alert_events if rt else 0) + (it.count_alert_events if it else 0),
             "mode": mode,
+            # Drone path data
+            "rgb_center": rgb_center,
+            "ir_center": ir_center,
+            "frame_w": frame_w,
+            "frame_h": frame_h,
         }
 
     def _cleanup(self):
