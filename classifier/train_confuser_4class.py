@@ -248,12 +248,12 @@ def train_one_modality(manifest, modality, out_dir, epochs, batch_size, lr,
     tr_loader = DataLoader(
         FourClassDataset(tr_df, train_tfm, modality),
         batch_size=batch_size, shuffle=True,
-        num_workers=0, pin_memory=True, drop_last=True,
+        num_workers=2, pin_memory=True, drop_last=True,
     )
     va_loader = DataLoader(
         FourClassDataset(va_df, eval_tfm, modality),
         batch_size=batch_size, shuffle=False,
-        num_workers=0, pin_memory=True,
+        num_workers=2, pin_memory=True,
     )
 
     model = build_model(device, num_classes=len(CLASS_NAMES))
@@ -297,6 +297,10 @@ def train_one_modality(manifest, modality, out_dir, epochs, batch_size, lr,
             best_acc = val["acc"]
             best_state = {k: v.detach().cpu().clone()
                            for k, v in model.state_dict().items()}
+            # Save checkpoint to disk immediately
+            ckpt_path = out_dir / f"confuser_filter4_{modality}_ckpt.pt"
+            torch.save({"state_dict": best_state, "epoch": ep,
+                         "val_acc": best_acc}, ckpt_path)
 
     model.load_state_dict(best_state)
     final_val = evaluate(model, va_loader, device)

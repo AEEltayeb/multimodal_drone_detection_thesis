@@ -388,13 +388,30 @@ class TalosEngine:
                         skip_ir_ood_gate=not ir_is_real_thermal,
                         suppressed_classes=_build_suppressed_classes(s),
                     )
-                    # Per-modality: only suppress the modality whose filter flagged
-                    if rt.alert_active and gate_rgp and max(gate_rgp) >= patch_thr:
-                        rt.alert_active = False
-                        rt.confuser_suppressed = True
-                    if it.alert_active and gate_irp and max(gate_irp) >= patch_thr:
-                        it.alert_active = False
-                        it.confuser_suppressed = True
+                    # Trust-aware veto: only check the verifier for trusted modality
+                    rgb_confuser = bool(gate_rgp and max(gate_rgp) >= patch_thr)
+                    ir_confuser = bool(gate_irp and max(gate_irp) >= patch_thr)
+
+                    should_suppress = False
+                    if orig_trust == 1:    # trust_rgb → only RGB verifier matters
+                        should_suppress = rgb_confuser
+                    elif orig_trust == 2:  # trust_ir → only IR verifier matters
+                        should_suppress = ir_confuser
+                    elif orig_trust == 3:  # trust_both → either veto wins
+                        should_suppress = rgb_confuser or ir_confuser
+                    # trust=0 (reject_both) → no alert possible, nothing to suppress
+
+                    if should_suppress:
+                        if rt.alert_active:
+                            rt.alert_active = False
+                            rt.confuser_suppressed = True
+                            if rt.count_alert_events > 0:
+                                rt.count_alert_events -= 1
+                        if it.alert_active:
+                            it.alert_active = False
+                            it.confuser_suppressed = True
+                            if it.count_alert_events > 0:
+                                it.count_alert_events -= 1
                     # Update verifier diagnostics for UI
                     if rt:
                         rt.last_verifier = self._verifier_diag(
@@ -475,13 +492,18 @@ class TalosEngine:
 
     @staticmethod
     def _best_center(dets):
-        """Return (cx, cy) of the highest-confidence detection, or None."""
+        """Return (cx, cy, area) of the highest-confidence detection, or None.
+
+        area is bbox width*height in pixels^2 — used downstream as a proxy for
+        target range (apparent size grows as the drone approaches).
+        """
         if not dets:
             return None
         best = max(dets, key=lambda d: d[4])
         cx = (best[0] + best[2]) / 2.0
         cy = (best[1] + best[3]) / 2.0
-        return (cx, cy)
+        area = max(0.0, (best[2] - best[0]) * (best[3] - best[1]))
+        return (cx, cy, area)
 
     def _stats(self, mode, trust, probs, ms, rt, it, fe):
         # In single mode, show "single_model" instead of fusion trust labels

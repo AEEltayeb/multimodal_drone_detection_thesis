@@ -1,0 +1,90 @@
+# ══════════════════════════════════════════════════════════════
+# Evaluation Configuration — Central paths & defaults
+# ══════════════════════════════════════════════════════════════
+
+# ── Model weights (defaults; CLI overrides) ──
+rgb_weights: "../RGB model/Yolo26n_trained/weights/best.pt"
+ir_weights: "../runs/corrective_finetune/finetune_v3b/weights/best.pt"
+
+# ── Fusion classifier ──
+classifier_path: "../classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
+
+# ── Patch verifier weights ──
+patch_rgb_weights: "../classifier/runs/patches/confuser_filter4_rgb.pt"
+patch_ir_weights: "../classifier/runs/patches/confuser_filter4_ir.pt"
+
+# ── Datasets ──
+datasets:
+  antiuav:
+    type: paired
+    root: "G:/drone/Anti-UAV-RGBT_yolo_converted/test"
+    rgb_images: "RGB/images"
+    rgb_labels: "RGB/labels"
+    ir_images: "IR/images"
+    ir_labels: "IR/labels"
+    rgb_stem_suffix: "_visible"
+    ir_stem_suffix: "_infrared"
+    categories: ["DRONE"]
+
+  svanstrom:
+    type: paired
+    root: "G:/drone/svanstrom_paired"
+    rgb_images: "RGB/images"
+    rgb_labels: "RGB/labels"
+    ir_images: "IR/images"
+    ir_labels: "IR/labels"
+    rgb_stem_suffix: "_visible"
+    ir_stem_suffix: "_infrared"
+    categories: ["AIRPLANE", "BIRD", "DRONE", "HELICOPTER"]
+
+  youtube_ir:
+    type: video
+    root: "../ir_gui/demo_outputs"
+    modality: ir
+    videos:
+      yt_EdOX8tJZDzw.mp4: HELICOPTER
+      yt_gg0Da0AtWJk.mp4: AIRPLANE
+      yt_LflkvbKEEr8.mp4: AIRPLANE
+      yt_UwOMwAGVwvs.mp4: AIRPLANE
+      yt_oon2AjhmAE8.mp4: AIRPLANE
+      yt_vfLc8n8mcKo.mp4: AIRPLANE
+      yt_r5tBDvY7MrA.mp4: AIRPLANE
+      yt_5BYnJQfMvrg.mp4: AIRPLANE
+      yt_omoX_2UYb0s.mp4: BIRD
+      yt_NEANQ74oTew.mp4: BIRD
+      yt_zFu7hAi5mIc.mp4: DRONE
+      yt_oA8Bfc_bjFk.mp4: DRONE
+      yt_Y0epqCI7muk.mp4: DRONE
+      yt_nqk0NsTBlFI.mp4: DRONE
+    drone_quality:
+      yt_zFu7hAi5mIc.mp4: CLEAN
+      yt_oA8Bfc_bjFk.mp4: LABELS
+      yt_Y0epqCI7muk.mp4: LABELS
+      yt_nqk0NsTBlFI.mp4: LABELS
+
+# ── Inference cache locations ──
+# These point to existing caches from prior eval runs.
+# cache_inference.py writes here; eval_pipeline.py reads from here.
+cache:
+  antiuav: "cache/raw_detections_antiuav.json"
+  svanstrom: "cache/raw_detections_svanstrom.json"
+  # Legacy caches (from old scripts, still loadable)
+  legacy_antiuav: "../classifier/runs/raw_detections.json"
+  legacy_svanstrom: "../classifier/runs/svanstrom_detections.json"
+
+# ── Evaluation defaults ──
+defaults:
+  iou_threshold: 0.5
+  iop_threshold: 0.5
+  rgb_conf: 0.25
+  ir_conf: 0.40
+  patch_threshold: 0.70
+  imgsz: 640
+  stride: 1
+
+# ── Size buckets for detection distribution ──
+# bbox area as fraction of image area
+size_buckets:
+  small: [0.0, 0.001]       # < 0.1% of image
+  medium: [0.001, 0.01]     # 0.1% - 1%
+  large: [0.01, 1.0]        # > 1%

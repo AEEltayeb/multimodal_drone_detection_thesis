@@ -9,7 +9,7 @@ from pathlib import Path
 
 import cv2
 import numpy as np
-from PySide6.QtCore import Qt, Signal, QObject, Slot, QSize
+from PySide6.QtCore import Qt, Signal, QObject, Slot, QSize, QEvent
 from PySide6.QtGui import QImage, QPixmap, QFont, QShortcut, QKeySequence, QIcon
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -92,11 +92,10 @@ class TalosWindow(QMainWindow):
         self.temporal_on = False
         self._prev_alert = False
         self._prev_warning = False
-        self._fps_samples = []
         self.dark_mode = True
         self._is_fullscreen = False
         self._pre_fs_geometry = None
-        self._path_history = []  # list of (frame, rgb_cx, rgb_cy, ir_cx, ir_cy, trust, alert, warning)
+        self._path_history = []  # list of (frame, rgb_cx, rgb_cy, rgb_area, ir_cx, ir_cy, ir_area, trust, alert, warning)
         self._path_frame_w = 0
         self._path_frame_h = 0
         self._seeking = False
@@ -133,6 +132,7 @@ class TalosWindow(QMainWindow):
         self.stack.addWidget(self._build_detection_view())  # index 0
         self.stack.addWidget(self._build_youtube_view())    # index 1
         self.stack.addWidget(self._build_analytics_view()) # index 2
+        self.stack.addWidget(self._build_drone_path_view()) # index 3
         main_col.addWidget(self.stack, 1)
 
         main_w = QWidget()
@@ -187,6 +187,7 @@ class TalosWindow(QMainWindow):
         return page
 
     def _build_analytics_view(self):
+        # Inner content widget
         page = QWidget()
         lay = QVBoxLayout(page)
         lay.setContentsMargins(16, 12, 16, 16); lay.setSpacing(12)
@@ -195,60 +196,132 @@ class TalosWindow(QMainWindow):
         title.setStyleSheet("font-size:22px; font-weight:700;")
         lay.addWidget(title)
 
-        # Stats grid -- 2 columns
+        # Stats grid -- 2 columns x 3 rows, all cards same size
         grid = QHBoxLayout(); grid.setSpacing(10)
 
-        # Left column
-        left = QVBoxLayout(); left.setSpacing(8)
-        for label_text, attr in [("Total Frames", "an_frames"), ("Avg FPS", "an_fps"),
-                                  ("Mode", "an_mode")]:
-            c = QFrame(); c.setObjectName("card")
-            cl = QVBoxLayout(c); cl.setContentsMargins(16, 14, 16, 14)
-            cl.addWidget(QLabel(label_text))
-            val = QLabel("--")
-            val.setStyleSheet("font-size:20px; font-weight:700;")
-            cl.addWidget(val)
-            setattr(self, attr, val)
-            left.addWidget(c)
-        left.addStretch()
-        grid.addLayout(left)
+        CARD_MIN_H = 80
+        CARD_STYLE = "font-size:20px; font-weight:700;"
 
-        # Right column
-        right = QVBoxLayout(); right.setSpacing(8)
-        for label_text, attr in [("Warning Events", "an_warnings"), ("Alert Events", "an_alerts"),
-                                  ("Video", "an_video")]:
+        def make_stat_card(label_text, attr):
             c = QFrame(); c.setObjectName("card")
+            c.setMinimumHeight(CARD_MIN_H)
             cl = QVBoxLayout(c); cl.setContentsMargins(16, 14, 16, 14)
             cl.addWidget(QLabel(label_text))
             val = QLabel("--")
-            val.setStyleSheet("font-size:20px; font-weight:700;")
+            val.setStyleSheet(CARD_STYLE)
             cl.addWidget(val)
             setattr(self, attr, val)
-            right.addWidget(c)
+            return c
+
+        # Left column: Total Frames, Mode, Drone Path
+        left = QVBoxLayout(); left.setSpacing(8)
+        left.addWidget(make_stat_card("Total Frames", "an_frames"))
+        left.addWidget(make_stat_card("Mode", "an_mode"))
+
+        # Drone Path card (clickable, styled like other cards)
+        path_card = QFrame(); path_card.setObjectName("card")
+        path_card.setMinimumHeight(CARD_MIN_H)
+        path_card.setCursor(Qt.CursorShape.PointingHandCursor)
+        pcl = QVBoxLayout(path_card); pcl.setContentsMargins(16, 14, 16, 14)
+        pcl.addWidget(QLabel("Drone Path"))
+        path_row = QHBoxLayout()
+        self.path_card_label = QLabel("→")
+        self.path_card_label.setStyleSheet(CARD_STYLE)
+        path_row.addWidget(self.path_card_label)
+        path_row.addStretch()
+        pcl.addLayout(path_row)
+        path_card.mousePressEvent = lambda e: self._open_drone_path_view()
+        self.path_card = path_card
+        self.path_card.setEnabled(False)
+        self.path_card.setStyleSheet("QFrame#card { opacity: 0.4; }")
+        left.addWidget(path_card)
+
+        left.addStretch()
+        grid.addLayout(left, 1)
+
+        # Right column: Warning Events, Alert Events, Video
+        right = QVBoxLayout(); right.setSpacing(8)
+        right.addWidget(make_stat_card("Warning Events", "an_warnings"))
+        right.addWidget(make_stat_card("Alert Events", "an_alerts"))
+
+        # Video card (same size as others)
+        video_card = QFrame(); video_card.setObjectName("card")
+        video_card.setMinimumHeight(CARD_MIN_H)
+        vcl = QVBoxLayout(video_card); vcl.setContentsMargins(16, 14, 16, 14)
+        vcl.addWidget(QLabel("Video"))
+        self.an_video = QLabel("--")
+        self.an_video.setStyleSheet(CARD_STYLE)
+        self.an_video.setWordWrap(True)
+        vcl.addWidget(self.an_video)
+        right.addWidget(video_card)
+
         right.addStretch()
-        grid.addLayout(right)
+        grid.addLayout(right, 1)
 
         lay.addLayout(grid)
+        lay.addStretch()
+        return page
 
-        # Drone Path visualization card
-        path_card = QFrame(); path_card.setObjectName("card")
-        pc_lay = QVBoxLayout(path_card); pc_lay.setContentsMargins(14, 14, 14, 14); pc_lay.setSpacing(8)
-        path_hdr = QHBoxLayout()
-        path_hdr.addWidget(QLabel("DRONE PATH"))
-        path_hdr.addStretch()
+    def _build_drone_path_view(self):
+        page = QWidget()
+        lay = QVBoxLayout(page)
+        lay.setContentsMargins(16, 12, 16, 16); lay.setSpacing(10)
+
+        # Header: back button + title + save
+        hdr = QHBoxLayout()
+        back_btn = QPushButton("←  Back to Analytics")
+        back_btn.setObjectName("text_btn")
+        back_btn.clicked.connect(lambda: self.stack.setCurrentIndex(2))
+        hdr.addWidget(back_btn)
+        title = QLabel("Drone Path")
+        title.setStyleSheet("font-size:22px; font-weight:700;")
+        hdr.addWidget(title)
+        hdr.addStretch()
         self.path_save_btn = QPushButton("Save")
         self.path_save_btn.setObjectName("text_btn")
         self.path_save_btn.clicked.connect(self._save_path_image)
         self.path_save_btn.setEnabled(False)
-        path_hdr.addWidget(self.path_save_btn)
-        pc_lay.addLayout(path_hdr)
+        hdr.addWidget(self.path_save_btn)
+        lay.addLayout(hdr)
+
+        # Image fills remaining space.
         self.path_image_label = QLabel("Run a video to generate the drone flight path")
         self.path_image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.path_image_label.setMinimumHeight(300)
-        self.path_image_label.setStyleSheet("color:#555; font-size:12px;")
-        pc_lay.addWidget(self.path_image_label, 1)
-        lay.addWidget(path_card, 1)
+        self.path_image_label.setSizePolicy(QSizePolicy.Policy.Expanding,
+                                            QSizePolicy.Policy.Expanding)
+        self.path_image_label.setStyleSheet(
+            "color:#555; font-size:12px; background:#0a0a0a; border:1px solid #1c1c1c;")
+        self.path_image_label.installEventFilter(self)
+        lay.addWidget(self.path_image_label, 1)
         return page
+
+    def _open_drone_path_view(self):
+        self.stack.setCurrentIndex(3)
+        # Re-fit pixmap once the new page is laid out.
+        self._refresh_path_pixmap()
+
+    def eventFilter(self, obj, event):
+        if obj is getattr(self, "path_image_label", None) \
+                and event.type() == QEvent.Type.Resize \
+                and getattr(self, "_path_canvas", None) is not None:
+            self._refresh_path_pixmap()
+        return super().eventFilter(obj, event)
+
+    def _refresh_path_pixmap(self):
+        """Re-scale the cached path canvas to the current label width."""
+        canvas = getattr(self, "_path_canvas", None)
+        if canvas is None:
+            return
+        rgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+        h, w, ch_c = rgb.shape
+        qimg = QImage(rgb.data, w, h, w * ch_c, QImage.Format.Format_RGB888)
+        target_w = max(self.path_image_label.width() - 8, 320)
+        target_h = max(self.path_image_label.height() - 8, 200)
+        pm = QPixmap.fromImage(qimg).scaled(
+            target_w, target_h,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation)
+        self.path_image_label.setPixmap(pm)
 
     def _build_sidebar(self):
         sb = QFrame()
@@ -1035,9 +1108,7 @@ class TalosWindow(QMainWindow):
         self.infer_ms_lbl.setText(f"{stats.get('infer_ms', 0):.0f}ms")
 
         # Live analytics update
-        self._fps_samples.append(stats.get("fps", 0))
         self.an_frames.setText(str(f))
-        self.an_fps.setText(f"{sum(self._fps_samples)/max(len(self._fps_samples),1):.1f}")
         self.an_warnings.setText(str(stats.get("w_events", 0)))
         self.an_alerts.setText(str(stats.get("a_events", 0)))
         self.an_mode.setText(self.current_mode)
@@ -1051,7 +1122,9 @@ class TalosWindow(QMainWindow):
         self._path_history.append((
             f,
             rgb_c[0] if rgb_c else None, rgb_c[1] if rgb_c else None,
+            rgb_c[2] if rgb_c and len(rgb_c) > 2 else None,
             ir_c[0] if ir_c else None, ir_c[1] if ir_c else None,
+            ir_c[2] if ir_c and len(ir_c) > 2 else None,
             trust, is_alert, is_warn,
         ))
         fw = stats.get("frame_w", 0)
@@ -1163,41 +1236,61 @@ class TalosWindow(QMainWindow):
         for gy in range(0, ch, grid_step):
             cv2.line(canvas, (0, gy), (cw, gy), grid_color, 1)
 
-        # Collect RGB and IR path points
-        rgb_pts = []  # (x, y, t_norm, is_alert, is_warning)
+        # Collect RGB and IR path points (with bbox area for range proxy)
+        rgb_pts = []  # (x, y, t_norm, is_alert, is_warning, area_px)
         ir_pts = []
         total = len(self._path_history)
-        for i, (frame, rcx, rcy, icx, icy, trust, is_alert, is_warn) in enumerate(self._path_history):
+        for i, (frame, rcx, rcy, rarea, icx, icy, iarea, trust, is_alert, is_warn) in enumerate(self._path_history):
             t = i / max(total - 1, 1)  # 0..1 time progress
             if rcx is not None and rcy is not None:
                 x = int(rcx * scale)
                 y = int(rcy * scale)
-                rgb_pts.append((x, y, t, is_alert, is_warn))
+                rgb_pts.append((x, y, t, is_alert, is_warn, rarea or 0.0))
             if icx is not None and icy is not None:
                 x = int(icx * scale)
                 y = int(icy * scale)
-                ir_pts.append((x, y, t, is_alert, is_warn))
+                ir_pts.append((x, y, t, is_alert, is_warn, iarea or 0.0))
 
         def _lerp_color(c1, c2, t):
             return tuple(int(a + (b - a) * t) for a, b in zip(c1, c2))
 
-        def _draw_path(pts, color_start, color_end, label, offset_y):
+        # Thickness range (px). Far → thin, near → bold.
+        T_MIN, T_MAX = 1, 6
+
+        def _draw_path(pts, label, offset_y, color):
             if len(pts) < 2:
                 return
-            # Draw connected segments with time-gradient color
+            # Apparent radius (∝ 1/Z): the range proxy that drives thickness.
+            radii_px = [max(1.0, (a ** 0.5)) for *_, a in pts]
+            # Per-modality normalization so thickness actually spans the range
+            # even on clips where the drone never gets very close or very far.
+            r_min = min(radii_px)
+            r_max = max(radii_px)
+            r_span = max(1e-6, r_max - r_min)
+            # Smooth radii a touch so thickness doesn't strobe per frame.
+            from collections import deque
+            w = max(2, len(radii_px) // 30)
+            q = deque(maxlen=w)
+            smoothed = []
+            for r_ in radii_px:
+                q.append(r_)
+                smoothed.append(sum(q) / len(q))
+
             gap_thresh = max(cw, ch) * 0.15  # gap if points jump > 15% of frame
             for j in range(1, len(pts)):
-                x0, y0, t0, _, _ = pts[j - 1]
-                x1, y1, t1, a1, w1 = pts[j]
+                x0, y0, *_ = pts[j - 1]
+                x1, y1, *_ = pts[j]
                 dist = ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
                 if dist > gap_thresh:
-                    continue  # gap — don't connect
-                color = _lerp_color(color_start, color_end, t1)
-                thickness = max(1, int(2 - t1 + 1))  # thicker at start
-                cv2.line(canvas, (x0, y0), (x1, y1), color, thickness, cv2.LINE_AA)
+                    continue
+                # Average smoothed size across the segment.
+                seg = (smoothed[j - 1] + smoothed[j]) * 0.5
+                norm = (seg - r_min) / r_span
+                thick = int(round(T_MIN + norm * (T_MAX - T_MIN)))
+                cv2.line(canvas, (x0, y0), (x1, y1), color, thick, cv2.LINE_AA)
 
             # Draw markers: alerts (red circles), warnings (yellow diamonds)
-            for x, y, t, is_alert, is_warn in pts:
+            for x, y, t, is_alert, is_warn, _ in pts:
                 if is_alert:
                     cv2.circle(canvas, (x, y), 6, (0, 0, 255), 2, cv2.LINE_AA)
                 elif is_warn:
@@ -1217,13 +1310,21 @@ class TalosWindow(QMainWindow):
             cv2.putText(canvas, "E", (ex - 4, ey + 4), cv2.FONT_HERSHEY_SIMPLEX,
                         0.35, (80, 80, 255), 1, cv2.LINE_AA)
 
-            # Legend label
+            # Modality label in its own colour
             cv2.putText(canvas, label, (12, offset_y), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5, _lerp_color(color_start, color_end, 0.5), 1, cv2.LINE_AA)
+                        0.5, color, 1, cv2.LINE_AA)
 
-        # Draw IR first (underneath), then RGB on top
-        _draw_path(ir_pts, (180, 120, 40), (40, 160, 255), "IR path", ch - 20)
-        _draw_path(rgb_pts, (200, 180, 0), (220, 0, 180), "RGB path", ch - 40)
+        # Modality colors. Thickness encodes range (far=thin, near=bold).
+        RGB_COLOR = (255, 80, 220)   # bright magenta
+        IR_COLOR  = (60, 180, 255)   # bright orange
+        _draw_path(ir_pts,  "IR path",  ch - 20, color=IR_COLOR)
+        _draw_path(rgb_pts, "RGB path", ch - 40, color=RGB_COLOR)
+
+        # Closing-rate panel + apparent-size sparkline (bottom-right of canvas).
+        # Use whichever modality has more samples for the readout.
+        primary_is_rgb = len(rgb_pts) >= len(ir_pts)
+        primary_pts = rgb_pts if primary_is_rgb else ir_pts
+        self._draw_range_panel(canvas, primary_pts, primary_is_rgb)
 
         # Title overlay
         video_name = os.path.basename(self.rgb_path.text()) if self.rgb_path.text() else "video"
@@ -1245,23 +1346,105 @@ class TalosWindow(QMainWindow):
         cv2.circle(canvas, (210, legend_y), 5, (80, 80, 255), 2, cv2.LINE_AA)
         cv2.putText(canvas, "End", (220, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
                     0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        # Modality color swatches
+        cv2.line(canvas, (260, legend_y), (282, legend_y), (255, 80, 220), 3, cv2.LINE_AA)
+        cv2.putText(canvas, "RGB", (288, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        cv2.line(canvas, (322, legend_y), (344, legend_y), (60, 180, 255), 3, cv2.LINE_AA)
+        cv2.putText(canvas, "IR", (350, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
 
-        # Cache for save
+        # Thickness ramp: thin (far) → bold (near)
+        cv2.putText(canvas, "Far", (376, legend_y + 4), cv2.FONT_HERSHEY_SIMPLEX,
+                    0.4, (150, 150, 150), 1, cv2.LINE_AA)
+        ramp_x0 = 398
+        seg_w = 18
+        for i, t in enumerate((1, 2, 3, 4, 5, 6)):
+            x = ramp_x0 + i * seg_w
+            cv2.line(canvas, (x, legend_y), (x + seg_w - 2, legend_y),
+                     (200, 200, 200), t, cv2.LINE_AA)
+        cv2.putText(canvas, "Near", (ramp_x0 + 6 * seg_w + 4, legend_y + 4),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.4, (150, 150, 150), 1, cv2.LINE_AA)
+
+        # Cache for save and re-scale to current label size
         self._path_canvas = canvas.copy()
-
-        # Convert to QPixmap and display
-        rgb_canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
-        h, w, ch_c = rgb_canvas.shape
-        qimg = QImage(rgb_canvas.data, w, h, w * ch_c, QImage.Format.Format_RGB888)
-        lw = self.path_image_label.width()
-        lh = self.path_image_label.height()
-        pixmap = QPixmap.fromImage(qimg).scaled(
-            max(lw, 400), max(lh, 300),
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation)
-        self.path_image_label.setPixmap(pixmap)
+        self._refresh_path_pixmap()
         self.path_save_btn.setEnabled(True)
+        self.path_card.setEnabled(True)
+        self.path_card.setStyleSheet("")  # Reset dimmed style
         self._add_log(f"Drone path generated ({len(rgb_pts)} RGB, {len(ir_pts)} IR points)")
+
+    def _draw_range_panel(self, canvas, pts, is_rgb):
+        """Bottom-right panel: apparent-size sparkline + closing/receding readout.
+
+        We can't measure absolute Z without camera intrinsics, but the rate of
+        change of the bbox's apparent linear size (sqrt of area) is a calibration-
+        free proxy: positive slope = closing, negative = receding.
+        """
+        ch_, cw_ = canvas.shape[:2]
+        # Filter to points with a valid area sample.
+        sizes = [a ** 0.5 for *_, a in pts if a and a > 0]
+        if len(sizes) < 4:
+            return
+        # Smooth with a short moving average to suppress per-frame jitter.
+        win = max(3, len(sizes) // 20)
+        smoothed = []
+        acc = 0.0
+        from collections import deque
+        q = deque(maxlen=win)
+        for s in sizes:
+            q.append(s)
+            smoothed.append(sum(q) / len(q))
+
+        # Overall start to end change in apparent linear size.
+        # Compare mean radius of the first ~10% of samples vs the last ~10%,
+        # so the readout reflects how much closer the drone got across the whole
+        # run (not just the tail — which can be flat if the drone landed).
+        win_n = max(3, len(smoothed) // 10)
+        head_mean = sum(smoothed[:win_n]) / win_n
+        tail_mean = sum(smoothed[-win_n:]) / win_n
+        rel_pct = ((tail_mean - head_mean) / head_mean * 100.0) if head_mean > 0 else 0.0
+
+        # Panel geometry
+        pw, ph = 240, 78
+        pad = 12
+        x0 = cw_ - pw - pad
+        y0 = ch_ - ph - pad
+        cv2.rectangle(canvas, (x0, y0), (x0 + pw, y0 + ph), (24, 24, 24), -1)
+        cv2.rectangle(canvas, (x0, y0), (x0 + pw, y0 + ph), (60, 60, 60), 1)
+
+        modality = "RGB" if is_rgb else "IR"
+        # Threshold at ±5% overall change — below that, the drone effectively
+        # held its distance over the run.
+        if rel_pct > 5:
+            label = f"CLOSING  +{rel_pct:.0f}%  start to end"
+            col = (0, 255, 255)       # bright yellow (BGR)
+        elif rel_pct < -5:
+            label = f"RECEDING  {rel_pct:.0f}%  start to end"
+            col = (255, 0, 200)       # bright magenta
+        else:
+            label = f"STEADY  {rel_pct:+.0f}%  start to end"
+            col = (200, 200, 200)
+        cv2.putText(canvas, f"Range change ({modality})", (x0 + 8, y0 + 16),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, (160, 160, 160), 1, cv2.LINE_AA)
+        cv2.putText(canvas, label, (x0 + 8, y0 + 34),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, col, 1, cv2.LINE_AA)
+
+        # Sparkline of smoothed apparent size across the full run.
+        sx0 = x0 + 8
+        sy0 = y0 + 44
+        sw = pw - 16
+        sh = ph - 50
+        s_min = min(smoothed)
+        s_max = max(smoothed)
+        rng = max(1e-6, s_max - s_min)
+        prev = None
+        for i, s in enumerate(smoothed):
+            px = sx0 + int(i * (sw - 1) / max(1, len(smoothed) - 1))
+            py = sy0 + sh - 1 - int((s - s_min) / rng * (sh - 1))
+            if prev is not None:
+                cv2.line(canvas, prev, (px, py), col, 1, cv2.LINE_AA)
+            prev = (px, py)
 
     def _save_path_image(self):
         """Save the generated drone path image to file."""

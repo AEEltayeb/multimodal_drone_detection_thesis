@@ -85,6 +85,14 @@ YT_RGB_CONFUSERS = {
     "birds_flock_rgb.mp4": "bird",
 }
 
+# RGB confuser videos that live in demo_outputs (alongside IR videos)
+YT_RGB_DEMO_CONFUSERS = {
+    "yt_Z8HJNypu_1Y.mp4": "airplane",
+    "yt_JkK2KcJVXpg.mp4": "airplane",
+    "yt_1U7Bu2pSUwU.mp4": "helicopter",
+    "yt_ZO5lV0gh5i4.mp4": "bird",
+}
+
 # ── Cropping ──────────────────────────────────────────────────────
 
 def crop_with_context(img, x1, y1, x2, y2, pad_frac=0.5, min_side=24):
@@ -209,8 +217,13 @@ def extract_yolo_drone_crops(sources, out_root, max_crops_per_split=3000,
 
 def mine_youtube_confusers(video_map, video_dir, modality, model_path,
                            conf, out_root, stride=3, max_per_video=200,
-                           dry_run=False):
-    """Run YOLO on confuser videos, crop every FP detection."""
+                           dry_run=False, grayscale=False):
+    """Run YOLO on confuser videos, crop every FP detection.
+    
+    If grayscale=True, converts frames to 3-channel grayscale before
+    inference (for running IR model on RGB videos). Saved crops are
+    also grayscale.
+    """
     from ultralytics import YOLO
 
     rows = []
@@ -247,7 +260,13 @@ def mine_youtube_confusers(video_map, video_dir, modality, model_path,
             if frame_idx % stride != 0:
                 continue
 
-            res = model.predict(frame, conf=conf, iou=0.45, imgsz=640,
+            # Convert to grayscale if needed (for IR model on RGB videos)
+            infer_frame = frame
+            if grayscale:
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                infer_frame = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+
+            res = model.predict(infer_frame, conf=conf, iou=0.45, imgsz=640,
                                 verbose=False, device=0, max_det=50)[0]
             if res.boxes is None or len(res.boxes) == 0:
                 continue
@@ -259,7 +278,8 @@ def mine_youtube_confusers(video_map, video_dir, modality, model_path,
                 if count >= max_per_video:
                     break
                 x1, y1, x2, y2 = xyxy[bi]
-                crop = crop_with_context(frame, x1, y1, x2, y2)
+                # Crop from the infer_frame (grayscale if applicable)
+                crop = crop_with_context(infer_frame, x1, y1, x2, y2)
                 if crop is None:
                     continue
 
@@ -374,6 +394,33 @@ def main():
         )
 
         yt_rows = ir_rows + rgb_rows
+
+        # RGB confusers from demo_outputs dir
+        print("\n  --- RGB YouTube Confusers (demo_outputs) ---")
+        rgb_demo_rows = mine_youtube_confusers(
+            YT_RGB_DEMO_CONFUSERS, YT_IR_DIR, "rgb",
+            model_path=settings["rgb_model"],
+            conf=args.rgb_conf,
+            out_root=PATCH_DIR,
+            stride=args.yt_stride,
+            max_per_video=args.max_yt_per_video,
+            dry_run=args.dry_run,
+        )
+        yt_rows += rgb_demo_rows
+
+        # IR confusers from demo_outputs RGB videos (grayscale conversion)
+        print("\n  --- IR YouTube Confusers (grayscale from RGB videos) ---")
+        ir_gray_rows = mine_youtube_confusers(
+            YT_RGB_DEMO_CONFUSERS, YT_IR_DIR, "ir",
+            model_path=settings["ir_model"],
+            conf=args.ir_conf,
+            out_root=PATCH_DIR,
+            stride=args.yt_stride,
+            max_per_video=args.max_yt_per_video,
+            dry_run=args.dry_run,
+            grayscale=True,
+        )
+        yt_rows += ir_gray_rows
         new_yt = [r for r in yt_rows if r["stem"] not in existing_stems]
         print(f"\n  YouTube total: {len(yt_rows)} extracted, "
               f"{len(new_yt)} new (after dedup)")
