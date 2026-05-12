@@ -39,6 +39,7 @@ from datasets import (
     load_config, resolve_path, read_yolo_labels, img_from_label,
     detect_category, CachedDetectionDataset, VideoDataset, SVAN_CATS,
 )
+from run_manifest import write_manifest, cache_identity_tag
 from reporting import (
     print_metrics_table, print_fp_by_category, print_size_distribution,
     save_metrics_csv, save_fp_category_csv, save_json, save_jsonl,
@@ -195,24 +196,34 @@ def evaluate_paired(ds_name, cfg, args, active_configs):
 
     # Find cache file. Resolution order:
     #   1. tagged eval-side cache (if --cache-tag given)
-    #   2. plain eval-side cache
-    #   3. tagged legacy cache (rare)
-    #   4. plain legacy cache
+    #   2. auto-tagged eval-side cache (weights+imgsz+stride hash)
+    #   3. plain eval-side cache
+    #   4. tagged legacy cache (rare)
+    #   5. plain legacy cache
     # Skip tiny/empty files (< 100 bytes) — stubs from aborted runs.
     cache_key = ds_name
     legacy_key = f"legacy_{ds_name}"
     eval_path = resolve_path(cache_cfg.get(cache_key, ""))
     legacy_path = resolve_path(cache_cfg.get(legacy_key, ""))
 
-    def _tagged(p):
-        return p.with_name(p.stem + f"_{args.cache_tag}.json") if args.cache_tag else None
+    def _tagged(p, tag):
+        return p.with_name(p.stem + f"_{tag}.json") if tag else None
+
+    auto_tag = cache_identity_tag(
+        rgb_weights=resolve_path(cfg["rgb_weights"]),
+        ir_weights=resolve_path(cfg["ir_weights"]),
+        imgsz=args.imgsz,
+        stride=1,  # cache files are stride-1 by convention; pipeline applies stride later
+    )
 
     candidates = []
     if args.cache_tag:
-        candidates.append(_tagged(eval_path))
+        candidates.append(_tagged(eval_path, args.cache_tag))
+    # Auto-tag candidate (always tried after explicit tag)
+    candidates.append(_tagged(eval_path, auto_tag))
     candidates.append(eval_path)
     if args.cache_tag:
-        candidates.append(_tagged(legacy_path))
+        candidates.append(_tagged(legacy_path, args.cache_tag))
     candidates.append(legacy_path)
 
     cache_path = None
@@ -224,7 +235,14 @@ def evaluate_paired(ds_name, cfg, args, active_configs):
             break
 
     if cache_path is None:
-        print(f"  [SKIP] No cache found for {ds_name}. Run cache_inference.py first.")
+        rgb_w = resolve_path(cfg["rgb_weights"])
+        ir_w = resolve_path(cfg["ir_weights"])
+        print(f"  [CACHE-MISS] No cache found for {ds_name}.")
+        print(f"  [CACHE-MISS] Auto-tag tried: {auto_tag}")
+        print(f"  [CACHE-MISS] Run:")
+        print(f"    python eval/cache_inference.py --dataset {ds_name} "
+              f"--imgsz {args.imgsz} "
+              f'--rgb-weights "{rgb_w}" --ir-weights "{ir_w}"')
         return
 
     root = Path(ds_cfg["root"])
@@ -233,6 +251,23 @@ def evaluate_paired(ds_name, cfg, args, active_configs):
 
     out_dir = Path(args.output_dir) / ds_name
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Provenance manifest (written before heavy work so crashes still leave a record)
+    write_manifest(
+        out_dir=out_dir,
+        args=args,
+        cfg=cfg,
+        weights_paths={
+            "rgb_weights": resolve_path(cfg.get("rgb_weights", "")),
+            "ir_weights": resolve_path(cfg.get("ir_weights", "")),
+            "classifier_path": resolve_path(cfg.get("classifier_path", "")),
+            "patch_rgb_weights": resolve_path(cfg.get("patch_rgb_weights", "")),
+            "patch_ir_weights": resolve_path(cfg.get("patch_ir_weights", "")),
+        },
+        cache_paths=[cache_path],
+        extra={"dataset": ds_name, "stage": "eval_pipeline.evaluate_paired",
+               "scoring": getattr(args, "scoring", "dual")},
+    )
 
     # Load components as needed
     need_clf = any(c in active_configs for c in
@@ -478,6 +513,20 @@ def evaluate_youtube(ds_name, cfg, args):
     weights_key = "ir_weights" if modality == "ir" else "rgb_weights"
     model = YOLO(str(resolve_path(cfg[weights_key])))
     conf_thr = args.ir_conf if modality == "ir" else args.rgb_conf
+
+    # Provenance
+    write_manifest(
+        out_dir=out_dir,
+        args=args,
+        cfg=cfg,
+        weights_paths={
+            weights_key: resolve_path(cfg[weights_key]),
+            "patch_rgb_weights": resolve_path(cfg.get("patch_rgb_weights", "")),
+            "patch_ir_weights": resolve_path(cfg.get("patch_ir_weights", "")),
+        },
+        extra={"dataset": ds_name, "stage": "eval_pipeline.evaluate_youtube",
+               "modality": modality},
+    )
 
     sys.path.insert(0, str(REPO / "classifier"))
     from patch_verifier import PatchVerifier

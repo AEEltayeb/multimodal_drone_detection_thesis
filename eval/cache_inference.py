@@ -27,6 +27,7 @@ REPO = EVAL_DIR.parent
 sys.path.insert(0, str(EVAL_DIR))
 
 from datasets import load_config, resolve_path, img_from_label
+from run_manifest import cache_identity_tag, write_manifest, weights_short_hash
 
 
 def cache_paired_dataset(ds_name: str, cfg: dict, args):
@@ -42,17 +43,42 @@ def cache_paired_dataset(ds_name: str, cfg: dict, args):
     rgb_suffix = ds_cfg.get("rgb_stem_suffix", "")
     ir_suffix = ds_cfg.get("ir_stem_suffix", "")
 
-    # Output path
-    cache_dir = EVAL_DIR / "cache"
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    tag = f"_{args.tag}" if args.tag else ""
-    out_path = cache_dir / f"raw_detections_{ds_name}{tag}.json"
-
-    # Load models
+    # Resolve weights up front so we can hash-tag the cache filename.
     rgb_weights = args.rgb_weights or str(resolve_path(cfg["rgb_weights"]))
     ir_weights = args.ir_weights or str(resolve_path(cfg["ir_weights"]))
-    print(f"[{ds_name}] RGB weights: {Path(rgb_weights).name}")
-    print(f"[{ds_name}] IR weights:  {Path(ir_weights).name}")
+
+    # Output path. If --tag is given, use it verbatim (back-compat). Otherwise
+    # auto-tag with a deterministic identity that captures (weights, imgsz,
+    # stride) so different model versions can't silently share a cache file.
+    cache_dir = EVAL_DIR / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    if args.tag:
+        tag_suffix = f"_{args.tag}"
+    else:
+        auto = cache_identity_tag(
+            rgb_weights=rgb_weights, ir_weights=ir_weights,
+            imgsz=args.imgsz, stride=args.stride,
+        )
+        tag_suffix = f"_{auto}"
+    out_path = cache_dir / f"raw_detections_{ds_name}{tag_suffix}.json"
+
+    # Print cache identity banner
+    print(f"[{ds_name}] RGB weights: {Path(rgb_weights).name}  "
+          f"({weights_short_hash(rgb_weights)})")
+    print(f"[{ds_name}] IR weights:  {Path(ir_weights).name}  "
+          f"({weights_short_hash(ir_weights)})")
+    print(f"[{ds_name}] cache file:  {out_path.name}")
+    # Manifest goes next to the cache file (one per cache, named by cache stem)
+    write_manifest(
+        out_dir=cache_dir,
+        args=args,
+        cfg=cfg,
+        weights_paths={"rgb_weights": rgb_weights, "ir_weights": ir_weights},
+        cache_paths=[out_path],
+        extra={"dataset": ds_name, "stage": "cache_inference"},
+        filename=f"{out_path.stem}.manifest.json",
+    )
+
     rgb_model = YOLO(rgb_weights)
     ir_model = YOLO(ir_weights)
     conf = cfg["defaults"].get("conf", 0.001) if not args.conf else args.conf

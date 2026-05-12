@@ -35,15 +35,25 @@ def resolve_path(p: str) -> Path:
 
 # ── YOLO label reading ───────────────────────────────────────────
 
-def read_yolo_labels(path: Path, img_w: int, img_h: int) -> list[tuple]:
+def read_yolo_labels(path: Path, img_w: int, img_h: int,
+                     drone_classes: set[int] | None = None) -> list[tuple]:
     """Read YOLO-format labels → list of (x1, y1, x2, y2) boxes.
-    Only reads class 0 (drone)."""
+    Only reads classes in *drone_classes* (default: {0}).
+    Pass drone_classes=set() to get no boxes (negatives-only mode)."""
+    if drone_classes is None:
+        drone_classes = {0}
     boxes = []
     if not path.exists():
         return boxes
     for line in path.read_text().splitlines():
         parts = line.strip().split()
-        if len(parts) < 5 or parts[0] != "0":
+        if len(parts) < 5:
+            continue
+        try:
+            cls_id = int(parts[0])
+        except ValueError:
+            continue
+        if cls_id not in drone_classes:
             continue
         cx, cy, bw, bh = map(float, parts[1:5])
         boxes.append((

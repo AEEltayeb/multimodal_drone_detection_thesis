@@ -1,0 +1,184 @@
+# Ablation matrix for the drone-detection pipeline.
+#
+# Schema:
+#   default_stack:    weights / classifier / verifier paths held constant
+#                     for every cell that doesn't override them
+#   datasets:         dataset-name → {script, stride, conf, extra-args}
+#   factors:          map of factor-key → {description, levels: [...]}
+#                     each level lists which CLI flags to override.
+#   cells:            list of {factor, levels, datasets, script}
+#                     orchestrated by eval/ablate.py
+#
+# All paths are relative to repo root (resolved by run_manifest.cache_identity_tag).
+
+default_stack:
+  rgb_weights:        "RGB model/Yolo26n_retrained_v2/weights/best.pt"
+  ir_weights:         "runs/corrective_finetune/finetune_v3b/weights/best.pt"
+  classifier_path:    "classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
+  patch_rgb_weights:  "classifier/runs/patches/confuser_filter4_rgb_v2_backup.pt"
+  patch_ir_weights:   "classifier/runs/patches/confuser_filter4_ir_v2_backup.pt"
+  scoring:            trust_aware
+  cascade:            filter_then_classifier
+  imgsz:              1280
+  rgb_conf:           0.25
+  ir_conf:            0.40
+  patch_thr:          0.70
+
+datasets:
+  antiuav:
+    script:  eval_pipeline.py
+    type:    paired
+    stride:  5
+  svanstrom:
+    script:  eval_pipeline.py
+    type:    paired
+    stride:  5
+  rgb_dataset:
+    script:  eval_model.py
+    type:    rgb_only
+    stride:  3
+    weights_key: rgb_weights
+  ir_dset_final:
+    script:  eval_model.py
+    type:    ir_only
+    stride:  3
+    weights_key: ir_weights
+  antiuav_rgb_gray:
+    script:  eval_model.py
+    type:    grayscale
+    stride:  3
+    weights_key: ir_weights
+    extra_args: ["--grayscale"]
+
+# Diagnostic clips for the grayscale-gap investigation (Phase 4).
+# Each clip is processed by eval_video_temporal.py with several condition
+# combinations; the driver expands these into per-condition cells.
+diagnostic_clips:
+  - path:        "ir_gui/demo_outputs/yt_DiN4s-MWvPg.mp4"
+    frame_range: "565:end"
+    note:        "drone in sky after frame 565; before is held in hand"
+  - path:        "ir_gui/demo_outputs/yt_FQO3COJl5Us.mp4"
+    frame_range: "1:end"
+    note:        "drone in hand whole clip; easy-mode positive control"
+  - path:        "ir_gui/demo_outputs/yt_Qx1Hlot9Ye8.mp4"
+    frame_range: "163:end"
+    note:        "drone in sky after frame 163; before is held in hand"
+
+factors:
+
+  A_rgb_yolo:
+    description: "RGB YOLO weights — old (Jan, Yolo26n_trained) vs new (May, Yolo26n_retrained_v2)"
+    overrides_yolo_cache: true
+    levels:
+      - name: rgb_old
+        rgb_weights: "RGB model/Yolo26n_trained/weights/best.pt"
+      - name: rgb_new       # default
+        rgb_weights: "RGB model/Yolo26n_retrained_v2/weights/best.pt"
+    datasets: [antiuav, svanstrom, rgb_dataset]
+
+  B_patch_verifier:
+    description: "Patch verifier weights — v1 / v2_backup / v3_backup / v4 current"
+    levels:
+      - name: pv_v1
+        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v1_backup.pt"
+        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v1_backup.pt"
+      - name: pv_v2         # default
+        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v2_backup.pt"
+        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v2_backup.pt"
+      - name: pv_v3
+        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v3_backup.pt"
+        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v3_backup.pt"
+      - name: pv_v4
+        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb.pt"
+        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir.pt"
+    datasets: [svanstrom]   # confuser-rich; antiuav has no confusers so verifier is a no-op
+
+  C_classifier:
+    description: "Trust classifier — retrainedv2 / sceneaware / control40 / fusionnofn"
+    levels:
+      - name: clf_retrainedv2  # default
+        classifier_path: "classifier/fusion_models/retrained_v2_32feat/model.joblib"
+      - name: clf_sceneaware
+        classifier_path: "classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
+      - name: clf_control40
+        classifier_path: "classifier/fusion_models/control_v3more_40feat/model.joblib"
+      - name: clf_fusionnofn
+        classifier_path: "classifier/runs/reliability/fusion/fusion_no_fn_model.joblib"
+    datasets: [antiuav, svanstrom]
+
+  D_cascade:
+    description: "Cascade order — filter→classifier / classifier→filter / alert_gate_only (production)"
+    levels:
+      - name: cas_filter_then_classifier   # default
+        cascade: filter_then_classifier
+      - name: cas_classifier_then_filter
+        cascade: classifier_then_filter
+      - name: cas_alert_gate_only
+        cascade: alert_gate_only
+        # alert_gate_only is only meaningful with temporal on; the driver
+        # routes this level to eval_video_temporal.py instead of eval_pipeline.py
+        requires_temporal: true
+    datasets: [antiuav, svanstrom]
+
+  E_scoring:
+    description: "Scoring rule — dual (strict) vs trust_aware (email rule)"
+    levels:
+      - name: score_dual
+        scoring: dual
+      - name: score_trust_aware  # default
+        scoring: trust_aware
+    datasets: [antiuav, svanstrom]
+
+  F_temporal:
+    description: "Temporal layer — off (existing pipeline) vs on (video-mode)"
+    levels:
+      - name: temp_off          # default for paired pipeline
+        temporal: off
+      - name: temp_on
+        temporal: on
+        # routes to eval_video_temporal.py for paired+video datasets
+    datasets: [antiuav]   # videos only — antiuav as paired sequence; expand later
+
+  G_grayscale_imgsz:
+    description: "Grayscale + imgsz sweep on the cross-domain test"
+    levels:
+      - name: gray_640_temp_off_roi_off
+        mode: grayscale
+        imgsz: 640
+        temporal: off
+        use_roi_fallback: off
+      - name: gray_640_temp_on_roi_on
+        mode: grayscale
+        imgsz: 640
+        temporal: on
+        use_roi_fallback: on
+      - name: gray_1280_temp_off_roi_off
+        mode: grayscale
+        imgsz: 1280
+        temporal: off
+        use_roi_fallback: off
+      - name: gray_1920_temp_off_roi_off
+        mode: grayscale
+        imgsz: 1920
+        temporal: off
+        use_roi_fallback: off
+    datasets: [antiuav_rgb_gray]   # plus the diagnostic_clips, expanded by ablate.py
+
+  H_conf_sweep:
+    description: "Operating-point sweep — conf ∈ {0.10, 0.20, 0.25, 0.30, 0.40, 0.50}"
+    levels:
+      - {name: conf_0p10, ir_conf: 0.10, rgb_conf: 0.10}
+      - {name: conf_0p20, ir_conf: 0.20, rgb_conf: 0.20}
+      - {name: conf_0p25, ir_conf: 0.25, rgb_conf: 0.25}
+      - {name: conf_0p30, ir_conf: 0.30, rgb_conf: 0.30}
+      - {name: conf_0p40, ir_conf: 0.40, rgb_conf: 0.40}
+      - {name: conf_0p50, ir_conf: 0.50, rgb_conf: 0.50}
+    datasets: [antiuav, svanstrom]
+    note: "YOLO cache must be regenerated once at conf=0.001 so all sweep levels read from the same cache; eval_pipeline applies its own --rgb-conf / --ir-conf threshold downstream."
+
+# Driver behavior knobs
+driver:
+  output_root:    "eval/results/_ablation"
+  dryrun_first:   true       # always dryrun before the real run; skip cell on dryrun fail
+  sequential:     true
+  stop_on_error:  false      # log [SKIP] but continue

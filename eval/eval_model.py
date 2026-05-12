@@ -1,7 +1,7 @@
 """
 eval_model.py — Raw YOLO model benchmarking on datasets.
 
-No classifier, no filter — just model performance. Supports:
+Supports:
 - Single or multi-model comparison
 - IoU and IoP matching
 - Per-source breakdown
@@ -9,16 +9,18 @@ No classifier, no filter — just model performance. Supports:
 - Size distribution (small/medium/large)
 - FPPI on negative-only datasets
 - Frame-level TP/FP/FN/TN
+- Patch verifier (confuser filter) — raw vs filtered metrics side-by-side
+- Temporal alert gate — simulated N-of-M window on sequential images
+- Multi-class label remapping (--drone-classes)
 
 Usage:
     python eval/eval_model.py --weights best.pt --dataset G:/drone/test
     python eval/eval_model.py --weights a.pt b.pt --dataset G:/drone/test
-    python eval/eval_model.py --weights best.pt --dataset data.yaml --mode yolo-val
     python eval/eval_model.py --weights best.pt --dataset path --stride 10
-    python eval/eval_model.py --weights best.pt --dataset path --per-source
-    python eval/eval_model.py --weights best.pt --dataset path --conf-sweep 0.1,0.2,0.3,0.4,0.5
     python eval/eval_model.py --weights best.pt --dataset path --negatives-only
-    python eval/eval_model.py --weights best.pt --dataset path --output-dir results/ --plot
+    python eval/eval_model.py --weights best.pt --dataset path --patch-weights filter.pt --patch-thr 0.70
+    python eval/eval_model.py --weights best.pt --dataset path --temporal --patch-weights filter.pt
+    python eval/eval_model.py --weights best.pt --dataset path --drone-classes 0,1
 """
 
 from __future__ import annotations
@@ -42,7 +44,8 @@ from metrics import (
     size_distribution, classify_size, iou_iop, score_per_size,
     SIZE_BUCKETS,
 )
-from datasets import load_config, resolve_path, ImageDataset, detect_category
+from datasets import load_config, resolve_path, ImageDataset, detect_category, read_yolo_labels
+from run_manifest import write_manifest
 from reporting import (
     print_metrics_table, print_size_distribution,
     save_metrics_csv, save_json,
@@ -65,12 +68,27 @@ def evaluate_model(
     dataset_path: str,
     args,
     model_name: str = "",
+    drone_classes: set[int] | None = None,
+    patch_verifier=None,
+    patch_thr: float = 0.70,
+    enable_temporal: bool = False,
 ) -> dict:
-    """Evaluate a single YOLO model on an image dataset."""
+    """Evaluate a single YOLO model on an image dataset.
+
+    Extended to support:
+      - drone_classes: which class IDs in GT labels count as drone
+      - patch_verifier: PatchVerifier instance for confuser filtering
+      - enable_temporal: simulate N-of-M alert gate on sequential images
+    """
     from ultralytics import YOLO
     model = YOLO(weights_path)
     if not model_name:
         model_name = Path(weights_path).stem
+    if drone_classes is None:
+        drone_classes = getattr(args, '_drone_classes', {0})
+    # negatives-only: no drone GT, every detection = FP
+    if getattr(args, 'negatives_only', False):
+        drone_classes = set()
 
     # Determine images and labels dirs
     ds_path = Path(dataset_path)
@@ -87,19 +105,46 @@ def evaluate_model(
         images = images[::args.stride]
     if args.limit:
         images = images[:args.limit]
-    print(f"  [{model_name}] {len(images):,} images, conf={args.conf}")
+    print(f"  [{model_name}] {len(images):,} images, conf={args.conf}, drone_classes={drone_classes}")
 
     # Per-source tracking
     per_source = defaultdict(lambda: {"tp": 0, "fp": 0, "fn": 0, "tn": 0,
                                        "frames": 0, "det_frames": 0,
                                        "sizes": {"small": 0, "medium": 0, "large": 0}})
-    # Aggregate
+    # Aggregate — raw and filtered
     totals = {rule: {"tp": 0, "fp": 0, "fn": 0} for rule in ("iou", "iop")}
+    filt_totals = {rule: {"tp": 0, "fp": 0, "fn": 0} for rule in ("iou", "iop")}
     frame_totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
+    filt_frame_totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
     all_sizes = {"small": 0, "medium": 0, "large": 0}
     per_size_totals = {rule: {b: {"tp": 0, "fp": 0, "fn": 0} for b in SIZE_BUCKETS}
                        for rule in ("iou", "iop")}
     conf_records = []  # (conf, matched_iou, matched_iop) for PR/conf sweep
+
+    # Temporal states (raw + filtered)
+    temporal_raw = temporal_filt = None
+    if enable_temporal:
+        sys.path.insert(0, str(REPO.parent / "ir_gui")) if str(REPO / "ir_gui") not in sys.path else None
+        sys.path.insert(0, str(REPO / "ir_gui"))
+        from fusion.temporal import PerModalityTemporalState
+        temporal_raw = PerModalityTemporalState(
+            stride=1, warning_window=10, warning_require=9,
+            alert_window=10, alert_require=9,
+        )
+        temporal_filt = PerModalityTemporalState(
+            stride=1, warning_window=10, warning_require=9,
+            alert_window=10, alert_require=9,
+        )
+
+    # Counters for patch verifier
+    raw_det_count = 0
+    filt_det_count = 0
+    raw_det_frames = 0
+    filt_det_frames = 0
+    alert_raw_count = 0
+    alert_filt_count = 0
+    alert_suppressed_count = 0
+    frame_records = []  # per-frame cache
 
     t0 = time.time()
     for idx, img_path in enumerate(images):
@@ -107,9 +152,12 @@ def evaluate_model(
         if frame is None:
             continue
         img = frame["img"]
-        gt = frame["gt"]
         w, h = frame["w"], frame["h"]
         stem = frame["stem"]
+
+        # Read GT with drone_classes
+        lbl_path = ds.labels_dir / f"{stem}.txt"
+        gt = read_yolo_labels(lbl_path, w, h, drone_classes=drone_classes)
 
         # Source = first part of stem before underscore or full stem
         parts = stem.split("_")
@@ -130,7 +178,21 @@ def evaluate_model(
             dets.append(((float(xyxy[0]), float(xyxy[1]),
                           float(xyxy[2]), float(xyxy[3])), conf_val))
 
-        # Frame-level
+        raw_det_count += len(dets)
+        if dets:
+            raw_det_frames += 1
+
+        # Patch verifier filtering
+        dets_filt = dets
+        if patch_verifier is not None and dets:
+            xyxy_list = [d[0] for d in dets]
+            probs = patch_verifier.predict_boxes(img, xyxy_list)
+            dets_filt = [d for d, p in zip(dets, probs) if p < patch_thr]
+        filt_det_count += len(dets_filt)
+        if dets_filt:
+            filt_det_frames += 1
+
+        # Frame-level (raw)
         has_det = len(dets) > 0
         has_gt = len(gt) > 0
         ftp, ffp, ffn, ftn = compute_frame_metrics(has_det, has_gt)
@@ -138,6 +200,14 @@ def evaluate_model(
         frame_totals["fp"] += ffp
         frame_totals["fn"] += ffn
         frame_totals["tn"] += ftn
+
+        # Frame-level (filtered)
+        has_det_f = len(dets_filt) > 0
+        ftp_f, ffp_f, ffn_f, ftn_f = compute_frame_metrics(has_det_f, has_gt)
+        filt_frame_totals["tp"] += ftp_f
+        filt_frame_totals["fp"] += ffp_f
+        filt_frame_totals["fn"] += ffn_f
+        filt_frame_totals["tn"] += ftn_f
 
         # Per-source frame-level
         per_source[source]["frames"] += 1
@@ -150,7 +220,7 @@ def evaluate_model(
             all_sizes[sz] += 1
             per_source[source]["sizes"][sz] += 1
 
-        # Detection-level scoring
+        # Detection-level scoring (raw)
         for rule in ("iou", "iop"):
             tp, fp, fn = score_detections(dets, gt, rule=rule,
                                            iou_thr=args.iou_thr, iop_thr=args.iop_thr)
@@ -161,6 +231,15 @@ def evaluate_model(
                 per_source[source]["tp"] += tp
                 per_source[source]["fp"] += fp
                 per_source[source]["fn"] += fn
+
+        # Detection-level scoring (filtered)
+        if patch_verifier is not None:
+            for rule in ("iou", "iop"):
+                tp_f, fp_f, fn_f = score_detections(dets_filt, gt, rule=rule,
+                                                     iou_thr=args.iou_thr, iop_thr=args.iop_thr)
+                filt_totals[rule]["tp"] += tp_f
+                filt_totals[rule]["fp"] += fp_f
+                filt_totals[rule]["fn"] += fn_f
 
         # Per-size TP/FP/FN attribution
         ps = score_per_size(dets, gt, w, h,
@@ -180,6 +259,53 @@ def evaluate_model(
                 best_ip = max(best_ip, ip)
             conf_records.append((d_conf, best_iu >= args.iou_thr, best_ip >= args.iop_thr))
 
+        # Temporal alert gate
+        if temporal_raw is not None:
+            dets_list_raw = [[d[0][0], d[0][1], d[0][2], d[0][3], d[1]] for d in dets]
+            dets_list_filt = [[d[0][0], d[0][1], d[0][2], d[0][3], d[1]] for d in dets_filt]
+            _, a_raw = temporal_raw.update(dets_list_raw, w, h)
+            if a_raw and not getattr(temporal_raw, '_prev_alert', False):
+                alert_raw_count += 1
+            temporal_raw._prev_alert = a_raw
+
+            _, a_filt_pre = temporal_filt.update(dets_list_raw, w, h)
+            # Alert gate: when alert about to fire, check filter
+            if a_filt_pre and not getattr(temporal_filt, '_prev_alert', False):
+                # Check patch verifier on current dets
+                suppressed = False
+                if patch_verifier is not None and dets:
+                    xyxy_list = [d[0] for d in dets]
+                    probs = patch_verifier.predict_boxes(img, xyxy_list)
+                    if any(p >= patch_thr for p in probs):
+                        suppressed = True
+                        alert_suppressed_count += 1
+                        temporal_filt.alert_active = False
+                        a_filt_pre = False
+                if not suppressed:
+                    alert_filt_count += 1
+            temporal_filt._prev_alert = a_filt_pre
+
+        # Per-frame record for caching
+        tp_iop, fp_iop, fn_iop = score_detections(dets, gt, rule="iop",
+                                                    iou_thr=args.iou_thr, iop_thr=args.iop_thr)
+        tp_f_iop = fp_f_iop = fn_f_iop = 0
+        if patch_verifier is not None:
+            tp_f_iop, fp_f_iop, fn_f_iop = score_detections(dets_filt, gt, rule="iop",
+                                                             iou_thr=args.iou_thr, iop_thr=args.iop_thr)
+        det_boxes = [f"{d[0][0]:.1f},{d[0][1]:.1f},{d[0][2]:.1f},{d[0][3]:.1f},{d[1]:.3f}" for d in dets]
+        det_sizes = [classify_size(d[0], w, h) for d in dets]
+        frame_records.append({
+            "stem": stem, "n_gt": len(gt),
+            "n_raw": len(dets), "n_filt": len(dets_filt),
+            "tp": tp_iop, "fp": fp_iop, "fn": fn_iop,
+            "tp_f": tp_f_iop, "fp_f": fp_f_iop, "fn_f": fn_f_iop,
+            "n_small": det_sizes.count("small"),
+            "n_medium": det_sizes.count("medium"),
+            "n_large": det_sizes.count("large"),
+            "dets": "|".join(det_boxes),
+            "sizes": "|".join(det_sizes),
+        })
+
         if (idx + 1) % 200 == 0:
             elapsed = time.time() - t0
             fps = (idx + 1) / elapsed
@@ -191,13 +317,23 @@ def evaluate_model(
     # Build results
     result = {"model": model_name, "weights": weights_path}
 
-    # Detection-level metrics
+    # Detection-level metrics (raw)
     det_rows = []
     for rule in ("iou", "iop"):
         row = compute_prf(totals[rule]["tp"], totals[rule]["fp"], totals[rule]["fn"])
         row["config"] = f"{model_name}_{rule}"
         det_rows.append(row)
     result["detection_metrics"] = det_rows
+
+    # Detection-level metrics (filtered)
+    if patch_verifier is not None:
+        filt_rows = []
+        for rule in ("iou", "iop"):
+            row = compute_prf(filt_totals[rule]["tp"], filt_totals[rule]["fp"],
+                              filt_totals[rule]["fn"])
+            row["config"] = f"{model_name}_filtered_{rule}"
+            filt_rows.append(row)
+        result["filtered_metrics"] = filt_rows
 
     # Frame-level metrics
     ftot = frame_totals
@@ -210,10 +346,30 @@ def evaluate_model(
         "total_frames": sum(ftot.values()),
     }
 
+    # Filter summary
+    if patch_verifier is not None:
+        result["filter_summary"] = {
+            "raw_det_count": raw_det_count,
+            "filt_det_count": filt_det_count,
+            "raw_det_frames": raw_det_frames,
+            "filt_det_frames": filt_det_frames,
+            "det_suppression_rate": round(1 - filt_det_count / max(raw_det_count, 1), 4),
+            "frame_suppression_rate": round(1 - filt_det_frames / max(raw_det_frames, 1), 4),
+        }
+
+    # Temporal summary
+    if temporal_raw is not None:
+        result["temporal_summary"] = {
+            "alerts_raw": alert_raw_count,
+            "alerts_filtered": alert_filt_count,
+            "alerts_suppressed": alert_suppressed_count,
+        }
+
     result["size_distribution"] = all_sizes
     result["per_size_metrics"] = per_size_totals
     result["per_source"] = dict(per_source) if args.per_source else {}
     result["conf_records"] = conf_records
+    result["frame_records"] = frame_records
 
     return result
 
@@ -263,6 +419,8 @@ def run_conf_sweep(conf_records, total_gt_iou, total_gt_iop, thresholds, out_dir
 def main():
     ap = argparse.ArgumentParser(description="YOLO model benchmarking")
     ap.add_argument("--weights", nargs="+", required=True, help="Model weight files")
+    ap.add_argument("--model-name", type=str, default="",
+                    help="Override model name (default: weights filename stem)")
     ap.add_argument("--dataset", required=True, help="Dataset path or data.yaml")
     ap.add_argument("--mode", default="per-frame",
                     choices=["per-frame", "yolo-val"],
@@ -281,12 +439,41 @@ def main():
                     help="Comma-separated conf thresholds to sweep")
     ap.add_argument("--grayscale", action="store_true",
                     help="Convert images to grayscale before inference (for IR model on RGB data)")
+    ap.add_argument("--patch-weights", type=str, default="",
+                    help="Patch verifier weights for confuser filtering")
+    ap.add_argument("--patch-thr", type=float, default=0.70,
+                    help="Patch verifier confuser threshold")
+    ap.add_argument("--temporal", action="store_true",
+                    help="Enable temporal alert gate simulation")
+    ap.add_argument("--drone-classes", type=str, default="0",
+                    help="Comma-separated class IDs that count as drone in GT labels")
     ap.add_argument("--output-dir", type=str, default=str(EVAL_DIR / "results"))
     ap.add_argument("--plot", action="store_true")
     args = ap.parse_args()
+    # Parse drone classes
+    args._drone_classes = {int(c) for c in args.drone_classes.split(",")}
 
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Load patch verifier if requested
+    pv = None
+    if args.patch_weights:
+        sys.path.insert(0, str(REPO / "classifier"))
+        from patch_verifier import PatchVerifier
+        pv = PatchVerifier(args.patch_weights)
+        print(f"  Loaded patch verifier: {Path(args.patch_weights).name}")
+
+    # Provenance manifest — every weights file in the run gets hashed
+    wp = {f"weights_{i}": w for i, w in enumerate(args.weights)}
+    if args.patch_weights:
+        wp["patch_weights"] = args.patch_weights
+    write_manifest(
+        out_dir=out_dir,
+        args=args,
+        weights_paths=wp,
+        extra={"dataset": args.dataset, "stage": "eval_model", "mode": args.mode},
+    )
 
     if args.mode == "yolo-val":
         for w in args.weights:
@@ -295,31 +482,79 @@ def main():
 
     all_results = []
     for w in args.weights:
-        result = evaluate_model(w, args.dataset, args)
+        result = evaluate_model(w, args.dataset, args,
+                                model_name=args.model_name or "",
+                                patch_verifier=pv,
+                                patch_thr=args.patch_thr,
+                                enable_temporal=args.temporal)
         all_results.append(result)
 
-        # Print detection metrics
-        if result.get("detection_metrics"):
-            print_metrics_table(result["detection_metrics"],
-                                f"Detection metrics: {result['model']}")
+        # ── Compact summary ──────────────────────────────
+        model = result.get("model", "?")
+        print(f"\n  ┌─── {model} ───────────────────────────────────────")
 
-        # Print frame metrics
+        # Raw detection metrics (IoP)
+        dm = result.get("detection_metrics", [])
+        iop_raw = dm[1] if len(dm) > 1 else (dm[0] if dm else {})
+        if iop_raw:
+            print(f"  │ RAW    TP={iop_raw.get('TP',0):>5d}  FP={iop_raw.get('FP',0):>5d}  "
+                  f"FN={iop_raw.get('FN',0):>5d}  "
+                  f"P={iop_raw.get('precision',0):.4f}  R={iop_raw.get('recall',0):.4f}  "
+                  f"F1={iop_raw.get('f1',0):.4f}")
+
+        # Filtered detection metrics (IoP)
+        fm_list = result.get("filtered_metrics", [])
+        iop_filt = fm_list[1] if len(fm_list) > 1 else (fm_list[0] if fm_list else None)
+        if iop_filt:
+            print(f"  │ FILT   TP={iop_filt.get('TP',0):>5d}  FP={iop_filt.get('FP',0):>5d}  "
+                  f"FN={iop_filt.get('FN',0):>5d}  "
+                  f"P={iop_filt.get('precision',0):.4f}  R={iop_filt.get('recall',0):.4f}  "
+                  f"F1={iop_filt.get('f1',0):.4f}")
+
+        # Frame-level
         fm = result.get("frame_metrics", {})
         if fm:
-            print(f"\n  Frame-level: TP={fm['tp']} FP={fm['fp']} "
-                  f"FN={fm['fn']} TN={fm['tn']}  "
-                  f"FPR={fm['fp_rate']:.4f} FNR={fm['fn_rate']:.4f}")
+            print(f"  │ FRAME  TP={fm['tp']}  FP={fm['fp']}  FN={fm['fn']}  TN={fm['tn']}  "
+                  f"FPR={fm['fp_rate']:.4f}")
 
-        # Print size distribution
-        sd = result.get("size_distribution", {})
-        if sd:
-            print_size_distribution({result["model"]: sd},
-                                     f"Size distribution: {result['model']}")
+        # Filter impact
+        fs = result.get("filter_summary")
+        if fs:
+            print(f"  │ FILTER det_supp={fs['det_suppression_rate']:.1%}  "
+                  f"({fs['raw_det_count']}→{fs['filt_det_count']} dets)  "
+                  f"frame_supp={fs['frame_suppression_rate']:.1%}  "
+                  f"({fs['raw_det_frames']}→{fs['filt_det_frames']} frames)")
 
-        # Per-size TP/FP/FN/P/R/F1
-        psm = result.get("per_size_metrics")
-        if psm:
-            print_per_size_metrics(psm, result["model"])
+        # Temporal alerts
+        ts = result.get("temporal_summary")
+        if ts:
+            print(f"  │ ALERT  raw={ts['alerts_raw']}  filtered={ts['alerts_filtered']}  "
+                  f"suppressed={ts['alerts_suppressed']}")
+
+        # Size profile (IoP)
+        psm = result.get("per_size_metrics", {})
+        iop_psm = psm.get("iop", {})
+        if iop_psm:
+            tp_s = iop_psm.get("small",{}).get("tp",0)
+            tp_m = iop_psm.get("medium",{}).get("tp",0)
+            tp_l = iop_psm.get("large",{}).get("tp",0)
+            fp_s = iop_psm.get("small",{}).get("fp",0)
+            fp_m = iop_psm.get("medium",{}).get("fp",0)
+            fp_l = iop_psm.get("large",{}).get("fp",0)
+            print(f"  │ SIZE   TP  S={tp_s:<4d} M={tp_m:<4d} L={tp_l:<4d}  |  "
+                  f"FP  S={fp_s:<4d} M={fp_m:<4d} L={fp_l:<4d}")
+
+        print(f"  └{'─'*55}")
+
+        # Size + per-size (only with --per-source for verbose output)
+        if args.per_source:
+            sd = result.get("size_distribution", {})
+            if sd:
+                print_size_distribution({result["model"]: sd},
+                                         f"Size distribution: {result['model']}")
+            psm = result.get("per_size_metrics")
+            if psm:
+                print_per_size_metrics(psm, result["model"])
 
         # Per-source
         if args.per_source and result.get("per_source"):
@@ -343,11 +578,22 @@ def main():
                            thresholds, out_dir, result["model"])
 
         # Save results
-        save_json({k: v for k, v in result.items() if k != "conf_records"},
+        save_json({k: v for k, v in result.items()
+                   if k not in ("conf_records", "frame_records")},
                   out_dir / f"{result['model']}_results.json")
         if result.get("detection_metrics"):
             save_metrics_csv(result["detection_metrics"],
                              out_dir / f"{result['model']}_metrics.csv")
+
+        # Save per-frame detection cache
+        fr = result.get("frame_records", [])
+        if fr:
+            det_csv = out_dir / f"{result['model']}_frame_detections.csv"
+            with open(det_csv, "w", newline="", encoding="utf-8") as f:
+                w = csv.DictWriter(f, fieldnames=list(fr[0].keys()))
+                w.writeheader()
+                w.writerows(fr)
+            print(f"  Cached: {det_csv}")
 
     # Cross-model comparison
     if len(all_results) > 1:

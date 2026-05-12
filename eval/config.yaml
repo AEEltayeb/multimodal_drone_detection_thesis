@@ -3,7 +3,7 @@
 # ══════════════════════════════════════════════════════════════
 
 # ── Model weights (defaults; CLI overrides) ──
-rgb_weights: "../RGB model/Yolo26n_trained/weights/best.pt"
+rgb_weights: "../RGB model/Yolo26n_retrained_v2/weights/best.pt"
 ir_weights: "../runs/corrective_finetune/finetune_v3b/weights/best.pt"
 
 # ── Fusion classifier ──
@@ -36,6 +36,35 @@ datasets:
     rgb_stem_suffix: "_visible"
     ir_stem_suffix: "_infrared"
     categories: ["AIRPLANE", "BIRD", "DRONE", "HELICOPTER"]
+
+  # ── Single-modality / cross-domain datasets ──
+
+  rgb_dataset:
+    type: image
+    root: "G:/drone/dataset/dataset"
+    images: "images/test"
+    labels: "labels/test"
+    modality: rgb
+    categories: ["DRONE"]
+
+  ir_dset_final:
+    type: image
+    root: "G:/drone/IR_dset_final"
+    images: "test/images"
+    labels: "test/labels"
+    modality: ir
+    categories: ["DRONE"]
+
+  antiuav_rgb_gray:
+    # Same source as antiuav, but only RGB stream, fed in grayscale to the IR model.
+    # Used by the grayscale-cross-domain evaluation in eval_model.py --grayscale
+    # and by eval_video_temporal.py via --mode grayscale.
+    type: image
+    root: "G:/drone/Anti-UAV-RGBT_yolo_converted/test/RGB"
+    images: "images"
+    labels: "labels"
+    modality: rgb_grayscale
+    categories: ["DRONE"]
 
   youtube_ir:
     type: video
