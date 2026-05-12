@@ -56,6 +56,9 @@ node_modules/
 *.csv
 *.parquet
 *.json
+*.jsonl
+*.txt
+!requirements.txt
 !requirements.json
 !package.json
 !package-lock.json
