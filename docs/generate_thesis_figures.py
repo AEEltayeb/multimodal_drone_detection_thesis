@@ -290,6 +290,112 @@ def fig_resolution():
     plt.close(fig)
 
 
+# ── Fig 5.realvideo: Pareto frontier (drone F1 vs all-confuser FPPI) ──
+def fig_realvideo_pareto():
+    """Scatter of six detector modes on the joint (drone F1, all-confuser FPPI) axis.
+    Hard-coded from Ledger §9.4 because the source CSVs are unified per-run aggregates."""
+    detectors = [
+        # (label, F1, FPPI, color, marker)
+        ("baseline RGB",        0.760, 0.512, "#1f77b4", "o"),
+        ("retrained_v2",        0.605, 0.196, "#ff7f0e", "s"),
+        ("selcom_1280",         0.721, 0.709, "#2ca02c", "^"),
+        ("selcom_640",          0.730, 0.260, "#d62728", "D"),
+        ("IR on grayscale-RGB", 0.636, 0.158, "#9467bd", "P"),
+        ("IR on raw RGB",       0.295, 0.150, "#8c564b", "X"),
+    ]
+    fig, ax = plt.subplots(figsize=(7.5, 5.5))
+    for label, f1, fppi, color, marker in detectors:
+        ax.scatter(fppi, f1, s=140, c=color, marker=marker, edgecolor="black",
+                   linewidth=1.0, label=label, zorder=3)
+
+    # Pareto frontier: baseline, selcom_640, IR-grayscale
+    front = sorted(
+        [(fppi, f1, lbl) for lbl, f1, fppi, *_ in detectors
+         if lbl in ("baseline RGB", "selcom_640", "IR on grayscale-RGB")],
+        key=lambda r: r[0])
+    fx = [p[0] for p in front]; fy = [p[1] for p in front]
+    ax.plot(fx, fy, "--", color="gray", linewidth=1.4, alpha=0.7,
+            label="Pareto frontier", zorder=2)
+
+    ax.set_xlabel("All-confuser FPPI (lower is better)")
+    ax.set_ylabel("Aggregate drone $F1$ (higher is better)")
+    ax.set_title("Real-video detector Pareto frontier (9 drone + 10 confuser videos)")
+    ax.set_xlim(0, 0.78)
+    ax.set_ylim(0.25, 0.82)
+    ax.grid(True, alpha=0.3, linestyle=":")
+    ax.legend(loc="lower right", framealpha=0.95)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "fig5_realvideo_pareto.pdf")
+    fig.savefig(OUT_DIR / "fig5_realvideo_pareto.png")
+    print("  ✓ fig5_realvideo_pareto.pdf")
+    plt.close(fig)
+
+
+# ── Fig 5.cascade: Per-category cascade FPR (real video) ──────────────
+def fig_cascade_percategory():
+    """Grouped bars: per-category confuser FPR before vs after cascade, by RGB model.
+    Sourced from eval/results/pipeline_video_tests/{cat}/{video}/{model}.json (sa32)."""
+    import glob, collections
+    PIPE_DIR = WORKSPACE / "ES_Drone_Detection" / "eval" / "results" / "pipeline_video_tests"
+    if not PIPE_DIR.exists():
+        print(f"  WARNING: {PIPE_DIR} not found; skipping per-category figure")
+        return
+
+    # Aggregate: per (rgb_model, category) sum of seg_final FP / segments
+    seg = collections.defaultdict(lambda: collections.defaultdict(lambda: {"FP": 0, "Total": 0}))
+    raw = collections.defaultdict(lambda: collections.defaultdict(lambda: {"frames": 0, "FP": 0}))
+    for f in glob.glob(str(PIPE_DIR / "**" / "*.json"), recursive=True):
+        if "pipeline_comparison" in f: continue
+        with open(f) as fh:
+            d = json.load(fh)
+        if not d["is_negative"]:
+            continue
+        cat = d["category"]; m = d["rgb_model"]
+        seg[m][cat]["FP"] += d["seg_final"]["FP"]
+        seg[m][cat]["Total"] += d["seg_final"]["segments"]
+        raw[m][cat]["frames"] += d["total_frames"]
+        raw[m][cat]["FP"] += d["rgb_yolo"]["FP"]
+
+    models = ["baseline_trained", "retrained_v2", "selcom_1280", "selcom_640"]
+    cats = ["birds", "airplanes", "helicopters"]
+    cat_labels = ["Birds", "Airplanes", "Helicopters"]
+    model_labels = ["baseline", "retrained_v2", "selcom_1280", "selcom_640"]
+
+    x = np.arange(len(cats))
+    w = 0.20
+
+    fig, ax = plt.subplots(figsize=(9, 4.8))
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
+    for i, (m, lbl, col) in enumerate(zip(models, model_labels, colors)):
+        fprs = []
+        for cat in cats:
+            v = seg[m][cat]
+            fprs.append(v["FP"] / v["Total"] * 100 if v["Total"] else 0)
+        offset = (i - 1.5) * w
+        bars = ax.bar(x + offset, fprs, w, label=lbl, color=col, edgecolor="white")
+        for bar, v in zip(bars, fprs):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.3,
+                    f"{v:.1f}%", ha="center", fontsize=8, color=col)
+
+    ax.set_xticks(x); ax.set_xticklabels(cat_labels)
+    ax.set_ylabel("Segment-level FPR (%)")
+    ax.set_title("Per-category cascade confuser FPR on real-video diagnostic (sa32)")
+    ax.set_ylim(0, max(0.255, ax.get_ylim()[1]) * 100 * 1.1 if ax.get_ylim()[1] < 1 else ax.get_ylim()[1])
+    ax.legend(loc="upper left", ncol=2, framealpha=0.95)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.grid(True, alpha=0.3, axis="y", linestyle=":")
+
+    fig.tight_layout()
+    fig.savefig(OUT_DIR / "fig5_cascade_percategory.pdf")
+    fig.savefig(OUT_DIR / "fig5_cascade_percategory.png")
+    print("  ✓ fig5_cascade_percategory.pdf")
+    plt.close(fig)
+
+
 # ── Main ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     print(f"Output: {OUT_DIR}")
@@ -302,5 +408,7 @@ if __name__ == "__main__":
     fig_ood_classifier()
     fig_ir_evolution()
     fig_resolution()
+    fig_realvideo_pareto()
+    fig_cascade_percategory()
 
     print(f"\nAll figures saved to {OUT_DIR}")

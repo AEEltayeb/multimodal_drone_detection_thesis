@@ -41,7 +41,7 @@ BOOL_KEYS = {"show_troi", "show_gate", "show_source_tags",
               "save_output_enabled", "confuser_filter_history",
               "suppress_helicopter", "suppress_airplane", "suppress_bird"}
 CHOICE_KEYS = {
-    "imgsz": ["320", "480", "640", "960", "1280"],
+    "imgsz": ["320", "480", "640", "960", "1280", "1920"],
     "feature_max_height": ["240", "320", "480", "720", "1080"],
     "confuser_suppress_mode": ["primary_only", "primary_and_avg", "any_above"],
     "cascade_order": ["filter_then_classifier", "classifier_then_filter"],

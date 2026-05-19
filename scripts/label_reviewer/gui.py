@@ -28,7 +28,7 @@ MODES = {
     },
     "Review + Model": {
         "description": "Review GT labels (blue) with model predictions (purple) — promote, delete, or keep",
-        "fields": ["images_dir", "labels_dir", "model_path", "confidence", "detection_filter", "output_dir", "grouping", "pattern"],
+        "fields": ["images_dir", "labels_dir", "model_path", "confidence", "imgsz", "detection_filter", "output_dir", "grouping", "pattern"],
         "required": ["images_dir", "labels_dir", "model_path"],
     },
     "Compare Labels": {
@@ -38,15 +38,17 @@ MODES = {
     },
     "Auto-Label": {
         "description": "Run model on unlabeled images, then review and edit the predictions",
-        "fields": ["images_dir", "model_path", "confidence", "grouping", "pattern"],
+        "fields": ["images_dir", "model_path", "confidence", "imgsz", "grouping", "pattern"],
         "required": ["images_dir", "model_path"],
     },
     "Predict Only": {
         "description": "Run model inference and save labels + review images (no review window)",
-        "fields": ["images_dir", "model_path", "confidence"],
+        "fields": ["images_dir", "model_path", "confidence", "imgsz"],
         "required": ["images_dir", "model_path"],
     },
 }
+
+IMGSZ_OPTIONS = ["320", "416", "512", "640", "768", "896", "1024", "1280", "1536", "1920"]
 
 GROUPING_OPTIONS = ["Auto-detect", "By filename pattern", "By parent folder", "None"]
 GROUPING_MAP = {
@@ -97,6 +99,7 @@ class LabelReviewerGUI:
         self.grouping_var = tk.StringVar(value=self.last_session.get("grouping", "Auto-detect"))
         self.pattern_var = tk.StringVar(value=self.last_session.get("pattern", ""))
         self.confidence_var = tk.StringVar(value=self.last_session.get("confidence", "0.25"))
+        self.imgsz_var = tk.StringVar(value=self.last_session.get("imgsz", "640"))
         self.detection_filter_var = tk.StringVar(value=self.last_session.get("detection_filter", "All"))
 
         self._build_ui()
@@ -123,6 +126,7 @@ class LabelReviewerGUI:
             "grouping": self.grouping_var.get(),
             "pattern": self.pattern_var.get(),
             "confidence": self.confidence_var.get(),
+            "imgsz": self.imgsz_var.get(),
             "detection_filter": self.detection_filter_var.get(),
         }
         with open(LAST_SESSION_FILE, "w") as f:
@@ -204,6 +208,16 @@ class LabelReviewerGUI:
         self.field_rows["confidence"] = (conf_label, conf_entry, None)
         conf_label.grid(row=row, column=0, **pad, sticky="w")
         conf_entry.grid(row=row, column=1, **pad, sticky="w")
+        row += 1
+
+        # Image size (YOLO imgsz)
+        imgsz_label = tk.Label(self.root, text="Image size:", font=("Segoe UI", 10),
+                               bg=self.bg, fg=self.fg, anchor="w")
+        imgsz_combo = ttk.Combobox(self.root, textvariable=self.imgsz_var,
+                                   values=IMGSZ_OPTIONS, width=8)
+        self.field_rows["imgsz"] = (imgsz_label, imgsz_combo, None)
+        imgsz_label.grid(row=row, column=0, **pad, sticky="w")
+        imgsz_combo.grid(row=row, column=1, **pad, sticky="w")
         row += 1
 
         # Detection filter dropdown (Review + Model only)
@@ -366,6 +380,18 @@ class LabelReviewerGUI:
                 messagebox.showerror("Invalid Confidence", "Confidence must be between 0 and 1.")
                 return False
 
+        # Validate imgsz
+        if "imgsz" in cfg["fields"]:
+            try:
+                imgsz = int(self.imgsz_var.get())
+                if imgsz < 64 or imgsz > 4096 or imgsz % 32 != 0:
+                    raise ValueError
+            except ValueError:
+                messagebox.showerror("Invalid Image Size",
+                                     "Image size must be an integer multiple of 32 "
+                                     "between 64 and 4096 (e.g. 640, 1280).")
+                return False
+
         return True
 
     # Helpers
@@ -418,17 +444,19 @@ class LabelReviewerGUI:
             "group_by_video": False,
         }
 
-    def _get_prediction_cache_key(self, model_path: str, images_dir: str, conf: float) -> str:
-        """Generate a cache key from model path, images dir, and confidence."""
-        key_str = f"{Path(model_path).resolve()}|{Path(images_dir).resolve()}|{conf}"
+    def _get_prediction_cache_key(self, model_path: str, images_dir: str,
+                                   conf: float, imgsz: int) -> str:
+        """Generate a cache key from model path, images dir, confidence, and imgsz."""
+        key_str = f"{Path(model_path).resolve()}|{Path(images_dir).resolve()}|{conf}|{imgsz}"
         return hashlib.md5(key_str.encode()).hexdigest()[:12]
 
     def _run_or_cache_prediction(self, model_path: str, images_dir: str,
-                                  conf: float, save_review: bool = False) -> Path:
+                                  conf: float, imgsz: int = 640,
+                                  save_review: bool = False) -> Path:
         """Run prediction or reuse cached results. Supports resuming interrupted runs."""
         from .predictor import run_prediction
 
-        cache_key = self._get_prediction_cache_key(model_path, images_dir, conf)
+        cache_key = self._get_prediction_cache_key(model_path, images_dir, conf, imgsz)
         cache_dir = Path("label_reviewer") / ".cache" / cache_key
         manifest = cache_dir / "labeling_manifest.json"
         label_dir = cache_dir / "labels"
@@ -470,6 +498,7 @@ class LabelReviewerGUI:
             source_dir=Path(images_dir),
             output_dir=cache_dir,
             conf_threshold=conf,
+            image_size=imgsz,
             save_review=save_review,
         )
         return cache_dir
@@ -528,10 +557,12 @@ class LabelReviewerGUI:
         output_dir = Path(self.output_dir_var.get().strip()) if self.output_dir_var.get().strip() else self._make_output_dir()
         model_path = self.model_path_var.get().strip()
         conf = float(self.confidence_var.get())
+        imgsz = int(self.imgsz_var.get())
 
         # Run or reuse cached predictions
         pred_dir = self._run_or_cache_prediction(model_path,
-                                                  self.images_dir_var.get(), conf)
+                                                  self.images_dir_var.get(),
+                                                  conf, imgsz)
 
         self.root.withdraw()
         reviewer = LabelReviewer(
@@ -570,12 +601,14 @@ class LabelReviewerGUI:
         from .core import LabelReviewer
 
         conf = float(self.confidence_var.get())
+        imgsz = int(self.imgsz_var.get())
         model_path = self.model_path_var.get().strip()
 
         # Run or reuse cached predictions
         pred_dir = self._run_or_cache_prediction(model_path,
                                                   self.images_dir_var.get(),
-                                                  conf, save_review=True)
+                                                  conf, imgsz,
+                                                  save_review=True)
 
         self.root.withdraw()
         reviewer = LabelReviewer(
@@ -591,11 +624,13 @@ class LabelReviewerGUI:
     def _launch_predict_only(self):
         """Run model, save labels + review images, no review window."""
         conf = float(self.confidence_var.get())
+        imgsz = int(self.imgsz_var.get())
         model_path = self.model_path_var.get().strip()
 
         pred_dir = self._run_or_cache_prediction(model_path,
                                                   self.images_dir_var.get(),
-                                                  conf, save_review=True)
+                                                  conf, imgsz,
+                                                  save_review=True)
 
         label_count = len(list((pred_dir / "labels").glob("*.txt")))
         messagebox.showinfo("Predict Complete",
