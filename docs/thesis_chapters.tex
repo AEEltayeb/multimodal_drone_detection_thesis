@@ -215,7 +215,7 @@ Counter-UAS sensing systems are dual-use technology. The same passive visual-det
 \section{Thesis Outline}
 \label{sec:outline}
 
-The remainder of this thesis is organised as follows. Chapter~\ref{ch:literature} reviews the relevant literature on real-time object detection, drone-detection datasets and the confuser problem, thermal-infrared imaging, multi-modal fusion, hard-negative mining, detection scoring, and cross-modal transfer. Chapter~\ref{ch:architecture} presents the system architecture: the five-stage cascade, the asymmetric-recoverability design principle, the trust-aware fusion model, the alert-gate cascade, and the temporal smoother. Chapter~\ref{ch:components} covers the individual components: the three RGB detector variants, the SelCom CCTV fine-tune, the IR detector with its six-revision HITL co-evolution trace, the trust classifier and its three variants, the patch verifier, and the label-reviewer GUI. Chapter~\ref{ch:methodology} describes the methodology: datasets and their composition, the IoP scoring rule, the scoring-rule audit, the Svanstr\"om usage / leakage audit, and the reproducibility infrastructure. Chapter~\ref{ch:experiments} reports the experimental results: cumulative confuser suppression, classifier comparison, patch threshold sweep, patch catch-rate audit, the Roboflow OOD audit, the real-video six-mode diagnostic, the grayscale cross-modal transfer finding, the full cascade on real video, SelCom CCTV evaluation, and threats to validity. Chapter~\ref{ch:conclusion} answers the four research questions, summarises the production stack, and lists future-work directions. Appendix~\ref{app:datasets} provides the consolidated per-clip / per-split dataset metadata; Appendix~\ref{app:glossary} a glossary of abbreviations and shorthand tokens used throughout.
+The remainder of this thesis is organised as follows. Chapter~\ref{ch:literature} reviews the relevant literature on real-time object detection, drone-detection datasets and the confuser problem, thermal-infrared imaging, multi-modal fusion, hard-negative mining, detection scoring, and cross-modal transfer. Chapter~\ref{ch:architecture} presents the system architecture and individual component designs: the four-stage cascade, the asymmetric-recoverability design principle, the trust-aware fusion model, the alert-gate cascade, and the temporal smoother, followed by each component's architecture and the inline ablation that justifies the production choice (RGB three-stance comparison, classifier variant comparison, patch threshold sweep, and patch catch-rate audit). Chapter~\ref{ch:hitl} is a standalone contribution chapter documenting the dataset curation process: the label-reviewer GUI, the HITL co-evolution loop, and the IR detector's six-revision evolution trace including the V5 regression analysis. Chapter~\ref{ch:methodology} describes the empirical infrastructure: datasets and their composition (training corpora and held-out evaluation surfaces separately), the IoP scoring rule, the scoring-rule audit, the Svanstr\"om usage/leakage audit, training recipes, and reproducibility infrastructure. Chapter~\ref{ch:experiments} reports the evaluation results: cumulative confuser suppression, the Roboflow OOD audit, the real-video six-mode diagnostic, the grayscale cross-modal transfer finding, the full cascade on real video, SelCom CCTV evaluation, comparisons with prior published work, and threats to validity. Chapter~\ref{ch:conclusion} answers the four research questions, summarises the production stack, and lists future-work directions. Appendix~\ref{app:datasets} provides the consolidated per-clip / per-split dataset metadata; Appendix~\ref{app:glossary} a glossary of abbreviations and shorthand tokens used throughout.
 
 % ======================================================================
 % CHAPTER 2 — RELATED WORK
@@ -336,12 +336,12 @@ Two qualitative claims survive the caveats. The RGB-only and IR-only numbers of 
 % ======================================================================
 % CHAPTER 3 — SYSTEM ARCHITECTURE
 % ======================================================================
-\chapter{System Architecture}
+\chapter{System Architecture and Component Design}
 \label{ch:architecture}
 
 \section{Overview}
 
-The pipeline processes paired RGB and thermal-IR streams through a four-stage cascade. Each stage's empirical contribution is measured independently in Chapter~\ref{ch:experiments}; this chapter presents the architecture and the design choices behind it.
+The pipeline processes paired RGB and thermal-IR streams through a four-stage cascade. This chapter presents the pipeline architecture, the design rationale behind each stage, and the individual component designs. For each component, the production choice is justified by an inline ablation. Headline evaluation results across held-out test and OOD surfaces are in Chapter~\ref{ch:experiments}; the HITL co-development process for the IR detector is in Chapter~\ref{ch:hitl}.
 
 \begin{enumerate}
     \item \textbf{RGB detector}: a YOLOv26-class single-stage detector trained on a composite RGB drone corpus that includes bird frames as confuser negatives. Strong on drones; residually hallucinates on small bird-on-sky frames.
@@ -432,12 +432,6 @@ Resolution is the single largest hyperparameter affecting small-drone recall and
     \label{fig:resolution}
 \end{figure}
 
-% ======================================================================
-% CHAPTER 4 — COMPONENT DESIGN AND HITL
-% ======================================================================
-\chapter{Component Design and HITL}
-\label{ch:components}
-
 \section{RGB Drone Detector}
 \label{sec:rgb_detector}
 
@@ -501,57 +495,7 @@ The imgsz sweep on selcom (4~models $\times$ 4~sizes $\times$ 3~datasets, \textt
 \section{IR Drone Detector}
 \label{sec:ir_detector}
 
-The IR detector uses the same YOLOv26n architecture as the RGB detector, finetuned on iteratively curated thermal data (\S\ref{sec:hitl_ir}). Its training corpus includes bird, airplane, and helicopter thermal frames as hard negatives, fed into the dataset across HITL revisions whenever the previous IR detector hallucinated on a confuser scene (\S\ref{sec:hitl_ir}). The production weights (\texttt{runs/corrective\_finetune/finetune\_v3b/weights/best.pt}, hereafter \texttt{v3b}) are a 2-epoch corrective fine-tune on top of the \texttt{Final} checkpoint and address specific deployment-time failure modes.
-
-\subsection{IR Detector Evolution: Precision and Recall on a Fixed Test Split}
-\label{sec:ir_evolution}
-
-The IR detector was developed across six numbered revisions (V2 through V6) plus a \texttt{Final} retrain and a \texttt{v3b} corrective fine-tune. Earlier discussions of this work reported a per-version best-epoch mAP50 number from each model's training run, which is not directly comparable across versions because the val split changed with the dataset. To produce comparable numbers, every version was re-evaluated on the same fixed \texttt{IR\_dset\_final} test split at \texttt{imgsz=640} (\textsc{Ledger}~\S4.1; script: \texttt{eval/eval\_ir\_versions.py}; output: \texttt{eval/results/ir\_version\_comparison/ir\_comparison\_test\_640\_2026-05-16T20-04-39.\{json,csv\}}).
-
-\begin{table}[htbp]
-    \centering
-    \caption{IR detector versions evaluated on the fixed \texttt{IR\_dset\_final} test split @ \texttt{imgsz=640}. Comparable across versions; supersedes the per-version best-epoch mAP narrative. Source: \textsc{Ledger}~\S4.1.}
-    \label{tab:ir_evolution}
-    \begin{tabular}{lcccccc}
-        \toprule
-        Version & mAP50 & mAP50-95 & $P$ & $R$ & F1 & Status \\
-        \midrule
-        V2     & 0.661 & --- & 0.458 & 0.406 & 0.430 & superseded \\
-        V3     & 0.571 & 0.242 & 0.648 & 0.579 & 0.611 & superseded \\
-        V4     & 0.722 & 0.393 & 0.895 & 0.669 & 0.765 & superseded \\
-        V5     & 0.694 & 0.446 & 0.768 & 0.709 & 0.737 & superseded (regression) \\
-        V6     & 0.956 & 0.571 & 0.921 & 0.941 & 0.931 & superseded \\
-        Final  & \textbf{0.977} & \textbf{0.602} & 0.955 & \textbf{0.980} & 0.967 & base for prod \\
-        \textbf{v3b (production)} & 0.972 & 0.591 & \textbf{0.957} & 0.977 & \textbf{0.967} & current \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{fig4_ir_evolution}
-    \caption{IR detector P/R trajectory across six revisions on the fixed \texttt{IR\_dset\_final} test split. The V5 regression (precision $0.895 \to 0.768$) is recovered by V6 and the production \texttt{v3b}. Source: \textsc{Ledger}~\S4.1.}
-    \label{fig:ir_evolution}
-\end{figure}
-
-The IR-detector trajectory the table records can be read in four passes.
-
-\emph{V2 vs V3: mAP and F1 disagree.} V2 was a 300-epoch fine-tune on a broader, merged training corpus. It sits below V3 in F1 (0.430 vs 0.611) despite a higher mAP50 (0.661 vs 0.571). The split reflects the corpora rather than the models: V2's broader corpus has noisier labels, so the F1-optimal operating point is poorly calibrated; V3's narrower curated subset lifts F1 even as mAP integrates worse across thresholds. This is the case that justifies reporting P and R rather than mAP alone.
-
-\emph{V3 $\to$ V4 is a precision jump, not a recall jump.} Precision rises from 0.648 to 0.895; recall barely moves (0.579 $\to$ 0.669). The signature is consistent with an FP-mining cycle: the reviewer fed V3's false positives into V4's hard-negative set.
-
-\emph{V5 regression.} Precision drops from 0.895 to 0.768. New positive data was ingested faster than the reviewer could clean it; the new positives carried unlabelled drones that V5 fires on and is scored against as FP. This is the failure mode of an undisciplined HITL loop and is the case for which V6 and \texttt{Final} are the recovery.
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}
-        \textbf{[PLACEHOLDER: Fig 4.2 --- V5 regression qualitative]} 3--4 frame panel showing scenes where V4 was correct and V5 fires on newly-ingested but unlabelled drones (scored as FP). Same scenes after corpus cleanup (V6) where the label is corrected and the model fires correctly. Concretises the dataset-state $\leftrightarrow$ model-state coupling described in §\ref{sec:hitl_ir}.
-    \vspace{2cm}}}
-    \caption{V5 regression case study: same scenes scored as FP under V5 (label missing) and as TP under V6 (label corrected). The model state is unchanged across the V5--V6 transition in these specific frames; the dataset state is what moved.}
-    \label{fig:v5_regression}
-\end{figure}
-
-\emph{\texttt{Final} vs v3b are indistinguishable on this split.} Both reach F1$=$0.967. \texttt{v3b} is retained as production because the 2-epoch corrective fine-tune addresses specific deployment failures (GUI regressions, particular hot-pixel scenes) not represented in this test split.
+The IR detector uses the same YOLOv26n architecture as the RGB detector, finetuned on iteratively curated thermal data (\S\ref{sec:hitl_ir}). Its training corpus includes bird, airplane, and helicopter thermal frames as hard negatives, fed into the dataset across HITL revisions whenever the previous IR detector hallucinated on a confuser scene (\S\ref{sec:hitl_ir}). The production weights (\texttt{runs/corrective\_finetune/finetune\_v3b/weights/best.pt}, hereafter \texttt{v3b}) are a 2-epoch corrective fine-tune on top of the \texttt{Final} checkpoint and address specific deployment-time failure modes. The full evolution trace across six numbered revisions --- including the V5 regression and its recovery --- is documented as a case study in Chapter~\ref{ch:hitl} (\S\ref{sec:ir_evolution}).
 
 \subsection{IR Detector on Svanstr\"om and Anti-UAV}
 
@@ -583,7 +527,7 @@ The label space is the 4-way trust decision of \S\ref{sec:trust_fusion}. The mod
 
 The Svanstr\"om frames used to train the classifier overlap with the frames used to evaluate the full cascade in Chapter~\ref{ch:experiments}; this is flagged as a threat to validity (\S\ref{sec:threats}) and partially mitigated by the Anti-UAV results, which are not contaminated.
 
-The classifier's value depends jointly on the evaluation surface and the classifier variant; the three-surface behaviour --- a small in-distribution $F1$ cost on Svanstr\"om, substantial OOD-suppression on the synthetic zoo, and a net $F1$ gain on the real-video diagnostic when paired with temporal smoothing --- is quantified in Chapter~\ref{ch:experiments} (\S\S\ref{sec:cumulative}, \ref{sec:classifier_compare}, \ref{sec:realvideo_classifier}). The next subsection describes the three classifier variants that were retained.
+The classifier's value depends jointly on the evaluation surface and the classifier variant; the three-surface behaviour --- a small in-distribution $F1$ cost on Svanstr\"om, substantial OOD-suppression on the synthetic zoo, and a net $F1$ gain on the real-video diagnostic when paired with temporal smoothing --- is quantified in \S\ref{sec:classifier_compare} (this chapter) and Chapter~\ref{ch:experiments} (\S\S\ref{sec:cumulative}, \ref{sec:realvideo_classifier}). The next subsection describes the three classifier variants and their comparative performance.
 
 \subsection{Classifier Variants}
 \label{sec:classifier_variants}
@@ -597,6 +541,44 @@ Two classifier variants are load-bearing in this thesis. Both are trained agains
 \end{itemize}
 
 The early \texttt{retrained\_v2\_32feat} classifier (trained against the \texttt{retrained\_v2} RGB detector) is also superseded because the production RGB detector is no longer \texttt{retrained\_v2}. The mismatch between the classifier's training-time RGB confidence distribution and the production RGB confidence distribution accounts for the bulk of the gap in classifier-comparison results (\textsc{Ledger}~\S5). A single trust classifier is not portable across arbitrary RGB detector swaps without re-checking calibration.
+
+\subsection{Classifier Performance Comparison}
+\label{sec:classifier_compare}
+
+Three classifier variants were compared in the same harness on Svanstr\"om (stride 9; IoP@0.5; baseline RGB; v2 patch verifier; \texttt{imgsz=1280}; \textsc{Ledger}~\S7) and on the OOD confuser zoo:
+
+\begin{table}[htbp]
+    \centering
+    \caption{Classifier comparison. The split verdict between Svanstr\"om and the OOD zoo motivates the open-world vs calibrated-deployment distinction. Source: \textsc{Ledger}~\S7.}
+    \label{tab:classifiers}
+    \begin{tabular}{lccccccc}
+        \toprule
+        Classifier & thr & Drone S2 $R$ & Drone S2 F1 & Drone S3 $R$ & Drone S3 F1 & Zoo S2 & Zoo S3 \\
+        \midrule
+        \texttt{fusion\_no\_fn\_v1.1}        & 0.8/0.9 & 0.909 & 0.912 & 0.856/0.869 & 0.889/0.895 & \textbf{0.016} & \textbf{0.008} \\
+        \textbf{\texttt{scene\_aware\_v3more\_32feat}} & 0.8 & 0.922 & 0.919 & 0.868 & 0.896 & 0.205 & 0.103 \\
+        \texttt{control\_v3more\_40feat} & 0.9 & \textbf{0.934} & \textbf{0.925} & \textbf{0.893} & \textbf{0.909} & 0.212 & 0.094 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fig7_1_ood_classifier}
+    \caption{Classifier comparison on the OOD confuser zoo. \texttt{fusion\_no\_fn\_v1.1} fires on $\sim$13$\times$ fewer frames than the production sa32 and the previous-candidate control40; sa32 and control40 are tied within rounding on this benchmark. Source: \textsc{Ledger}~\S7 + \texttt{eval/results/\_cumulative\_halluc/confuser\_c40/summary.json}.}
+    \label{fig:ood_classifier}
+\end{figure}
+
+Three readings, ordered by the surface that drives the production decision.
+
+\emph{Svanstr\"om.} \texttt{control\_v3more\_40feat} wins on every Svanstr\"om drone metric ($+2.5$~pp Stage-3 recall vs \texttt{scene\_aware}; $+1.3$~pp Stage-3 F1). \texttt{fusion\_no\_fn\_v1.1} is roughly tied. Within 1.3 pp drone F1 the three are operationally indistinguishable on this benchmark.
+
+\emph{OOD confuser zoo.} \texttt{fusion\_no\_fn\_v1.1} is \emph{13$\times$ more conservative} than \texttt{scene\_aware} (1.6\% vs 20.5\% S2 fire). \texttt{control\_v3more\_40feat} ties \texttt{scene\_aware} (0.212 vs 0.205 S2; 0.094 vs 0.103 S3). The fnfn-vs-sa32 gap is therefore real and load-bearing; the control40-vs-sa32 gap on the zoo is not.
+
+\emph{Real video} (\S\ref{sec:realvideo_cascade}; \textsc{Ledger}~\S9.5.8). \texttt{scene\_aware} dominates: cascade drone segment $F1$ = 0.826 baseline RGB, vs 0.644 for \texttt{control\_v3more\_40feat} ($-18$~pp) and 0.219 for \texttt{fusion\_no\_fn\_v1.1} ($-61$~pp). The Svanstr\"om-only ordering reverses on real-video; the Svanstr\"om benchmark does not by itself select the production classifier.
+
+\paragraph{Deployment implication.}
+\texttt{scene\_aware\_v3more\_32feat} is the production pick: it ties or wins on every surface except a single 1.3-pp gap on Svanstr\"om S3 F1 (where \texttt{control\_v3more\_40feat} edges it by a margin smaller than typical run variance), and it strictly dominates on the real-video diagnostic. \texttt{control\_v3more\_40feat} buys nothing on the zoo over sa32 and loses on real-video; it is retained in this table for completeness and reproducibility but is deprecated for new deployments. \texttt{fusion\_no\_fn\_v1.1} remains the open-world fallback for surfaces where confuser noise dominates and missed drones are operationally tolerable.
 
 \section{Patch Verifier}
 \label{sec:patch_verifier_arch}
@@ -618,7 +600,89 @@ Four numbered versions of the patch verifier exist. The catch-rate / drone-veto 
     \item \textbf{v4}, corrective retrain of v3, F1$\approx$0.9331, essentially tied with v2. v2 is retained as the documented production version because it is the audited one.
 \end{itemize}
 
-It is worth being explicit about what the patch verifier costs as well as what it catches. On Svanstr\"om paired drones at \texttt{patch\_thr}$=$0.5, the verifier vetoes 5.4\% of drone TPs and drops S2 $\to$ S3 recall from 0.912 to 0.817 ($-9.5$~pp); at \texttt{patch\_thr}$=$0.9 the recall cost is roughly $-4$~pp (back to $R=0.869$). The verifier is therefore a recall/safety knob with a tunable operating point, not an unconditional precision booster. The reason the knob is useful is that the v2 verifier's output is bimodal: confuser crops score very confidently (probability $\gtrsim 0.9$), drone-TP crops score near zero, and only a narrow middle band of marginal drone crops sits in $[0.5, 0.9]$. Raising the threshold spares the marginal drones at minimal confuser-recovery cost, which is what \S\ref{sec:patch_threshold} quantifies.
+It is worth being explicit about what the patch verifier costs as well as what it catches. On Svanstr\"om paired drones at \texttt{patch\_thr}$=$0.5, the verifier vetoes 5.4\% of drone TPs and drops S2 $\to$ S3 recall from 0.912 to 0.817 ($-9.5$~pp); at \texttt{patch\_thr}$=$0.9 the recall cost is roughly $-4$~pp (back to $R=0.869$). The verifier is therefore a recall/safety knob with a tunable operating point, not an unconditional precision booster. The reason the knob is useful is that the v2 verifier's output is bimodal: confuser crops score very confidently (probability $\gtrsim 0.9$), drone-TP crops score near zero, and only a narrow middle band of marginal drone crops sits in $[0.5, 0.9]$. Raising the threshold spares the marginal drones at minimal confuser-recovery cost, as the threshold sweep below quantifies (\S\ref{sec:patch_threshold}).
+
+\subsection{Threshold Sweep and Production Operating Point}
+\label{sec:patch_threshold}
+
+The patch verifier's threshold \texttt{patch\_thr} controls the trade-off between confuser FP cuts and drone TP vetoes. The v2 verifier's bimodal output distribution (\S\ref{sec:patch_verifier_arch}) means most confuser crops are scored very confidently ($p \gtrsim 0.9$), so raising the threshold rejects marginal drone crops faster than it loses confuser cuts.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Patch threshold sweep on Svanstr\"om paired, stride 9 (3190~frames). S1 / S2 deterministic across the sweep; S3 numbers shown. Source: \textsc{Ledger}~\S7.}
+    \label{tab:patch_sweep}
+    \begin{tabular}{lcccc}
+        \toprule
+        \texttt{patch\_thr} & Drone $R$ & Drone F1 & Total confuser FP & Notes \\
+        \midrule
+        (S2, no patch) & 0.909 & 0.912 & 120 & ceiling on FP, max recall \\
+        0.5 & 0.817 & 0.868 & $\sim$29 & full run, stride 1 \\
+        0.6 & 0.818 & 0.869 & 33 & \\
+        0.7 & 0.836 & 0.879 & 37 & \\
+        0.8 & 0.856 & 0.889 & 42 & \\
+        \textbf{0.9} & \textbf{0.869} & \textbf{0.895} & \textbf{45} & production choice \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fig6_3_threshold_sweep}
+    \caption{Patch verifier threshold sweep on Svanstr\"om paired drones. The curve is monotone in the useful range. Production setting \texttt{patch\_thr=0.9} sits at the elbow where drone recall recovery saturates. Source: \textsc{Ledger}~\S7.}
+    \label{fig:patch_sweep}
+\end{figure}
+
+The curve is monotone in the relevant range: every threshold bump from 0.5 to 0.9 recovers more drone recall than it costs in confuser FPs. At \texttt{patch\_thr=0.9}, the cascade still catches $\sim$63\% of S2's residual confuser FPs (45 vs 120) while costing only 4.0~pp drone F1 vs S2 (0.912 $\to$ 0.895). The production choice is therefore \texttt{patch\_thr=0.9}; above 0.9 is unmeasured but unlikely to be useful since the residual 14+31+0 confuser crops at 0.9 are already in the noise floor of the 1891-frame confuser slice.
+
+\subsection{Catch-Rate Audit}
+\label{sec:patch_audit}
+
+A dedicated audit (\texttt{eval/audit\_patch\_catch.py}; \textsc{Ledger}~\S6.1) measures per-bucket veto rates for the baseline + v2 verifier on Svanstr\"om at \texttt{imgsz=1280}, stride 9, conf 0.25 (3190 frames, 3130 detections). The audit is the diagnostic counterpart to the cumulative-suppression numbers: it reveals what the verifier is good at, what it is bad at, and where the remaining failure modes live.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Patch v2 catch and veto rates by bucket at \texttt{patch\_thr=0.5}. Drone TP veto is unwanted (lower is better); confuser catches are wanted (higher is better). Source: \textsc{Ledger}~\S6.1.}
+    \label{tab:patch_audit}
+    \begin{tabular}{lrcr}
+        \toprule
+        Bucket & N & Catch / veto rate & Median patch prob \\
+        \midrule
+        BIRD       & 807 & 0.638 catch & 0.904 \\
+        AIRPLANE   & 532 & 0.517 catch & 0.540 \\
+        HELICOPTER & 464 & 0.709 catch & 0.987 \\
+        DRONE\_TP (unwanted veto) & 1248 & 0.054 veto & 0.000 \\
+        DRONE\_FP (bonus catches) &   79 & 0.266 catch & 0.000 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The audit identifies two patterns. The verifier is \emph{partially working}: helicopter catches are good (71\%), bird catches are mid (64\%), airplane catches are weak (52\%). All three are below the 90\% ``ceiling'' that would render the patch verifier the dominant suppression stage. The classifier remains the workhorse; the patch verifier is a useful but not decisive secondary stage. Independently, the drone-TP veto rate is only 5.4\%---the verifier is \emph{not} over-aggressive on drones at \texttt{patch\_thr=0.5}. Combined with the threshold sweep (\S\ref{sec:patch_threshold}), this is what makes \texttt{patch\_thr=0.9} a sound operating point: it lifts drone recall recovery to 0.869 without inflating the drone-TP veto into a recall problem.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}
+        \textbf{[PLACEHOLDER: Fig 6.5 --- Patch verifier failure modes]} 6-up grid: three airplane crops the verifier classifies as \texttt{other} with softmax $\approx 0.5$ (uncertain), two bird crops correctly classified at $p_\text{bird} > 0.9$, and one drone-TP crop the verifier vetoes at $p_\text{airplane}=0.61$. Caption identifies the actionable retraining direction for v5.
+    \vspace{2cm}}}
+    \caption{Representative patch-verifier outputs on Svanstr\"om-scale confuser crops. The airplane failure mode is genuine uncertainty in the softmax middle band, not a clean \texttt{other}-class abstention.}
+    \label{fig:patch_failure_modes}
+\end{figure}
+
+The airplane gap is the most actionable finding: 52\% catch with median patch probability 0.540 means the verifier is genuinely uncertain on a meaningful share of Svanstr\"om airplane crops, not just slightly under-confident. The v2 ``other'' class is a real OOD outlet (the verifier knows the crop is not one of its three confusers); the airplane misses are therefore not abstentions but \emph{active wrong classifications}, which makes them recoverable by retraining the verifier with the specific FP crops as confuser-class data. This is recorded as a planned next step in \texttt{path\_forward.md} \S3b.
+
+% ======================================================================
+% CHAPTER 4 — DATASET CURATION AND HUMAN-IN-THE-LOOP
+% ======================================================================
+\chapter{Dataset Curation and Human-in-the-Loop}
+\label{ch:hitl}
+
+The IR detector described in the previous chapter was not trained once on a fixed corpus. It was co-developed with its training dataset across six numbered revisions, each driven by the model's own failure modes on deployment-time data. This chapter documents that process: the label-reviewer tool that made the loop operationally tractable (\S\ref{sec:label_reviewer}), the disciplined loop itself (\S\ref{sec:hitl_ir}), and the empirical trace the loop produced on a fixed held-out test split (\S\ref{sec:ir_evolution}).
+
+\section{The Co-Evolution Problem}
+\label{sec:coevolution}
+
+A detector trained on a static dataset has a fixed relationship with its training distribution. Real-world deployment surfaces distribution shifts that cannot be anticipated at training time: novel confuser scenes, unseen lighting conditions, annotation errors in the original corpus. The standard response is a second training run on a larger dataset. The co-evolution approach used here is different: the model's own failure modes are the primary driver of corpus expansion. The model's disagreement with existing ground truth acts as a triage signal that concentrates annotation effort on frames where it has the highest marginal value.
+
+The practical consequence is that dataset state and model state are coupled. A model trained on corpus version $k$ generates the errors that define corpus version $k+1$; corpus $k+1$ then trains model version $k+2$. The coupling is productive when the loop is disciplined (reviewed errors enter training as clean labels or hard negatives) and regressive when it is not (unlabelled positives in an insufficiently reviewed batch enter training as confuser-class negatives, as the V5 regression in \S\ref{sec:ir_evolution} illustrates).
 
 \section{Label Reviewer GUI}
 \label{sec:label_reviewer}
@@ -650,7 +714,7 @@ Batch operations apply a single label correction across a contiguous video segme
 \section{HITL Co-Evolution Loop}
 \label{sec:hitl_ir}
 
-The IR detector was not trained once on a static dataset. It was co-developed with the dataset across the six revisions of Table~\ref{tab:ir_evolution}. Each revision follows the same loop:
+The IR detector was not trained once on a static dataset. It was co-developed with the dataset across the six revisions described in \S\ref{sec:ir_evolution}. Each revision follows the same loop:
 
 \begin{enumerate}
     \item \textbf{Train.} Train the next model version on the current dataset state.
@@ -661,7 +725,57 @@ The IR detector was not trained once on a static dataset. It was co-developed wi
     \item \textbf{Augment.} Apply the corrected labels, append the new positives and negatives, and emit the next dataset version.
 \end{enumerate}
 
-The key observation is that a well-performing model's disagreement with GT is informative regardless of which side is right. A model FP is either a real error (needs a hard negative) or an annotation error (correct the GT); a model FN is either a real miss (hard positive) or a spurious GT box (remove the GT). In either case the disagreement is actionable rather than ambiguous. The empirical record of the loop is the precision/recall trace in Table~\ref{tab:ir_evolution}.
+The key observation is that a well-performing model's disagreement with GT is informative regardless of which side is right. A model FP is either a real error (needs a hard negative) or an annotation error (correct the GT); a model FN is either a real miss (hard positive) or a spurious GT box (remove the GT). In either case the disagreement is actionable rather than ambiguous. The empirical record of the loop is the precision/recall trace in \S\ref{sec:ir_evolution}.
+
+\section{Case Study: IR Detector Evolution V2 $\to$ Final $\to$ v3b}
+\label{sec:ir_evolution}
+
+The IR detector was developed across six numbered revisions (V2 through V6) plus a \texttt{Final} retrain and a \texttt{v3b} corrective fine-tune. Earlier discussions of this work reported a per-version best-epoch mAP50 number from each model's training run, which is not directly comparable across versions because the val split changed with the dataset. To produce comparable numbers, every version was re-evaluated on the same fixed \texttt{IR\_dset\_final} test split at \texttt{imgsz=640} (\textsc{Ledger}~\S4.1; script: \texttt{eval/eval\_ir\_versions.py}).
+
+\begin{table}[htbp]
+    \centering
+    \caption{IR detector versions evaluated on the fixed \texttt{IR\_dset\_final} test split @ \texttt{imgsz=640}. Comparable across versions; supersedes the per-version best-epoch mAP narrative. Source: \textsc{Ledger}~\S4.1.}
+    \label{tab:ir_evolution}
+    \begin{tabular}{lcccccc}
+        \toprule
+        Version & mAP50 & mAP50-95 & $P$ & $R$ & F1 & Status \\
+        \midrule
+        V2     & 0.661 & --- & 0.458 & 0.406 & 0.430 & superseded \\
+        V3     & 0.571 & 0.242 & 0.648 & 0.579 & 0.611 & superseded \\
+        V4     & 0.722 & 0.393 & 0.895 & 0.669 & 0.765 & superseded \\
+        V5     & 0.694 & 0.446 & 0.768 & 0.709 & 0.737 & superseded (regression) \\
+        V6     & 0.956 & 0.571 & 0.921 & 0.941 & 0.931 & superseded \\
+        Final  & \textbf{0.977} & \textbf{0.602} & 0.955 & \textbf{0.980} & 0.967 & base for prod \\
+        \textbf{v3b (production)} & 0.972 & 0.591 & \textbf{0.957} & 0.977 & \textbf{0.967} & current \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.85\textwidth]{fig4_ir_evolution}
+    \caption{IR detector P/R trajectory across six revisions on the fixed \texttt{IR\_dset\_final} test split. The V5 regression (precision $0.895 \to 0.768$) is recovered by V6 and the production \texttt{v3b}. Source: \textsc{Ledger}~\S4.1.}
+    \label{fig:ir_evolution}
+\end{figure}
+
+The trajectory can be read in four passes.
+
+\emph{V2 vs V3: mAP and F1 disagree.} V2 was a 300-epoch fine-tune on a broader, merged training corpus. It sits below V3 in F1 (0.430 vs 0.611) despite a higher mAP50 (0.661 vs 0.571). The split reflects the corpora rather than the models: V2's broader corpus has noisier labels, so the F1-optimal operating point is poorly calibrated; V3's narrower curated subset lifts F1 even as mAP integrates worse across thresholds. This is the case that justifies reporting P and R rather than mAP alone.
+
+\emph{V3 $\to$ V4 is a precision jump, not a recall jump.} Precision rises from 0.648 to 0.895; recall barely moves (0.579 $\to$ 0.669). The signature is consistent with an FP-mining cycle: the reviewer fed V3's false positives into V4's hard-negative set.
+
+\emph{V5 regression.} Precision drops from 0.895 to 0.768. New positive data was ingested faster than the reviewer could clean it; the new positives carried unlabelled drones that V5 fires on and is scored against as FP. This is the failure mode of an undisciplined HITL loop and is the case for which V6 and \texttt{Final} are the recovery.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}
+        \textbf{[PLACEHOLDER: Fig 4.2 --- V5 regression qualitative]} 3--4 frame panel showing scenes where V4 was correct and V5 fires on newly-ingested but unlabelled drones (scored as FP). Same scenes after corpus cleanup (V6) where the label is corrected and the model fires correctly.
+    \vspace{2cm}}}
+    \caption{V5 regression case study: same scenes scored as FP under V5 (label missing) and as TP under V6 (label corrected). The model state is unchanged across the V5--V6 transition in these frames; the dataset state is what moved.}
+    \label{fig:v5_regression}
+\end{figure}
+
+\emph{\texttt{Final} vs v3b are indistinguishable on this split.} Both reach F1$=$0.967. \texttt{v3b} is retained as production because the 2-epoch corrective fine-tune addresses specific deployment failures (GUI regressions, particular hot-pixel scenes) not represented in this test split.
 
 % ======================================================================
 % CHAPTER 5 — METHODOLOGY
@@ -879,7 +993,7 @@ Svanstr\"om appears in both training and evaluation for some components, creatin
     \end{tabular}
 \end{table}
 
-The trust classifier's group-shuffled split prevents within-classifier temporal leakage, but does not prevent the cascade-level evaluation in Chapter~\ref{ch:experiments} from running on classifier-training sequences. Svanstr\"om classifier numbers are therefore in-distribution and should be read as upper bounds. Anti-UAV cascade numbers are fully clean (no Svanstr\"om data anywhere in the RGB training set or in the classifier's Anti-UAV partition), and the production decisions in Chapter~\ref{ch:components} are anchored against the Anti-UAV results, not only the Svanstr\"om ones.
+The trust classifier's group-shuffled split prevents within-classifier temporal leakage, but does not prevent the cascade-level evaluation in Chapter~\ref{ch:experiments} from running on classifier-training sequences. Svanstr\"om classifier numbers are therefore in-distribution and should be read as upper bounds. Anti-UAV cascade numbers are fully clean (no Svanstr\"om data anywhere in the RGB training set or in the classifier's Anti-UAV partition), and the production decisions in Chapter~\ref{ch:architecture} are anchored against the Anti-UAV results, not only the Svanstr\"om ones.
 
 \section{Training Recipes}
 \label{sec:training_recipes}
@@ -925,7 +1039,7 @@ The ablation matrix driver (\texttt{eval/ablate.py}, factor file \texttt{eval/ab
 \chapter{Experimental Results}
 \label{ch:experiments}
 
-This chapter presents the empirical results. \S\ref{sec:cumulative} reports cumulative confuser suppression across cascade stages. \S\ref{sec:classifier_compare} compares the three trust-classifier variants. \S\ref{sec:patch_threshold} and \S\ref{sec:patch_audit} cover the patch verifier's operating point and per-bucket catch rate. \S\ref{sec:roboflow} reports the Roboflow OOD audit. \S\ref{sec:realvideo} reports the six-mode real-video diagnostic and Pareto analysis; \S\ref{sec:grayscale} examines the unexpected cross-modal transfer. \S\ref{sec:realvideo_cascade} runs the full cascade on real video. \S\ref{sec:selcom} reports the SelCom CCTV evaluation. \S\ref{sec:threats} and \S\ref{sec:limits} list threats to validity and limitations.
+This chapter presents the empirical evaluation results. \S\ref{sec:cumulative} reports cumulative confuser suppression across cascade stages. \S\ref{sec:roboflow} reports the Roboflow OOD audit. \S\ref{sec:realvideo} reports the six-mode real-video diagnostic and Pareto analysis; \S\ref{sec:grayscale} examines the unexpected cross-modal transfer result. \S\ref{sec:realvideo_cascade} runs the full cascade on real video, including the classifier comparison on operational footage. \S\ref{sec:selcom} reports the SelCom CCTV evaluation. \S\ref{sec:threats} and \S\ref{sec:limits} list threats to validity and limitations. Design ablations (classifier variants, patch threshold sweep, catch-rate audit) are in Chapter~\ref{ch:architecture} \S\S\ref{sec:classifier_compare}--\ref{sec:patch_audit}.
 
 \section{Headline: Cumulative Confuser Suppression}
 \label{sec:cumulative}
@@ -981,111 +1095,6 @@ Tables~\ref{tab:cum_confuser} and~\ref{tab:cumulative_svanstrom} are two differe
 With the production sa32 classifier the picture shifts. On the OOD zoo, sa32 cuts fire from 52.1\% only to 20.5\% (\S\ref{sec:classifier_compare}, Table~\ref{tab:classifiers}), an order of magnitude weaker than fnfn but still a 2.5$\times$ reduction. On Svanstr\"om paired drones, sa32 reaches Stage-3 $F1=0.896$, roughly tied with fnfn. The fnfn numbers above are therefore the strongest OOD-suppression case (the open-world fallback's purpose) rather than the production stack's headline.
 
 The cascade is not an unconditional improvement over S1 on in-distribution drones with the fnfn classifier. It is an exchange: in-distribution F1 for OOD safety. The \emph{operating point} of that exchange (specifically the patch-verifier threshold) is the subject of \S\ref{sec:patch_threshold}, which shows that raising \texttt{patch\_thr} from 0.5 to 0.9 recovers most of the S3 recall loss (back to $R=0.869$, $F1=0.895$) at a small confuser-FP cost. The production cascade on Svanstr\"om-style inputs ships at \texttt{patch\_thr}$=$0.9; the OOD zoo numbers above use \texttt{patch\_thr}$=$0.5 because that is the operating point that produced the run. The real-video diagnostic (\S\ref{sec:realvideo_cascade}) shows that on operationally collected footage with the production sa32 classifier the temporal smoother inverts this exchange entirely: the cascade gains drone $F1$ over the Stage-1 RGB number while still cutting confuser FPR threefold. The exchange between in-distribution F1 and OOD safety is therefore a property of the classifier and evaluation surface, not of the cascade architecture itself.
-
-\section{Classifier Comparison}
-\label{sec:classifier_compare}
-
-Three classifier variants were compared in the same harness on Svanstr\"om (stride 9; IoP@0.5; baseline RGB; v2 patch verifier; \texttt{imgsz=1280}; \textsc{Ledger}~\S7) and on the OOD confuser zoo:
-
-\begin{table}[htbp]
-    \centering
-    \caption{Classifier comparison. The split verdict between Svanstr\"om and the OOD zoo motivates the open-world vs calibrated-deployment distinction. Source: \textsc{Ledger}~\S7.}
-    \label{tab:classifiers}
-    \begin{tabular}{lccccccc}
-        \toprule
-        Classifier & thr & Drone S2 $R$ & Drone S2 F1 & Drone S3 $R$ & Drone S3 F1 & Zoo S2 & Zoo S3 \\
-        \midrule
-        \texttt{fusion\_no\_fn\_v1.1}        & 0.8/0.9 & 0.909 & 0.912 & 0.856/0.869 & 0.889/0.895 & \textbf{0.016} & \textbf{0.008} \\
-        \textbf{\texttt{scene\_aware\_v3more\_32feat}} & 0.8 & 0.922 & 0.919 & 0.868 & 0.896 & 0.205 & 0.103 \\
-        \texttt{control\_v3more\_40feat} & 0.9 & \textbf{0.934} & \textbf{0.925} & \textbf{0.893} & \textbf{0.909} & 0.212 & 0.094 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{fig7_1_ood_classifier}
-    \caption{Classifier comparison on the OOD confuser zoo. \texttt{fusion\_no\_fn\_v1.1} fires on $\sim$13$\times$ fewer frames than the production sa32 and the previous-candidate control40; sa32 and control40 are tied within rounding on this benchmark. Source: \textsc{Ledger}~\S7 + \texttt{eval/results/\_cumulative\_halluc/confuser\_c40/summary.json}.}
-    \label{fig:ood_classifier}
-\end{figure}
-
-Three readings, ordered by the surface that drives the production decision.
-
-\emph{Svanstr\"om.} \texttt{control\_v3more\_40feat} wins on every Svanstr\"om drone metric ($+2.5$~pp Stage-3 recall vs \texttt{scene\_aware}; $+1.3$~pp Stage-3 F1). \texttt{fusion\_no\_fn\_v1.1} is roughly tied. Within 1.3 pp drone F1 the three are operationally indistinguishable on this benchmark.
-
-\emph{OOD confuser zoo.} \texttt{fusion\_no\_fn\_v1.1} is \emph{13$\times$ more conservative} than \texttt{scene\_aware} (1.6\% vs 20.5\% S2 fire). \texttt{control\_v3more\_40feat} ties \texttt{scene\_aware} (0.212 vs 0.205 S2; 0.094 vs 0.103 S3). The fnfn-vs-sa32 gap is therefore real and load-bearing; the control40-vs-sa32 gap on the zoo is not.
-
-\emph{Real video} (\S\ref{sec:realvideo_cascade}; \textsc{Ledger}~\S9.5.8). \texttt{scene\_aware} dominates: cascade drone segment $F1$ = 0.826 baseline RGB, vs 0.644 for \texttt{control\_v3more\_40feat} ($-18$~pp) and 0.219 for \texttt{fusion\_no\_fn\_v1.1} ($-61$~pp). The Svanstr\"om-only ordering reverses on real-video; the Svanstr\"om benchmark does not by itself select the production classifier.
-
-\paragraph{Deployment implication.}
-\texttt{scene\_aware\_v3more\_32feat} is the production pick: it ties or wins on every surface except a single 1.3-pp gap on Svanstr\"om S3 F1 (where \texttt{control\_v3more\_40feat} edges it by a margin smaller than typical run variance), and it strictly dominates on the real-video diagnostic. \texttt{control\_v3more\_40feat} buys nothing on the zoo over sa32 and loses on real-video; it is retained in this table for completeness and reproducibility but is deprecated for new deployments. \texttt{fusion\_no\_fn\_v1.1} remains the open-world fallback for surfaces where confuser noise dominates and missed drones are operationally tolerable.
-
-\section{Patch Threshold Sweep}
-\label{sec:patch_threshold}
-
-The patch verifier's threshold \texttt{patch\_thr} controls the trade-off between confuser FP cuts and drone TP vetoes. The v2 verifier's bimodal output distribution (\S\ref{sec:patch_verifier_arch}) means most confuser crops are scored very confidently ($p \gtrsim 0.9$), so raising the threshold rejects marginal drone crops faster than it loses confuser cuts.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Patch threshold sweep on Svanstr\"om paired, stride 9 (3190~frames). S1 / S2 deterministic across the sweep; S3 numbers shown. Source: \textsc{Ledger}~\S7.}
-    \label{tab:patch_sweep}
-    \begin{tabular}{lcccc}
-        \toprule
-        \texttt{patch\_thr} & Drone $R$ & Drone F1 & Total confuser FP & Notes \\
-        \midrule
-        (S2, no patch) & 0.909 & 0.912 & 120 & ceiling on FP, max recall \\
-        0.5 & 0.817 & 0.868 & $\sim$29 & full run, stride 1 \\
-        0.6 & 0.818 & 0.869 & 33 & \\
-        0.7 & 0.836 & 0.879 & 37 & \\
-        0.8 & 0.856 & 0.889 & 42 & \\
-        \textbf{0.9} & \textbf{0.869} & \textbf{0.895} & \textbf{45} & production choice \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.85\textwidth]{fig6_3_threshold_sweep}
-    \caption{Patch verifier threshold sweep on Svanstr\"om paired drones. The curve is monotone in the useful range. Production setting \texttt{patch\_thr=0.9} sits at the elbow where drone recall recovery saturates. Source: \textsc{Ledger}~\S7.}
-    \label{fig:patch_sweep}
-\end{figure}
-
-The curve is monotone in the relevant range: every threshold bump from 0.5 to 0.9 recovers more drone recall than it costs in confuser FPs. At \texttt{patch\_thr=0.9}, the cascade still catches $\sim$63\% of S2's residual confuser FPs (45 vs 120) while costing only 4.0~pp drone F1 vs S2 (0.912 $\to$ 0.895). The production choice is therefore \texttt{patch\_thr=0.9}; above 0.9 is unmeasured but unlikely to be useful since the residual 14+31+0 confuser crops at 0.9 are already in the noise floor of the 1891-frame confuser slice.
-
-\section{Patch Catch-Rate Audit}
-\label{sec:patch_audit}
-
-A dedicated audit (\texttt{eval/audit\_patch\_catch.py}; \textsc{Ledger}~\S6.1) measures per-bucket veto rates for the baseline + v2 verifier on Svanstr\"om at \texttt{imgsz=1280}, stride 9, conf 0.25 (3190 frames, 3130 detections). The audit is the diagnostic counterpart to the cumulative-suppression numbers: it reveals what the verifier is good at, what it is bad at, and where the remaining failure modes live.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Patch v2 catch and veto rates by bucket at \texttt{patch\_thr=0.5}. Drone TP veto is unwanted (lower is better); confuser catches are wanted (higher is better). Source: \textsc{Ledger}~\S6.1.}
-    \label{tab:patch_audit}
-    \begin{tabular}{lrcr}
-        \toprule
-        Bucket & N & Catch / veto rate & Median patch prob \\
-        \midrule
-        BIRD       & 807 & 0.638 catch & 0.904 \\
-        AIRPLANE   & 532 & 0.517 catch & 0.540 \\
-        HELICOPTER & 464 & 0.709 catch & 0.987 \\
-        DRONE\_TP (unwanted veto) & 1248 & 0.054 veto & 0.000 \\
-        DRONE\_FP (bonus catches) &   79 & 0.266 catch & 0.000 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-The audit identifies two patterns. The verifier is \emph{partially working}: helicopter catches are good (71\%), bird catches are mid (64\%), airplane catches are weak (52\%). All three are below the 90\% ``ceiling'' that would render the patch verifier the dominant suppression stage. The classifier remains the workhorse; the patch verifier is a useful but not decisive secondary stage. Independently, the drone-TP veto rate is only 5.4\%---the verifier is \emph{not} over-aggressive on drones at \texttt{patch\_thr=0.5}. Combined with the threshold sweep (\S\ref{sec:patch_threshold}), this is what makes \texttt{patch\_thr=0.9} a sound operating point: it lifts drone recall recovery to 0.869 without inflating the drone-TP veto into a recall problem.
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}
-        \textbf{[PLACEHOLDER: Fig 6.5 --- Patch verifier failure modes]} 6-up grid: three airplane crops the verifier classifies as \texttt{other} with softmax $\approx 0.5$ (uncertain), two bird crops correctly classified at $p_\text{bird} > 0.9$, and one drone-TP crop the verifier vetoes at $p_\text{airplane}=0.61$. Caption identifies the actionable retraining direction for v5.
-    \vspace{2cm}}}
-    \caption{Representative patch-verifier outputs on Svanstr\"om-scale confuser crops. The airplane failure mode is genuine uncertainty in the softmax middle band, not a clean \texttt{other}-class abstention.}
-    \label{fig:patch_failure_modes}
-\end{figure}
-
-The airplane gap is the most actionable finding: 52\% catch with median patch probability 0.540 means the verifier is genuinely uncertain on a meaningful share of Svanstr\"om airplane crops, not just slightly under-confident. The v2 ``other'' class is a real OOD outlet (the verifier knows the crop is not one of its three confusers); the airplane misses are therefore not abstentions but \emph{active wrong classifications}, which makes them recoverable by retraining the verifier with the specific FP crops as confuser-class data. This is recorded as a planned next step in \texttt{path\_forward.md} \S3b.
 
 \section{OOD: Roboflow Audit}
 \label{sec:roboflow}

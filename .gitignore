@@ -108,6 +108,8 @@ node_modules/
 # --- Markdown docs (thesis-only, not needed to run) ---
 *.md
 !README.md
+!docs/**/*.md
+!docs/*.md
 
 # --- Training runs / outputs ---
 runs/

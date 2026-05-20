@@ -798,8 +798,79 @@ Remaining:
 
 ---
 
+## 12. Cross-model per-(model × surface × size) breakdown (2026-05-19/20)
+
+**Source dossier:** [`docs/analysis/2026-05-19_full_metrics_breakdown.md`](analysis/2026-05-19_full_metrics_breakdown.md) and [`docs/analysis/2026-05-19_metrics_inventory.csv`](analysis/2026-05-19_metrics_inventory.csv) (1869 long-format rows / 32 surfaces).
+
+Phase 2 gap-fill 2026-05-19 added:
+
+| Sub-surface | Models | imgsz | Source CSV | Status |
+|---|---|---|---|---|
+| Svanstrom per-size DRONE+confusers | baseline, hardneg_v3more, retrained_v2, selcom_640/960/1280 | 1280 (640 for selcom_640) | `eval/results/svanstrom_persize/summary.csv` | current |
+| Selcom held-out val (311 imgs) | baseline, hardneg_v3more, retrained_v2, selcom_640/960/1280 | per-model (1280/960/640) | `eval/results/selcom_val_holdout/<m>/<m>_results.json` | current |
+| Anti-UAV per-model RGB | baseline, retrained_v2, selcom_640/960/1280 | per-model | `eval/results/antiuav_per_model/<m>/<m>_results.json` | current |
+| Roboflow OOD with new RGB models | + hardneg_v3more, selcom_640/960/1280 | per-model | `eval/results/roboflow_ood/summary.csv` | current |
+| Real-video per-size | baseline_trained, retrained_v2, selcom_640/1280, ir_grayscale, ir_on_rgb | per-model | `eval/results/video_persize/summary.csv` | current |
+
+Headline numbers (IoP@0.5):
+
+| Surface | Top model | F1 | Notes |
+|---|---|---:|---|
+| Svanstrom small drones | hardneg_v3more / baseline | 0.56 / 0.54 | R 0.84 / 0.82, P 0.42 / 0.41 |
+| Svanstrom medium drones | baseline | 0.98 | R=0.97 |
+| Svanstrom large drones | selcom_1280 / selcom_960 | 0.99 | tied |
+| Selcom holdout (all sizes) | **selcom_960** | 0.585 | R 0.44, P 0.88 |
+| Roboflow rgb_drone (+patch) | **selcom_960** | 0.83 | R 0.81, P 0.87 |
+| Anti-UAV (saturated) | baseline / retrained_v2 / selcom_640 | 0.99 | F1=0.992–0.993 |
+| Real-video drone-clean | baseline | 0.89–0.95 | top on 2/3 clean clips |
+| Real-video mixed (clip-by-clip) | varies | 0.31–0.84 | selcom_1280 wins seagull_attack F1=0.82; baseline wins flock_of_seagulls F1=0.84; ir_grayscale wins sky_and_trees F1=0.65 |
+| Roboflow OOD confuser FPs (cleanest) | hardneg_v3more | airplane 309, helicopter 127 | lowest FPs but R 0.59 on drone |
+
+**Discriminating finding:** `selcom_960` is the highest-F1 selcom variant on Roboflow OOD drone, on its own held-out val, and on Svanstrom small-drone precision. Currently NOT in the production stack ([[project_production_stack]]). Reproduction: `python eval/run_selcom_val.py --models selcom_960` and `python eval/eval_svanstrom_persize.py`.
+
+**Bucket-zero caveat ([[feedback_per_size_recall_zero]]):** "R=0 on small bucket" claims must check `n_gt > 0`. 4 of 6 mixed real-video clips have ZERO small-bucket GT drones — `drone_seagull_attack`, `drone_over_mountain_attacked_by_birds`, `drone_takeoff_short_trees_background_*`, `drone_over_mountain_attacked_by_birds`. R=0 there is vacuous, not failure.
+
+### 12.1 Topic-by-topic ranking
+
+Best→worst per topic. Full numbers + per-model "good at / bad at" in [`docs/analysis/2026-05-19_full_metrics_breakdown.md`](analysis/2026-05-19_full_metrics_breakdown.md).
+
+| Topic | Rank order |
+|---|---|
+| **Svanstrom small drone R** | hardneg_v3more (0.84) > baseline (0.82) > selcom_1280 (0.75) > selcom_960 (0.63) > retrained_v2 / selcom_640 (0.34) |
+| **Svanstrom medium drone R** | baseline (0.97) > hardneg_v3more (0.96) > selcom_1280 (0.92) > selcom_960 (0.85) > selcom_640 (0.59) > retrained_v2 (0.31) |
+| **Selcom holdout F1** | selcom_960 (0.585) > selcom_1280 (0.580) > selcom_640 (0.21) > baseline (0.15) > hardneg_v3more (0.03) > retrained_v2 (0.01) |
+| **Roboflow OOD drone F1 (+patch)** | selcom_960 (0.84) > selcom_640 (0.81) > selcom_1280 (0.80) > baseline (0.79) > retrained_v2 (0.79) > hardneg_v3more (0.71) |
+| **Anti-UAV F1 (saturated)** | retrained_v2 (0.993) > baseline (0.992) > selcom_640 (0.988) > selcom_960 (0.972) > selcom_1280 (0.902, 849 FPs) |
+| **Roboflow confuser FP rejection (low=good)** | hardneg_v3more (785) > baseline (1867) > retrained_v2 (2158) > selcom_640 (2468) > selcom_960 (3909) > selcom_1280 (4311) |
+
+### 12.2 Cross-surface composite (drone-first)
+
+Average rank across 5 drone-recall / OOD topics (excluding confuser-FP-only to avoid favouring models with trash recall):
+
+| Rank | Model | Composite | Headline |
+|---|---|---:|---|
+| 1 | **selcom_960** | 2.5 | #1 selcom holdout, #1 Roboflow OOD drone, best small-drone P among recall-comparable |
+| 2 | baseline | 2.75 | #1 Svanstrom medium, #1 saturated Anti-UAV, #1 clean real-video clips |
+| 3 | selcom_1280 | 2.75 | highest raw recall everywhere but bleeds FPs (Anti-UAV P=0.84, Roboflow confuser FPs 4311) |
+| 4 | hardneg_v3more | n/a (Anti-UAV gap) | #1 small-drone R + cleanest confuser rejecter, but worst OOD drone recall |
+| 5 | selcom_640 | 3.75 | precision floor on small drones, but R below resolution floor |
+| 6 | retrained_v2 | 5.5 | not a usable solo detector; R≤0.10 on most surfaces |
+
+**Bottom line:** `selcom_960` is the cross-surface drone-first winner. Production stack pick ([[project_production_stack]]) should be revisited.
+
+Reproduction:
+- `python eval/run_selcom_val.py` — selcom held-out val
+- `python eval/eval_svanstrom_persize.py --imgsz 1280` — Svanstrom per-size
+- `python eval/eval_video_persize.py` — real-video per-size
+- `python eval/run_antiuav_per_model.py` — Anti-UAV per-model
+- `python eval/run_roboflow_eval.py --full --skip-extract --datasets rgb_airplane rgb_bird rgb_helicopter rgb_drone` — Roboflow OOD
+- `python analytics/spec_analysis/07_metrics_inventory.py` — re-aggregate
+
+---
+
 ## Changelog
 
+- **2026-05-19** — Phase 2 gap-fill landed: §12 added with 5 new sub-surfaces, all 6 RGB models on all surfaces. **`selcom_960` emerges as cross-surface F1 winner** on Roboflow OOD drone (0.83), selcom holdout (0.585), and best small-drone precision on Svanstrom (P=0.71 at R=0.63). Auto-stride helper added (cap 5k, floor 2k) to `run_roboflow_eval.py` / `eval_svanstrom_persize.py` / `run_antiuav_per_model.py`. Defensive `cv2.imread` skip added to `eval/datasets.py` (Roboflow `rgb_bird/train` had one corrupt image that crashed every model). Inventory consolidator extended to parse new schemas: `analytics/spec_analysis/07_metrics_inventory.py` now reads selcom_val_holdout, svanstrom_persize, video_persize, antiuav_per_model.
 - **2026-05-18 (d)** — Resolved long-standing §3.2 Anti-UAV baseline RGB placeholder. Ran `A_rgb_yolo` factor on antiuav (28 min): baseline and `retrained_v2` are numerically identical on this benchmark (P=0.9922, R=0.9950, F1=0.9936; TP=3178, FP=25, FN=16 for both). Anti-UAV confirmed saturated and non-discriminating for the RGB training-stance comparison. Ch2 saturated-benchmark sentence updated; Ch2 §2.X Numerical-Comparison Table cell filled.
 - **2026-05-18 (c)** — Added §9.5.8 Three-classifier real-video comparison (sa32 / control40 / fnfn). Flipped §1 production pick: **sa32** is now primary, control40 conservative alternative, fnfn open-world fallback. Justification: sa32 wins real-video drone F1 by 18–22 pp over control40 and 60+ pp over fnfn; fnfn rejects 85% of correct RGB drone TPs (too conservative for operational deployment). Added classifier-loading adapter for raw-model joblibs (`fusion_no_fn_v1.1`) via sibling `_metrics.json` features list.
 - **2026-05-18 (b)** — Added §9.5 Full pipeline on real video. 4 RGB models × 19 videos × {RGB, IR-gray, classifier, temporal, patch} stages. Sanity check passes (Stage 1 matches §9.4). Key finding: cascade tightens variant-F1 spread from $0.605$–$0.760$ to $0.770$–$0.826$; selcom_1280 confuser FPR collapses $0.709 \to 0.136$ (81% cut). Per-frame metrics misrepresent the cascade — segment/alert level is the production-relevant grain.
