@@ -271,7 +271,11 @@ class ImageDataset:
 
     def load_frame(self, img_path: Path) -> dict | None:
         """Load image + GT labels."""
-        img = cv2.imread(str(img_path))
+        try:
+            img = cv2.imread(str(img_path))
+        except cv2.error:
+            # ultralytics' patched imread raises on empty/corrupt files
+            return None
         if img is None:
             return None
         h, w = img.shape[:2]

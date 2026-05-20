@@ -118,9 +118,20 @@ DATASETS = [
 # ── Model & filter paths (relative to REPO) ────────────────────────
 
 MODELS = {
-    "rgb_baseline":     REPO / "RGB model" / "Yolo26n_trained" / "weights" / "best.pt",
-    "rgb_retrained_v2": REPO / "RGB model" / "Yolo26n_retrained_v2" / "weights" / "best.pt",
-    "ir_model":         REPO / "runs" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt",
+    "rgb_baseline":        REPO / "RGB model" / "Yolo26n_trained" / "weights" / "best.pt",
+    "rgb_retrained_v2":    REPO / "RGB model" / "Yolo26n_retrained_v2" / "weights" / "best.pt",
+    "rgb_hardneg_v3more":  REPO / "RGB model" / "Yolo26n_hardneg_v3_more" / "weights" / "best.pt",
+    "rgb_selcom_1280":     REPO / "RGB model" / "Yolo26n_selcom_mixed_ft2_1280" / "weights" / "best.pt",
+    "rgb_selcom_960":      REPO / "RGB model" / "Yolo26n_selcom_mixed_ft2_1280" / "weights" / "best.pt",
+    "rgb_selcom_640":      REPO / "RGB model" / "Yolo26n_selcom_mixed_ft2_1280" / "weights" / "best.pt",
+    "ir_model":            REPO / "runs" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt",
+}
+
+# Per-model imgsz override. selcom_* share weights but differ in inference imgsz.
+MODEL_IMGSZ = {
+    "rgb_selcom_640": 640,
+    "rgb_selcom_960": 960,
+    "rgb_selcom_1280": 1280,
 }
 
 FILTERS = {
@@ -186,12 +197,19 @@ def compute_stride(n_images: int, target: int = 500) -> int:
     return max(1, n_images // target)
 
 
+def auto_stride(n_images: int, cap: int = 5000, floor: int = 2000) -> int:
+    """Cap any eval at ~cap images. Below floor: stride 1 (no subsampling)."""
+    if n_images < floor:
+        return 1
+    return max(1, -(-n_images // cap))  # ceil division
+
+
 # ── Run eval_model.py ───────────────────────────────────────────────
 
 def run_eval(weights: str, dataset_path: str, output_dir: str,
              conf: float, patch_weights: str, patch_thr: float,
              drone_classes: str, stride: int, temporal: bool,
-             model_name: str = "") -> bool:
+             model_name: str = "", imgsz: int = 640) -> bool:
     """Call eval_model.py as a subprocess."""
     cmd = [
         sys.executable, str(EVAL_DIR / "eval_model.py"),
@@ -200,7 +218,7 @@ def run_eval(weights: str, dataset_path: str, output_dir: str,
         "--output-dir", str(output_dir),
         "--conf", str(conf),
         "--stride", str(stride),
-        "--imgsz", "640",
+        "--imgsz", str(imgsz),
         "--model-name", model_name,
     ]
     if patch_weights:
@@ -387,6 +405,10 @@ def main():
             model_runs = [
                 ("rgb_baseline", MODELS["rgb_baseline"]),
                 ("rgb_retrained_v2", MODELS["rgb_retrained_v2"]),
+                ("rgb_hardneg_v3more", MODELS["rgb_hardneg_v3more"]),
+                ("rgb_selcom_1280", MODELS["rgb_selcom_1280"]),
+                ("rgb_selcom_960", MODELS["rgb_selcom_960"]),
+                ("rgb_selcom_640", MODELS["rgb_selcom_640"]),
             ]
             patch_w = FILTERS["rgb"]
             conf = 0.25
@@ -406,7 +428,10 @@ def main():
 
             for split_name, split_dir in all_splits:
                 n_imgs = count_images(split_dir)
-                stride = 1 if args.full else compute_stride(n_imgs, 500)
+                if args.full:
+                    stride = auto_stride(n_imgs)  # cap at 5k, under 2k stride 1
+                else:
+                    stride = compute_stride(n_imgs, 500)
                 print(f"\n    ▸ Split: {split_name}  ({n_imgs} imgs, stride={stride})")
 
                 out = results_dir / ds["name"] / model_label / split_name
@@ -421,6 +446,7 @@ def main():
                     stride=stride,
                     temporal=True,
                     model_name=model_label,
+                    imgsz=MODEL_IMGSZ.get(model_label, 640),
                 )
                 if ok:
                     n_ok += 1

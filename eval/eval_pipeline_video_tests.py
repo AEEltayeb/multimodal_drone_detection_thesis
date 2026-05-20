@@ -101,8 +101,8 @@ def build_classifier_features(rgb_dets, ir_dets, rgb_gray, ir_gray, feat_cols):
         else:
             feats.update({f"{prefix}_max_conf": round(max(confs), 6),
                           f"{prefix}_mean_conf": round(float(np.mean(confs)), 6)})
-    rgb_global = compute_global_features(rgb_gray)
-    ir_global = compute_global_features(ir_gray)
+    rgb_global = compute_global_features(rgb_gray, modality="rgb")
+    ir_global = compute_global_features(ir_gray, modality="ir")
     feats.update({f"rgb_{k}": v for k, v in rgb_global.items()})
     feats.update({f"ir_{k}": v for k, v in ir_global.items()})
     for prefix, dets, gray, gw, gh in [

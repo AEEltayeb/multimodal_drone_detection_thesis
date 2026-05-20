@@ -220,6 +220,75 @@ def score_per_size(
     return out
 
 
+# ── Trust-aware scoring (the only scoring rule used in the
+#    full_pipeline_ablations docs) ─────────────────────────────────
+#
+# Per check.txt's "Rule A" (the email rule):
+#   - label=0 (reject_both): kept=[] on both sides; both GTs become FN.
+#   - label=1 (trust RGB):   score RGB dets vs RGB GT; IR GT *excluded* (the
+#                            system explicitly chose to not look at IR).
+#   - label=2 (trust IR):    score IR dets vs IR GT; RGB GT *excluded*.
+#   - label=3 (trust both):  RGB dets vs RGB GT + IR dets vs IR GT (TPs sum
+#                            across modalities, hence absolute counts can
+#                            exceed any single-modality run).
+#
+# For RGB-only datasets (no separate IR GT), `ir_dets` share the RGB coord
+# frame (e.g. ir_grayscale on RGB-only video). Trust-aware then collapses to:
+#   label=0: kept=[]; label=1: rgb_dets; label=2: ir_dets;
+#   label=3: rgb_dets + ir_dets   (all scored vs the single RGB GT)
+
+def score_trust_aware(
+    label: int,
+    rgb_dets: list, ir_dets: list,
+    gts: list, ir_gts: list,
+    w: int, h: int, iw: int, ih: int,
+    is_paired: bool,
+    rule: str = "iop",
+    iou_thr: float = 0.5, iop_thr: float = 0.5,
+) -> dict:
+    """Return per-size {bucket: {tp, fp, fn}} under trust-aware scoring.
+
+    Sums RGB-side and IR-side scores when both modalities are trusted (label=3).
+    For RGB-only datasets, treats ir_dets as additional RGB-coord-frame
+    candidate detections.
+    """
+    out = {b: {"tp": 0, "fp": 0, "fn": 0} for b in SIZE_BUCKETS}
+
+    def _add(s):
+        for b in s:
+            out[b]["tp"] += s[b]["tp"]
+            out[b]["fp"] += s[b]["fp"]
+            out[b]["fn"] += s[b]["fn"]
+
+    if is_paired:
+        # RGB side: score if label ∈ {0, 1, 3}; label=2 ignores RGB GT entirely
+        if label in (0, 1, 3):
+            kept_rgb = rgb_dets if label in (1, 3) else []
+            s = score_per_size(kept_rgb, gts, w, h,
+                               iou_thr=iou_thr, iop_thr=iop_thr)[rule]
+            _add(s)
+        # IR side: score if label ∈ {0, 2, 3}; label=1 ignores IR GT entirely
+        if label in (0, 2, 3):
+            kept_ir = ir_dets if label in (2, 3) else []
+            s = score_per_size(kept_ir, ir_gts, iw, ih,
+                               iou_thr=iou_thr, iop_thr=iop_thr)[rule]
+            _add(s)
+    else:
+        # RGB-only dataset: single GT side
+        if label == 0:
+            kept = []
+        elif label == 1:
+            kept = rgb_dets
+        elif label == 2:
+            kept = ir_dets
+        else:  # label == 3
+            kept = rgb_dets + ir_dets
+        s = score_per_size(kept, gts, w, h,
+                           iou_thr=iou_thr, iop_thr=iop_thr)[rule]
+        _add(s)
+    return out
+
+
 # ── PR curve helpers ─────────────────────────────────────────────
 
 def pr_sweep(

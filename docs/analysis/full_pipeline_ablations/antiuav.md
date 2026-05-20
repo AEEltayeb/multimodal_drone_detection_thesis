@@ -14,16 +14,16 @@ Detection-on-drone scoring. Any detection that does not match a drone GT box (Io
 |---|---|---:|---:|---:|---:|---:|---:|
 | baseline | rgb | 1,632 | 49 | 31 | 0.9709 | 0.9814 | 0.9761 |
 | baseline | +rgb_filter | 1,632 | 49 | 31 | 0.9709 | 0.9814 | 0.9761 |
-| baseline | classifier | 1,631 | 47 | 32 | 0.9720 | 0.9808 | 0.9764 |
-| baseline | classifier→filter | 1,631 | 47 | 32 | 0.9720 | 0.9808 | 0.9764 |
+| baseline | classifier | 3,283 | 74 | 37 | 0.9780 | 0.9889 | 0.9834 |
+| baseline | classifier→filter | 3,283 | 74 | 37 | 0.9780 | 0.9889 | 0.9834 |
 | retrained_v2 | rgb | 1,644 | 71 | 19 | 0.9586 | 0.9886 | 0.9734 |
 | retrained_v2 | +rgb_filter | 1,644 | 71 | 19 | 0.9586 | 0.9886 | 0.9734 |
-| retrained_v2 | classifier | 1,643 | 64 | 20 | 0.9625 | 0.9880 | 0.9751 |
-| retrained_v2 | classifier→filter | 1,643 | 64 | 20 | 0.9625 | 0.9880 | 0.9751 |
+| retrained_v2 | classifier | 3,295 | 92 | 35 | 0.9728 | 0.9895 | 0.9811 |
+| retrained_v2 | classifier→filter | 3,295 | 92 | 35 | 0.9728 | 0.9895 | 0.9811 |
 | selcom_1280 | rgb | 1,617 | 314 | 46 | 0.8374 | 0.9723 | 0.8998 |
 | selcom_1280 | +rgb_filter | 1,617 | 314 | 46 | 0.8374 | 0.9723 | 0.8998 |
-| selcom_1280 | classifier | 1,617 | 308 | 46 | 0.8400 | 0.9723 | 0.9013 |
-| selcom_1280 | classifier→filter | 1,617 | 308 | 46 | 0.8400 | 0.9723 | 0.9013 |
+| selcom_1280 | classifier | 3,270 | 336 | 42 | 0.9068 | 0.9873 | 0.9454 |
+| selcom_1280 | classifier→filter | 3,270 | 336 | 42 | 0.9068 | 0.9873 | 0.9454 |
 | ir_model | ir_native | 1,654 | 35 | 101 | 0.9793 | 0.9425 | 0.9605 |
 | ir_model | +ir_filter | 1,654 | 35 | 101 | 0.9793 | 0.9425 | 0.9605 |
 
@@ -42,11 +42,6 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 | ir_model | temporal | 571 | 0 | 21 | 1 | 1.0000 | 0.9645 | 0.9819 | 96.29% |
 | ir_model | temporal+alert_gate | 571 | 0 | 21 | 1 | 1.0000 | 0.9645 | 0.9819 | 96.29% |
 
-## Sanity flags
-
-⚠️  `baseline`: classifier R=0.9808 below max(R_rgb=0.9814, R_ir=0.9425)
-⚠️  `retrained_v2`: classifier R=0.9880 below max(R_rgb=0.9886, R_ir=0.9425)
-
 ## Per-size breakdown
 
 ### baseline (rgb)
@@ -61,14 +56,14 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 | +rgb_filter | medium | 1405 | 1,379 | 39 | 26 | 0.9725 | 0.9815 | 0.9770 |
 | +rgb_filter | large | 100 | 100 | 1 | 0 | 0.9901 | 1.0000 | 0.9950 |
 | +rgb_filter | all | 1663 | 1,632 | 49 | 31 | 0.9709 | 0.9814 | 0.9761 |
-| classifier | small | 158 | 153 | 8 | 5 | 0.9503 | 0.9684 | 0.9592 |
-| classifier | medium | 1405 | 1,378 | 38 | 27 | 0.9732 | 0.9808 | 0.9770 |
-| classifier | large | 100 | 100 | 1 | 0 | 0.9901 | 1.0000 | 0.9950 |
-| classifier | all | 1663 | 1,631 | 47 | 32 | 0.9720 | 0.9808 | 0.9764 |
-| classifier→filter | small | 158 | 153 | 8 | 5 | 0.9503 | 0.9684 | 0.9592 |
-| classifier→filter | medium | 1405 | 1,378 | 38 | 27 | 0.9732 | 0.9808 | 0.9770 |
-| classifier→filter | large | 100 | 100 | 1 | 0 | 0.9901 | 1.0000 | 0.9950 |
-| classifier→filter | all | 1663 | 1,631 | 47 | 32 | 0.9720 | 0.9808 | 0.9764 |
+| classifier | small | 158 | 182 | 10 | 2 | 0.9479 | 0.9891 | 0.9681 |
+| classifier | medium | 1405 | 2,891 | 62 | 34 | 0.9790 | 0.9884 | 0.9837 |
+| classifier | large | 100 | 210 | 2 | 1 | 0.9906 | 0.9953 | 0.9929 |
+| classifier | all | 1663 | 3,283 | 74 | 37 | 0.9780 | 0.9889 | 0.9834 |
+| classifier→filter | small | 158 | 182 | 10 | 2 | 0.9479 | 0.9891 | 0.9681 |
+| classifier→filter | medium | 1405 | 2,891 | 62 | 34 | 0.9790 | 0.9884 | 0.9837 |
+| classifier→filter | large | 100 | 210 | 2 | 1 | 0.9906 | 0.9953 | 0.9929 |
+| classifier→filter | all | 1663 | 3,283 | 74 | 37 | 0.9780 | 0.9889 | 0.9834 |
 | temporal | all | 577 | 555 | 0 | 22 | 1.0000 | 0.9619 | 0.9806 |
 | temporal+alert_gate | all | 577 | 555 | 0 | 22 | 1.0000 | 0.9619 | 0.9806 |
 
@@ -84,14 +79,14 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 | +rgb_filter | medium | 1405 | 1,392 | 49 | 13 | 0.9660 | 0.9907 | 0.9782 |
 | +rgb_filter | large | 100 | 100 | 2 | 0 | 0.9804 | 1.0000 | 0.9901 |
 | +rgb_filter | all | 1663 | 1,644 | 71 | 19 | 0.9586 | 0.9886 | 0.9734 |
-| classifier | small | 158 | 152 | 16 | 6 | 0.9048 | 0.9620 | 0.9325 |
-| classifier | medium | 1405 | 1,391 | 46 | 14 | 0.9680 | 0.9900 | 0.9789 |
-| classifier | large | 100 | 100 | 2 | 0 | 0.9804 | 1.0000 | 0.9901 |
-| classifier | all | 1663 | 1,643 | 64 | 20 | 0.9625 | 0.9880 | 0.9751 |
-| classifier→filter | small | 158 | 152 | 16 | 6 | 0.9048 | 0.9620 | 0.9325 |
-| classifier→filter | medium | 1405 | 1,391 | 46 | 14 | 0.9680 | 0.9900 | 0.9789 |
-| classifier→filter | large | 100 | 100 | 2 | 0 | 0.9804 | 1.0000 | 0.9901 |
-| classifier→filter | all | 1663 | 1,643 | 64 | 20 | 0.9625 | 0.9880 | 0.9751 |
+| classifier | small | 158 | 181 | 18 | 4 | 0.9095 | 0.9784 | 0.9427 |
+| classifier | medium | 1405 | 2,904 | 71 | 30 | 0.9761 | 0.9898 | 0.9829 |
+| classifier | large | 100 | 210 | 3 | 1 | 0.9859 | 0.9953 | 0.9906 |
+| classifier | all | 1663 | 3,295 | 92 | 35 | 0.9728 | 0.9895 | 0.9811 |
+| classifier→filter | small | 158 | 181 | 18 | 4 | 0.9095 | 0.9784 | 0.9427 |
+| classifier→filter | medium | 1405 | 2,904 | 71 | 30 | 0.9761 | 0.9898 | 0.9829 |
+| classifier→filter | large | 100 | 210 | 3 | 1 | 0.9859 | 0.9953 | 0.9906 |
+| classifier→filter | all | 1663 | 3,295 | 92 | 35 | 0.9728 | 0.9895 | 0.9811 |
 | temporal | all | 577 | 560 | 0 | 17 | 1.0000 | 0.9705 | 0.9850 |
 | temporal+alert_gate | all | 577 | 560 | 0 | 17 | 1.0000 | 0.9705 | 0.9850 |
 
@@ -107,14 +102,14 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 | +rgb_filter | medium | 1405 | 1,367 | 300 | 38 | 0.8200 | 0.9730 | 0.8900 |
 | +rgb_filter | large | 100 | 100 | 0 | 0 | 1.0000 | 1.0000 | 1.0000 |
 | +rgb_filter | all | 1663 | 1,617 | 314 | 46 | 0.8374 | 0.9723 | 0.8998 |
-| classifier | small | 158 | 150 | 12 | 8 | 0.9259 | 0.9494 | 0.9375 |
-| classifier | medium | 1405 | 1,367 | 296 | 38 | 0.8220 | 0.9730 | 0.8911 |
-| classifier | large | 100 | 100 | 0 | 0 | 1.0000 | 1.0000 | 1.0000 |
-| classifier | all | 1663 | 1,617 | 308 | 46 | 0.8400 | 0.9723 | 0.9013 |
-| classifier→filter | small | 158 | 150 | 12 | 8 | 0.9259 | 0.9494 | 0.9375 |
-| classifier→filter | medium | 1405 | 1,367 | 296 | 38 | 0.8220 | 0.9730 | 0.8911 |
-| classifier→filter | large | 100 | 100 | 0 | 0 | 1.0000 | 1.0000 | 1.0000 |
-| classifier→filter | all | 1663 | 1,617 | 308 | 46 | 0.8400 | 0.9723 | 0.9013 |
+| classifier | small | 158 | 179 | 14 | 2 | 0.9275 | 0.9890 | 0.9572 |
+| classifier | medium | 1405 | 2,881 | 321 | 39 | 0.8998 | 0.9866 | 0.9412 |
+| classifier | large | 100 | 210 | 1 | 1 | 0.9953 | 0.9953 | 0.9953 |
+| classifier | all | 1663 | 3,270 | 336 | 42 | 0.9068 | 0.9873 | 0.9454 |
+| classifier→filter | small | 158 | 179 | 14 | 2 | 0.9275 | 0.9890 | 0.9572 |
+| classifier→filter | medium | 1405 | 2,881 | 321 | 39 | 0.8998 | 0.9866 | 0.9412 |
+| classifier→filter | large | 100 | 210 | 1 | 1 | 0.9953 | 0.9953 | 0.9953 |
+| classifier→filter | all | 1663 | 3,270 | 336 | 42 | 0.9068 | 0.9873 | 0.9454 |
 | temporal | all | 577 | 553 | 0 | 24 | 1.0000 | 0.9584 | 0.9788 |
 | temporal+alert_gate | all | 577 | 553 | 0 | 24 | 1.0000 | 0.9584 | 0.9788 |
 
