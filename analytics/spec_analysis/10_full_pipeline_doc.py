@@ -316,6 +316,53 @@ def fmt_row_persize(stage: str, bucket: str, r: dict) -> str:
 
 # Per-dataset prose. Add an entry as each dataset comes online.
 DATASET_META = {
+    "svanstrom": {
+        "title": "Svanström",
+        "category": "RGB+IR not-truly-paired, mixed confuser + drone",
+        "scoring": "iop",
+        "headline": (
+            "The classifier's keystone dataset. RGB collapses on confusers "
+            "(birds, airplanes, helicopters) and hallucinates aggressively; IR is "
+            "physically immune to feathers/wings and stays clean. Under trust-aware "
+            "scoring the classifier routes RGB-confuser frames to the IR stream and "
+            "lifts F1 from ~0.43 (RGB alone) to ~0.89 — the modality-arbitration "
+            "rescue. The patch verifier (rgb_filter) only helps when applied before "
+            "the classifier choice; once the classifier has picked the trustworthy "
+            "modality the filter is largely redundant on this dataset."
+        ),
+        "commentary": {
+            "rgb": "Baseline RGB detector. Saturated by confusers — most FPs are birds. The R looks healthy (>0.9) but P is destroyed (<0.3).",
+            "ir_native": "IR detector on the paired IR frame. The most useful single signal on this dataset (F1≈0.95).",
+            "ir_grayscale": "IR weights on grayscale-RGB. Shown for symmetry with the RGB-only doc; not used in production on paired data.",
+            "+rgb_filter": "Patch verifier on RGB dets only. Catches some bird FPs but doesn't reach IR's confuser robustness.",
+            "+ir_filter": "Patch verifier on IR dets. Marginal effect since IR rarely hallucinates here.",
+            "classifier": "sa32 trust-aware: for each frame, classifier picks which modality (or both) to credit. The headline number — this is where modality arbitration shows up.",
+            "classifier→filter": "Classifier picks, then filter applied to the trusted side. So + filters out the residual after arbitration.",
+            "temporal": "3-frame segments, 2-of-3 voting on the raw detector firing pattern. Caps the per-segment FR%.",
+            "temporal+alert_gate": "Production rule. The patch verifier runs only on the 3rd frame, gate-keeping the alert. So + temporal voting + confuser-veto on the decisive frame.",
+        },
+    },
+    "selcom_val": {
+        "title": "Selcom CCTV val (drone-only RGB)",
+        "category": "RGB-only, drone-only (CCTV crops)",
+        "scoring": "iou",
+        "headline": (
+            "Held-out drone-only CCTV val split. RGB-only, so the IR side comes "
+            "from ir_grayscale (cross-modal fallback). No confusers in this split, "
+            "so the patch verifier and classifier have nothing to arbitrate — "
+            "the interesting question here is whether the soft-veto / classifier "
+            "harms RGB recall in the no-confuser case."
+        ),
+        "commentary": {
+            "rgb": "Baseline RGB on the val split. Reference number.",
+            "ir_grayscale": "IR weights on the grayscale-RGB input — cross-modal fallback path. Low recall is expected (IR weights weren't trained on RGB-derived grayscale).",
+            "+rgb_filter": "Patch verifier on RGB dets. On a confuser-free dataset, this is a pure recall tax.",
+            "classifier": "sa32 trust-aware in grayscale mode (IR side = ir_grayscale).",
+            "classifier→filter": "Classifier-trusted dets passed through the patch verifier.",
+            "temporal": "3-frame segments. Tight clip framing in CCTV makes temporal voting easy.",
+            "temporal+alert_gate": "Production rule, same as elsewhere.",
+        },
+    },
     "antiuav": {
         "title": "Anti-UAV RGBT",
         "category": "RGB+IR paired, drone-only",

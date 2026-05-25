@@ -52,7 +52,7 @@ from eval_full_pipeline_persize import (  # noqa: E402
 DOC_ROOT = REPO / "docs" / "analysis" / "full_pipeline_ablations"
 CSV_DIR = DOC_ROOT / "csv"
 
-THRESHOLDS = [0.5, 0.7, 0.85, 0.95]
+THRESHOLDS = [0.5, 0.7, 0.85, 0.95, 0.99]
 N_TARGET_FRAMES = 1000
 DRONE_CLIP_KEYS = [c["key"] for c in enumerate_video_clips()
                    if c["has_drone_gt"]]
@@ -106,7 +106,8 @@ def score_ta(label, rgb_dets, ir_dets, gts, ir_gts, w, h, iw, ih, is_paired, rul
 
 def run_one_dataset(ds, n_target: int, args, classifier, feat_cols,
                     yolo_rgb, yolo_ir, det_cache,
-                    patch_rgb, patch_ir, baseline_imgsz):
+                    patch_rgb, patch_ir, baseline_imgsz,
+                    rgb_detector_key: str = "baseline"):
     """Process one dataset (paired or single-clip). Returns dict
     {stage_label: {"TP":..., "FP":..., "FN":...}}."""
     frames = list_frames(ds)
@@ -159,8 +160,8 @@ def run_one_dataset(ds, n_target: int, args, classifier, feat_cols,
                                               drone_classes=drone_cls)
 
         # ── Baseline RGB ──
-        rgb_w_path, rgb_imgsz = RGB_MODELS["baseline"]
-        cached = det_cache.get_dets(ds["key"], "baseline", rgb_w_path,
+        rgb_w_path, rgb_imgsz = RGB_MODELS[rgb_detector_key]
+        cached = det_cache.get_dets(ds["key"], rgb_detector_key, rgb_w_path,
                                     rgb_imgsz, stem,
                                     ir_weights_path=IR_WEIGHTS if is_paired else None)
         if cached is not None:
@@ -175,7 +176,7 @@ def run_one_dataset(ds, n_target: int, args, classifier, feat_cols,
                 confs = r0.boxes.conf.cpu().numpy()
                 rgb_dets = [(tuple(map(float, b)), float(c))
                             for b, c in zip(xyxy, confs)]
-            det_cache.put_dets(ds["key"], "baseline", rgb_w_path,
+            det_cache.put_dets(ds["key"], rgb_detector_key, rgb_w_path,
                                 rgb_imgsz, stem,
                                 [(b[0], b[1], b[2], b[3], c) for b, c in rgb_dets])
 
@@ -317,13 +318,23 @@ def main():
     ap.add_argument("--patch-thr", type=float, default=0.70)
     ap.add_argument("--device", type=str, default="0")
     ap.add_argument("--n-target", type=int, default=N_TARGET_FRAMES)
+    ap.add_argument("--rgb-detector", type=str, default="baseline",
+                    choices=list(RGB_MODELS.keys()),
+                    help="Which RGB detector to ablate. Default baseline.")
+    ap.add_argument("--datasets", nargs="+",
+                    default=["antiuav", "svanstrom", "drone_video_drone"],
+                    help="Subset of {antiuav, svanstrom, drone_video_drone}.")
+    ap.add_argument("--out-suffix", type=str, default="",
+                    help="Suffix appended to output filenames "
+                         "(e.g. '_selcom_960' -> softveto_ablation_selcom_960.md).")
     args = ap.parse_args()
 
     cpath = CLASSIFIERS["sa32"]
     classifier, feat_cols = load_classifier(cpath)
     print(f"Loaded classifier sa32 ({len(feat_cols)} features)")
 
-    rgb_w, rgb_sz = RGB_MODELS["baseline"]
+    rgb_w, rgb_sz = RGB_MODELS[args.rgb_detector]
+    print(f"Using RGB detector: {args.rgb_detector} @ imgsz={rgb_sz}")
     yolo_rgb = YOLO(str(rgb_w))
     yolo_ir = YOLO(str(IR_WEIGHTS))
     patch_rgb = get_patch("rgb_filter")
@@ -333,64 +344,50 @@ def main():
     # Per-dataset run
     all_results: dict[str, dict] = {}
     for ds_key in ("antiuav", "svanstrom"):
+        if ds_key not in args.datasets:
+            continue
         ds = find_ds(ds_key)
         res = run_one_dataset(ds, args.n_target, args, classifier, feat_cols,
                               yolo_rgb, yolo_ir, det_cache,
-                              patch_rgb, patch_ir, rgb_sz)
+                              patch_rgb, patch_ir, rgb_sz,
+                              rgb_detector_key=args.rgb_detector)
         if res:
             all_results[ds_key] = res
         det_cache.flush()
 
     # Drone-video aggregate: iterate clips and sum
-    print("\n[drone_video_drone] aggregating across drone clips")
-    drone_counters: dict[str, dict] = defaultdict(
-        lambda: {"TP": 0, "FP": 0, "FN": 0})
-    drone_counters["__meta__"] = {"n_frames": 0, "scoring": "iop",
-                                  "paired": False, "dataset": "drone_video_drone"}
-    # For drone clips we want ~1000 total frames across all clips.
-    total_clip_frames = 0
-    clips_frames = []
-    for ckey in DRONE_CLIP_KEYS:
-        ds = find_ds(ckey)
-        if ds is None: continue
-        frames = list_frames(ds)
-        clips_frames.append((ds, frames))
-        total_clip_frames += len(frames)
-    if total_clip_frames > args.n_target:
-        stride_clip = max(1, total_clip_frames // args.n_target)
+    if "drone_video_drone" not in args.datasets:
+        print("\nSkipping drone_video_drone (not in --datasets)")
     else:
-        stride_clip = 1
-    # Run with stride per clip proportional to clip size
-    for ds, frames in clips_frames:
-        frames = frames[::stride_clip] if stride_clip > 1 else frames
-        if not frames: continue
-        # Quick: reuse run_one_dataset but with already-strided frames is awkward.
-        # Just create a virtual ds with a custom frame list via direct call.
-        # Easier: call run_one_dataset with n_target much larger so stride=1.
-        res = run_one_dataset(ds, n_target=10_000_000, args=args,
-                              classifier=classifier, feat_cols=feat_cols,
-                              yolo_rgb=yolo_rgb, yolo_ir=yolo_ir,
-                              det_cache=det_cache, patch_rgb=patch_rgb,
-                              patch_ir=patch_ir, baseline_imgsz=rgb_sz)
-        if not res: continue
-        # We need to ALSO subsample. Use stride_clip when iterating in run_one_dataset
-        # ... Simpler: just keep stride=1 on each clip (clips are small).
-        # NOTE: above call already ran on ALL frames of this clip without
-        # subsampling. That's fine for the small clips; total is ~1359 frames.
-        for stage, ctr in res.items():
-            if stage == "__meta__":
-                drone_counters["__meta__"]["n_frames"] += ctr["n_frames"]
-                continue
-            drone_counters[stage]["TP"] += ctr["TP"]
-            drone_counters[stage]["FP"] += ctr["FP"]
-            drone_counters[stage]["FN"] += ctr["FN"]
-    all_results["drone_video_drone"] = dict(drone_counters)
-    det_cache.flush()
-    print(f"[drone_video_drone] n_frames={drone_counters['__meta__']['n_frames']}")
+        print("\n[drone_video_drone] aggregating across drone clips")
+        drone_counters: dict[str, dict] = defaultdict(
+            lambda: {"TP": 0, "FP": 0, "FN": 0})
+        drone_counters["__meta__"] = {"n_frames": 0, "scoring": "iop",
+                                      "paired": False, "dataset": "drone_video_drone"}
+        for ckey in DRONE_CLIP_KEYS:
+            ds = find_ds(ckey)
+            if ds is None: continue
+            res = run_one_dataset(ds, n_target=10_000_000, args=args,
+                                  classifier=classifier, feat_cols=feat_cols,
+                                  yolo_rgb=yolo_rgb, yolo_ir=yolo_ir,
+                                  det_cache=det_cache, patch_rgb=patch_rgb,
+                                  patch_ir=patch_ir, baseline_imgsz=rgb_sz,
+                                  rgb_detector_key=args.rgb_detector)
+            if not res: continue
+            for stage, ctr in res.items():
+                if stage == "__meta__":
+                    drone_counters["__meta__"]["n_frames"] += ctr["n_frames"]
+                    continue
+                drone_counters[stage]["TP"] += ctr["TP"]
+                drone_counters[stage]["FP"] += ctr["FP"]
+                drone_counters[stage]["FN"] += ctr["FN"]
+        all_results["drone_video_drone"] = dict(drone_counters)
+        det_cache.flush()
+        print(f"[drone_video_drone] n_frames={drone_counters['__meta__']['n_frames']}")
 
     # ── Write CSV ──
     CSV_DIR.mkdir(parents=True, exist_ok=True)
-    csv_path = CSV_DIR / "softveto_ablation.csv"
+    csv_path = CSV_DIR / f"softveto_ablation{args.out_suffix}.csv"
     fieldnames = ["dataset", "n_frames", "scoring", "stage",
                   "TP", "FP", "FN", "P", "R", "F1"]
     with csv_path.open("w", newline="", encoding="utf-8") as f:
@@ -489,7 +486,7 @@ def main():
              "detections (matches the deployed cascade).")
     L.append("")
 
-    md_path = DOC_ROOT / "softveto_ablation.md"
+    md_path = DOC_ROOT / f"softveto_ablation{args.out_suffix}.md"
     md_path.write_text("\n".join(L), encoding="utf-8")
     print(f"  wrote {md_path}")
 

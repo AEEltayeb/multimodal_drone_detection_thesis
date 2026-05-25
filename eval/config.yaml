@@ -37,6 +37,39 @@ datasets:
     ir_stem_suffix: "_infrared"
     categories: ["AIRPLANE", "BIRD", "DRONE", "HELICOPTER"]
 
+  cutpaste_drone_old:
+    type: paired
+    root: "C:/Users/User/Desktop/cutpaste_drone_v4"
+    rgb_images: "RGB/images"
+    rgb_labels: "RGB/labels"
+    ir_images: "IR/images"
+    ir_labels: "IR/labels"
+    rgb_stem_suffix: "_visible"
+    ir_stem_suffix: "_infrared"
+    categories: ["DRONE"]
+
+  cutpaste_drone:
+    type: paired
+    root: "G:/drone/cutpaste_drone_v4"
+    rgb_images: "RGB/images"
+    rgb_labels: "RGB/labels"
+    ir_images: "IR/images"
+    ir_labels: "IR/labels"
+    rgb_stem_suffix: "_visible"
+    ir_stem_suffix: "_infrared"
+    categories: ["DRONE"]
+
+  cutpaste_confusers:
+    type: paired
+    root: "G:/drone/cutpaste_confusers_v4"
+    rgb_images: "RGB/images"
+    rgb_labels: "RGB/labels"
+    ir_images: "IR/images"
+    ir_labels: "IR/labels"
+    rgb_stem_suffix: "_visible"
+    ir_stem_suffix: "_infrared"
+    categories: ["BIRD", "HELICOPTER"]   # labels are intentionally empty (FP test)
+
   # ── Single-modality / cross-domain datasets ──
 
   rgb_dataset:

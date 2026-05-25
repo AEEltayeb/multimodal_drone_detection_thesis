@@ -116,6 +116,7 @@ DATASETS = [
         "lbl_dir": Path("G:/drone/_finetune_selcom_mixed_ft2/labels/val"),
         "has_drone_gt": True, "drone_class": 0,
         "is_sequence": True,  # selcom val is CCTV footage frames
+        "scoring": "iou",  # clean RGB drone benchmark
     },
     # Roboflow OOD: drone + 3 confuser categories (RGB only)
     {
@@ -141,6 +142,46 @@ DATASETS = [
         "img_dir": Path("G:/drone/roboflow_eval/rgb_helicopter/test/images"),
         "lbl_dir": Path("G:/drone/roboflow_eval/rgb_helicopter/test/labels"),
         "has_drone_gt": False,
+    },
+    {
+        "key": "cutpaste_drone2", "type": "paired", "modality": "rgb",
+        "img_dir": Path("G:/drone/cutpaste_drone2/RGB/images"),
+        "lbl_dir": Path("G:/drone/cutpaste_drone2/RGB/labels"),
+        "ir_img_dir": Path("G:/drone/cutpaste_drone2/IR/images"),
+        "ir_lbl_dir": Path("G:/drone/cutpaste_drone2/IR/labels"),
+        "rgb_suffix": "_visible", "ir_suffix": "_infrared",
+        "has_drone_gt": True, "drone_class": 0,
+        "scoring": "iou",
+    },
+    # Cut-paste synthetic paired (drone + confuser FP tests)
+    {
+        "key": "cutpaste_drone_old", "type": "paired", "modality": "rgb",
+        "img_dir": Path("C:/Users/User/Desktop/cutpaste_drone_v4/RGB/images"),
+        "lbl_dir": Path("C:/Users/User/Desktop/cutpaste_drone_v4/RGB/labels"),
+        "ir_img_dir": Path("C:/Users/User/Desktop/cutpaste_drone_v4/IR/images"),
+        "ir_lbl_dir": Path("C:/Users/User/Desktop/cutpaste_drone_v4/IR/labels"),
+        "rgb_suffix": "_visible", "ir_suffix": "_infrared",
+        "has_drone_gt": True, "drone_class": 0,
+        "scoring": "iou",
+    },
+    {
+        "key": "cutpaste_drone", "type": "paired", "modality": "rgb",
+        "img_dir": Path("G:/drone/cutpaste_drone_v4/RGB/images"),
+        "lbl_dir": Path("G:/drone/cutpaste_drone_v4/RGB/labels"),
+        "ir_img_dir": Path("G:/drone/cutpaste_drone_v4/IR/images"),
+        "ir_lbl_dir": Path("G:/drone/cutpaste_drone_v4/IR/labels"),
+        "rgb_suffix": "_visible", "ir_suffix": "_infrared",
+        "has_drone_gt": True, "drone_class": 0,
+        "scoring": "iou",
+    },
+    {
+        "key": "cutpaste_confusers", "type": "paired", "modality": "rgb",
+        "img_dir": Path("G:/drone/cutpaste_confusers_v4/RGB/images"),
+        "lbl_dir": Path("G:/drone/cutpaste_confusers_v4/RGB/labels"),
+        "ir_img_dir": Path("G:/drone/cutpaste_confusers_v4/IR/images"),
+        "ir_lbl_dir": Path("G:/drone/cutpaste_confusers_v4/IR/labels"),
+        "rgb_suffix": "_visible", "ir_suffix": "_infrared",
+        "has_drone_gt": False,  # confuser FP test - labels are intentionally empty
     },
     # Real-video clip family — enumerated dynamically below
 ]

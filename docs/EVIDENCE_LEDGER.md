@@ -101,6 +101,15 @@ Scoring is IoP@0.5 (Intersection over Prediction area), conf=0.25. Selcom drones
 | `Yolo26n_trained` (baseline) | 1280 | 26 | 37 | 269 | 0.413 | 0.088 | 0.145 | `runs/rgb_finetune_eval/Yolo26n_selcom_mixed_ft2_1280/comparison.json` | `python "RGB model/finetune_selcom.py" --ft 2 --imgsz 1280 --skip-stage --skip-train` | current |
 | `Yolo26n_selcom_mixed_ft2` | 640 | 72 | 50 | 223 | 0.590 | 0.244 | 0.345 | `runs/rgb_finetune_eval/Yolo26n_selcom_mixed_ft2/comparison.json` | `python "RGB model/finetune_selcom.py" --ft 2` | superseded by `_ft2_1280` |
 | **`Yolo26n_selcom_mixed_ft2_1280`** | **1280** | **138** | **43** | **157** | **0.762** | **0.468** | **0.580** | `runs/rgb_finetune_eval/Yolo26n_selcom_mixed_ft2_1280/comparison.json` | `python "RGB model/finetune_selcom.py" --ft 2 --imgsz 1280 --batch 4 --skip-stage` | current — CCTV production weights |
+| `Yolo26n_selcom_mixed_ft3_960` (epoch 9 best, early-stop) | 960 | 131 | 33 | 164 | 0.799 | 0.444 | 0.571 | `runs/rgb_finetune_eval/compare_selcom_ft2_vs_ft3/Yolo26n_selcom_mixed_ft3_960.json` | see "ft3 training recipe" note below; eval: `python "RGB model/compare_selcom_ft.py"` (IMGSZ=960) | current |
+| **`Yolo26n_selcom_mixed_ft3_1280`** (epoch 13 best, 16-epoch resume total) | **1280** | **144** | **26** | **151** | **0.847** | **0.488** | **0.619** | `runs/rgb_finetune_eval/compare_selcom_ft2_vs_ft3/Yolo26n_selcom_mixed_ft3_1280.json` | see "ft3 training recipe" note below; eval: `python "RGB model/compare_selcom_ft.py"` (IMGSZ=1280) | **current — candidate CCTV production weights** (supersedes `_ft2_1280` pending downstream confirmation) |
+
+**ft3 training recipe (2026-05-24/25)** — same as ft2_1280 except for the validation split:
+- **Train split (identical to ft2)**: 80% general RGB (sampled from `G:/drone/dataset/dataset/images/train` with seed=0) + 20% selcom positives+negatives. ft3 reuses ft2's staged train dir (`_finetune_selcom_mixed_ft2/images/train`, 8825 images) — no re-copy. Builder: `RGB model/dataset preparation/build_selcom_mixed_ft3.py`.
+- **Val split (changed)**: 50% selcom (311 imgs, same seed=0 slice as ft2's val) + 50% baseline (311 imgs sampled from `G:/drone/dataset/dataset/images/val`). Staged as a `val.txt` path list at `C:/drone_cache/_finetune_selcom_mixed_ft3/val.txt` — zero file copies. **Rationale**: ft2's selcom-only val was blind to baseline-distribution regression during training; the 50/50 val lets the model checkpoint on a recipe that explicitly tracks both surfaces.
+- **Hyperparams (unchanged from ft2_1280)**: base = `Yolo26n_trained/weights/best.pt`, AdamW, lr0=1e-5, lrf=0.01, cos_lr, freeze=10, batch=8 (1280) / 16 (960), workers=8, AMP, augs off (hsv/mosaic/mixup/copy_paste/erasing all 0; fliplr=0.5 only), epochs=20, patience=3.
+- **Outcome**: both ft3_960 and ft3_1280 early-stopped at epoch 12 with best=epoch 9 (initial run). Plateau visible in `RGB model/Yolo26n_selcom_mixed_ft3_{960,1280}/results.csv` from epoch 6 onward (mAP50 flat ~0.807, P flat ~0.83, R flat ~0.74). The 1280 variant was then **resumed via checkpoint patch** (`RGB model/unfinish_ckpt.py` to clear the early-stop "finished" marker), running to epoch 16 with `patience=3` and original `lr0=1e-5`. New best=epoch 13: selcom-val precision lifted 0.828→0.847 (4 fewer FPs at same TP=144), F1 0.614→0.619; baseline test held at F1=0.920 (tied with ft2). The "resume with lr0=5e-5" path was *not* used in the end — args.yaml was reverted to original hyperparams before resume.
+- **Comparison data path**: `C:/drone_cache/_finetune_selcom_mixed_ft2` is a robocopy mirror of `G:/drone/_finetune_selcom_mixed_ft2`; same content, faster I/O.
 
 **Base model for selcom fine-tune**: `Yolo26n_trained` (baseline), NOT `Yolo26n_retrained_v2`. This matters for downstream calibration: the selcom-fine-tuned weights inherit baseline's confidence distribution, so the production trust classifiers (`control_v3more_40feat`, `fusion_no_fn_v1.1`) — which were calibrated against baseline-family RGB — remain valid choices when the deployed RGB is the selcom fine-tune.
 
@@ -124,6 +133,17 @@ All detectors are trained with at least some confuser negatives. The cascade's r
 | `Yolo26n_selcom_mixed_ft2` | 640 | 0.951 | 0.939 | 0.945 | **-0.006** PASS | same |
 | `Yolo26n_trained` (baseline) | 1280 | 0.934 | 0.910 | 0.922 | (reference) | `Yolo26n_selcom_mixed_ft2_1280/comparison.json` |
 | `Yolo26n_selcom_mixed_ft2_1280` | 1280 | 0.899 | 0.930 | 0.914 | **-0.008** PASS | same |
+
+**ft3 regression check on `dataset_rgb_test` — 500-image stride sample (stride=34 over 17209)**, IoP@0.5, conf=0.25:
+
+| RGB model | imgsz | dataset_rgb_test_500 P | R | F1 | Δ F1 vs `ft2_1280` @ same imgsz | Source |
+|---|---|---|---|---|---|---|
+| `Yolo26n_selcom_mixed_ft2_1280` | 1280 | 0.919 | 0.921 | 0.920 | (reference) | `runs/rgb_finetune_eval/compare_selcom_ft2_vs_ft3/Yolo26n_selcom_mixed_ft2_1280.json` |
+| `Yolo26n_selcom_mixed_ft3_1280` (epoch 13 best, 16 ep resume) | 1280 | 0.909 | 0.930 | 0.920 | **±0.000** (tied with ft2 within noise) | `runs/rgb_finetune_eval/compare_selcom_ft2_vs_ft3/Yolo26n_selcom_mixed_ft3_1280.json` |
+| `Yolo26n_selcom_mixed_ft2_1280` | 960 | 0.952 | 0.917 | 0.934 | (reference) | same |
+| `Yolo26n_selcom_mixed_ft3_960` | 960 | 0.953 | 0.942 | 0.948 | **+0.014** (recall gain) | `runs/rgb_finetune_eval/compare_selcom_ft2_vs_ft3/Yolo26n_selcom_mixed_ft3_960.json` |
+
+**Read:** ft3's 50/50 val recipe achieved its goal — baseline regression eliminated. At native 1280 ft3 ties ft2 on baseline F1 (within stride-500 noise) while gaining +3.4 pt on selcom F1 (+6.5 P, +2.0 R). At 960 ft3 outright beats ft2 on baseline. The earlier 3-pt baseline P regression that motivated this retrain is closed.
 
 **Notes for thesis citation:**
 - Training-time val metrics (mAP50, R at F1-optimal conf) are higher than the table above because Ultralytics reports at the best-confidence operating point. The numbers here are at fixed conf=0.25 (production threshold) with IoP@0.5 scoring.

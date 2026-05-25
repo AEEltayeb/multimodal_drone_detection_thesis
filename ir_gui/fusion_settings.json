@@ -36,7 +36,7 @@
   "suppress_bird": true,
   "save_output_dir": "C:\\Users\\User\\Desktop\\drone detection outputs",
   "save_output_enabled": true,
-  "last_rgb_path": "G:/drone/drone detection video tests/rgb/drone/drone takeoff from ground and not hand short (dji-air-3s-startup-drone-shorts-short-sh_Media_85XdkfWsCuI_001_1080p).mp4",
+  "last_rgb_path": "G:/drone/drone detection video tests/rgb/drone/IMG_1519.MOV",
   "last_ir_path": "",
   "last_mode": "Grayscale Fusion",
   "confuser_filter_mode": "alert_gate",

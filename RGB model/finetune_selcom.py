@@ -35,14 +35,17 @@ SELCOM_VAL_PURE  = Path(r"G:/drone/_finetune_selcom_ft1")
 BUILDERS_MIXED = {
     1: ROOT / "RGB model" / "dataset preparation" / "build_selcom_mixed_ft1.py",
     2: ROOT / "RGB model" / "dataset preparation" / "build_selcom_mixed_ft2.py",
+    3: ROOT / "RGB model" / "dataset preparation" / "build_selcom_mixed_ft3.py",
 }
 DATA_YAMLS_MIXED = {
     1: Path(r"G:/drone/_finetune_selcom_mixed_ft1/data.yaml"),
     2: Path(r"G:/drone/_finetune_selcom_mixed_ft2/data.yaml"),
+    3: Path(r"C:/drone_cache/_finetune_selcom_mixed_ft3/data.yaml"),
 }
 SELCOM_VALS_MIXED = {
     1: Path(r"G:/drone/_finetune_selcom_mixed_ft1"),
     2: Path(r"G:/drone/_finetune_selcom_mixed_ft2"),
+    3: Path(r"C:/drone_cache/_finetune_selcom_mixed_ft3"),
 }
 
 IMG_EXTS   = {".jpg", ".jpeg", ".png", ".bmp"}
@@ -195,8 +198,8 @@ def print_comparison(all_results, out_dir):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--ft",         type=int, default=2, choices=[1, 2],
-                    help="Which selcom dataset version: 1 (TestDrone footage) or 2 (full labeled)")
+    ap.add_argument("--ft",         type=int, default=2, choices=[1, 2, 3],
+                    help="Which selcom dataset version: 1 (TestDrone footage), 2 (full labeled, val=selcom-only), 3 (full labeled, val=50/50 baseline+selcom)")
     ap.add_argument("--name",       default=None,
                     help="Output run name (default: Yolo26n_selcom_mixed_ft<N>[_1280])")
     ap.add_argument("--imgsz",      type=int, default=640,

@@ -1,8 +1,10 @@
-# svanstrom — Full Pipeline Ablations
+# Svanström — Full Pipeline Ablations
 
-- **Category:** ?
+- **Category:** RGB+IR not-truly-paired, mixed confuser + drone
 - **Scoring:** IOP @ 0.5
-- **Frames evaluated (per detector, post-stride):** ~4,785
+- **Frames evaluated (per detector, post-stride):** ~1,795
+
+The classifier's keystone dataset. RGB collapses on confusers (birds, airplanes, helicopters) and hallucinates aggressively; IR is physically immune to feathers/wings and stays clean. Under trust-aware scoring the classifier routes RGB-confuser frames to the IR stream and lifts F1 from ~0.43 (RGB alone) to ~0.89 — the modality-arbitration rescue. The patch verifier (rgb_filter) only helps when applied before the classifier choice; once the classifier has picked the trustworthy modality the filter is largely redundant on this dataset.
 
 ## Overall summary (all sizes) — bbox-level
 
@@ -10,18 +12,20 @@ Detection-on-drone scoring. Any detection that does not match a drone GT box (Io
 
 | Model | Stage | TP | FP | FN | P | R | F1 |
 |---|---|---:|---:|---:|---:|---:|---:|
-| baseline | rgb | 1,894 | 5,252 | 60 | 0.2650 | 0.9693 | 0.4163 |
-| baseline | +rgb_filter | 1,827 | 2,760 | 127 | 0.3983 | 0.9350 | 0.5586 |
-| baseline | classifier | 1,891 | 630 | 63 | 0.7501 | 0.9678 | 0.8451 |
-| baseline | classifier→filter | 1,825 | 503 | 129 | 0.7839 | 0.9340 | 0.8524 |
-| hardneg_v3more | rgb | 1,872 | 6,718 | 82 | 0.2179 | 0.9580 | 0.3551 |
-| hardneg_v3more | +rgb_filter | 1,809 | 3,774 | 145 | 0.3240 | 0.9258 | 0.4800 |
-| hardneg_v3more | classifier | 1,870 | 1,027 | 84 | 0.6455 | 0.9570 | 0.7710 |
-| hardneg_v3more | classifier→filter | 1,807 | 788 | 147 | 0.6963 | 0.9248 | 0.7945 |
-| retrained_v2 | rgb | 1,125 | 3,762 | 829 | 0.2302 | 0.5757 | 0.3289 |
-| retrained_v2 | +rgb_filter | 1,112 | 2,964 | 842 | 0.2728 | 0.5691 | 0.3688 |
-| retrained_v2 | classifier | 1,124 | 1,971 | 830 | 0.3632 | 0.5752 | 0.4452 |
-| retrained_v2 | classifier→filter | 1,111 | 1,877 | 843 | 0.3718 | 0.5686 | 0.4496 |
+| baseline | rgb | 709 | 1,996 | 23 | 0.2621 | 0.9686 | 0.4126 |
+| baseline | +rgb_filter | 682 | 1,083 | 50 | 0.3864 | 0.9317 | 0.5463 |
+| baseline | classifier | 1,403 | 281 | 21 | 0.8331 | 0.9853 | 0.9028 |
+| baseline | classifier→filter | 1,363 | 220 | 61 | 0.8610 | 0.9572 | 0.9066 |
+| retrained_v2 | rgb | 425 | 1,449 | 307 | 0.2268 | 0.5806 | 0.3262 |
+| retrained_v2 | +rgb_filter | 419 | 1,129 | 313 | 0.2707 | 0.5724 | 0.3675 |
+| retrained_v2 | classifier | 1,119 | 765 | 96 | 0.5939 | 0.9210 | 0.7222 |
+| retrained_v2 | classifier→filter | 1,100 | 728 | 115 | 0.6018 | 0.9053 | 0.7230 |
+| selcom_1280 | rgb | 680 | 1,001 | 52 | 0.4045 | 0.9290 | 0.5636 |
+| selcom_1280 | +rgb_filter | 652 | 388 | 80 | 0.6269 | 0.8907 | 0.7359 |
+| selcom_1280 | classifier | 1,374 | 46 | 18 | 0.9676 | 0.9871 | 0.9772 |
+| selcom_1280 | classifier→filter | 1,333 | 43 | 59 | 0.9688 | 0.9576 | 0.9632 |
+| ir_model | ir_native | 696 | 37 | 20 | 0.9495 | 0.9721 | 0.9607 |
+| ir_model | +ir_filter | 683 | 35 | 33 | 0.9513 | 0.9539 | 0.9526 |
 
 ## Temporal stages — segment-level (3-frame windows, 2-of-3)
 
@@ -29,18 +33,18 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 
 | Model | Stage | TP | FP | FN | TN | P | R | F1 | FR% |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
-| baseline | temporal | 638 | 759 | 13 | 185 | 0.4567 | 0.9800 | 0.6230 | 87.59% |
-| baseline | temporal+alert_gate | 623 | 346 | 28 | 598 | 0.6429 | 0.9570 | 0.7691 | 60.75% |
-| hardneg_v3more | temporal | 637 | 643 | 14 | 301 | 0.4977 | 0.9785 | 0.6598 | 80.25% |
-| hardneg_v3more | temporal+alert_gate | 623 | 324 | 28 | 620 | 0.6579 | 0.9570 | 0.7797 | 59.37% |
-| retrained_v2 | temporal | 449 | 282 | 202 | 662 | 0.6142 | 0.6897 | 0.6498 | 45.83% |
-| retrained_v2 | temporal+alert_gate | 445 | 170 | 206 | 774 | 0.7236 | 0.6836 | 0.7030 | 38.56% |
+| baseline | temporal | 241 | 293 | 3 | 62 | 0.4513 | 0.9877 | 0.6195 | 89.15% |
+| baseline | temporal+alert_gate | 238 | 139 | 6 | 216 | 0.6313 | 0.9754 | 0.7665 | 62.94% |
+| retrained_v2 | temporal | 171 | 101 | 73 | 254 | 0.6287 | 0.7008 | 0.6628 | 45.41% |
+| retrained_v2 | temporal+alert_gate | 170 | 61 | 74 | 294 | 0.7359 | 0.6967 | 0.7158 | 38.56% |
+| selcom_1280 | temporal | 236 | 293 | 8 | 62 | 0.4461 | 0.9672 | 0.6106 | 88.31% |
+| selcom_1280 | temporal+alert_gate | 229 | 95 | 15 | 260 | 0.7068 | 0.9385 | 0.8063 | 54.09% |
+| ir_model | temporal | 242 | 4 | 0 | 353 | 0.9837 | 1.0000 | 0.9918 | 41.07% |
+| ir_model | temporal+alert_gate | 242 | 3 | 0 | 354 | 0.9878 | 1.0000 | 0.9938 | 40.90% |
 
 ## Sanity flags
 
-⚠️  `baseline`: classifier R=0.9678 below max(R_rgb=0.9693, R_ir=0.0000)
-⚠️  `hardneg_v3more`: classifier R=0.9570 below max(R_rgb=0.9580, R_ir=0.0000)
-⚠️  `retrained_v2`: classifier R=0.5752 below max(R_rgb=0.5757, R_ir=0.0000)
+⚠️  `retrained_v2`: classifier R=0.9210 below max(R_rgb=0.5806, R_ir=0.9721)
 
 ## Per-size breakdown
 
@@ -48,73 +52,97 @@ Each row is one 3-frame segment scored as a single binary decision: fired ≥ 2 
 
 | Stage | Size | n_gt | TP | FP | FN | P | R | F1 |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| rgb | small | 91 | 75 | 4,185 | 16 | 0.0176 | 0.8242 | 0.0345 |
-| rgb | medium | 1819 | 1,777 | 954 | 42 | 0.6507 | 0.9769 | 0.7811 |
-| rgb | large | 44 | 42 | 113 | 2 | 0.2710 | 0.9545 | 0.4221 |
-| rgb | all | 1954 | 1,894 | 5,252 | 60 | 0.2650 | 0.9693 | 0.4163 |
-| +rgb_filter | small | 91 | 69 | 2,336 | 22 | 0.0287 | 0.7582 | 0.0553 |
-| +rgb_filter | medium | 1819 | 1,719 | 402 | 100 | 0.8105 | 0.9450 | 0.8726 |
-| +rgb_filter | large | 44 | 39 | 22 | 5 | 0.6393 | 0.8864 | 0.7429 |
-| +rgb_filter | all | 1954 | 1,827 | 2,760 | 127 | 0.3983 | 0.9350 | 0.5586 |
-| classifier | small | 91 | 75 | 566 | 16 | 0.1170 | 0.8242 | 0.2049 |
-| classifier | medium | 1819 | 1,774 | 64 | 45 | 0.9652 | 0.9753 | 0.9702 |
-| classifier | large | 44 | 42 | 0 | 2 | 1.0000 | 0.9545 | 0.9767 |
-| classifier | all | 1954 | 1,891 | 630 | 63 | 0.7501 | 0.9678 | 0.8451 |
-| classifier→filter | small | 91 | 69 | 445 | 22 | 0.1342 | 0.7582 | 0.2281 |
-| classifier→filter | medium | 1819 | 1,717 | 58 | 102 | 0.9673 | 0.9439 | 0.9555 |
-| classifier→filter | large | 44 | 39 | 0 | 5 | 1.0000 | 0.8864 | 0.9398 |
-| classifier→filter | all | 1954 | 1,825 | 503 | 129 | 0.7839 | 0.9340 | 0.8524 |
-| temporal | all | 651 | 638 | 759 | 13 | 0.4567 | 0.9800 | 0.6230 |
-| temporal+alert_gate | all | 651 | 623 | 346 | 28 | 0.6429 | 0.9570 | 0.7691 |
-
-### hardneg_v3more (rgb)
-
-| Stage | Size | n_gt | TP | FP | FN | P | R | F1 |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| rgb | small | 91 | 77 | 5,761 | 14 | 0.0132 | 0.8462 | 0.0260 |
-| rgb | medium | 1819 | 1,756 | 879 | 63 | 0.6664 | 0.9654 | 0.7885 |
-| rgb | large | 44 | 39 | 78 | 5 | 0.3333 | 0.8864 | 0.4845 |
-| rgb | all | 1954 | 1,872 | 6,718 | 82 | 0.2179 | 0.9580 | 0.3551 |
-| +rgb_filter | small | 91 | 71 | 3,396 | 20 | 0.0205 | 0.7802 | 0.0399 |
-| +rgb_filter | medium | 1819 | 1,700 | 360 | 119 | 0.8252 | 0.9346 | 0.8765 |
-| +rgb_filter | large | 44 | 38 | 18 | 6 | 0.6786 | 0.8636 | 0.7600 |
-| +rgb_filter | all | 1954 | 1,809 | 3,774 | 145 | 0.3240 | 0.9258 | 0.4800 |
-| classifier | small | 91 | 77 | 938 | 14 | 0.0759 | 0.8462 | 0.1392 |
-| classifier | medium | 1819 | 1,754 | 84 | 65 | 0.9543 | 0.9643 | 0.9593 |
-| classifier | large | 44 | 39 | 5 | 5 | 0.8864 | 0.8864 | 0.8864 |
-| classifier | all | 1954 | 1,870 | 1,027 | 84 | 0.6455 | 0.9570 | 0.7710 |
-| classifier→filter | small | 91 | 71 | 700 | 20 | 0.0921 | 0.7802 | 0.1647 |
-| classifier→filter | medium | 1819 | 1,698 | 83 | 121 | 0.9534 | 0.9335 | 0.9433 |
-| classifier→filter | large | 44 | 38 | 5 | 6 | 0.8837 | 0.8636 | 0.8736 |
-| classifier→filter | all | 1954 | 1,807 | 788 | 147 | 0.6963 | 0.9248 | 0.7945 |
-| temporal | all | 651 | 637 | 643 | 14 | 0.4977 | 0.9785 | 0.6598 |
-| temporal+alert_gate | all | 651 | 623 | 324 | 28 | 0.6579 | 0.9570 | 0.7797 |
+| rgb | small | 36 | 31 | 1,592 | 5 | 0.0191 | 0.8611 | 0.0374 |
+| rgb | medium | 680 | 663 | 363 | 17 | 0.6462 | 0.9750 | 0.7773 |
+| rgb | large | 16 | 15 | 41 | 1 | 0.2679 | 0.9375 | 0.4167 |
+| rgb | all | 732 | 709 | 1,996 | 23 | 0.2621 | 0.9686 | 0.4126 |
+| +rgb_filter | small | 36 | 29 | 917 | 7 | 0.0307 | 0.8056 | 0.0591 |
+| +rgb_filter | medium | 680 | 639 | 154 | 41 | 0.8058 | 0.9397 | 0.8676 |
+| +rgb_filter | large | 16 | 14 | 12 | 2 | 0.5385 | 0.8750 | 0.6667 |
+| +rgb_filter | all | 732 | 682 | 1,083 | 50 | 0.3864 | 0.9317 | 0.5463 |
+| classifier | small | 36 | 32 | 239 | 5 | 0.1181 | 0.8649 | 0.2078 |
+| classifier | medium | 680 | 1,340 | 41 | 16 | 0.9703 | 0.9882 | 0.9792 |
+| classifier | large | 16 | 31 | 1 | 0 | 0.9688 | 1.0000 | 0.9841 |
+| classifier | all | 732 | 1,403 | 281 | 21 | 0.8331 | 0.9853 | 0.9028 |
+| classifier→filter | small | 36 | 30 | 180 | 7 | 0.1429 | 0.8108 | 0.2429 |
+| classifier→filter | medium | 680 | 1,303 | 39 | 53 | 0.9709 | 0.9609 | 0.9659 |
+| classifier→filter | large | 16 | 30 | 1 | 1 | 0.9677 | 0.9677 | 0.9677 |
+| classifier→filter | all | 732 | 1,363 | 220 | 61 | 0.8610 | 0.9572 | 0.9066 |
+| temporal | all | 244 | 241 | 293 | 3 | 0.4513 | 0.9877 | 0.6195 |
+| temporal+alert_gate | all | 244 | 238 | 139 | 6 | 0.6313 | 0.9754 | 0.7665 |
 
 ### retrained_v2 (rgb)
 
 | Stage | Size | n_gt | TP | FP | FN | P | R | F1 |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| rgb | small | 91 | 50 | 1,636 | 41 | 0.0297 | 0.5495 | 0.0563 |
-| rgb | medium | 1819 | 1,032 | 758 | 787 | 0.5765 | 0.5673 | 0.5719 |
-| rgb | large | 44 | 43 | 1,368 | 1 | 0.0305 | 0.9773 | 0.0591 |
-| rgb | all | 1954 | 1,125 | 3,762 | 829 | 0.2302 | 0.5757 | 0.3289 |
-| +rgb_filter | small | 91 | 50 | 1,246 | 41 | 0.0386 | 0.5495 | 0.0721 |
-| +rgb_filter | medium | 1819 | 1,020 | 576 | 799 | 0.6391 | 0.5607 | 0.5974 |
-| +rgb_filter | large | 44 | 42 | 1,142 | 2 | 0.0355 | 0.9545 | 0.0684 |
-| +rgb_filter | all | 1954 | 1,112 | 2,964 | 842 | 0.2728 | 0.5691 | 0.3688 |
-| classifier | small | 91 | 50 | 756 | 41 | 0.0620 | 0.5495 | 0.1115 |
-| classifier | medium | 1819 | 1,031 | 475 | 788 | 0.6846 | 0.5668 | 0.6202 |
-| classifier | large | 44 | 43 | 740 | 1 | 0.0549 | 0.9773 | 0.1040 |
-| classifier | all | 1954 | 1,124 | 1,971 | 830 | 0.3632 | 0.5752 | 0.4452 |
-| classifier→filter | small | 91 | 50 | 667 | 41 | 0.0697 | 0.5495 | 0.1238 |
-| classifier→filter | medium | 1819 | 1,019 | 472 | 800 | 0.6834 | 0.5602 | 0.6157 |
-| classifier→filter | large | 44 | 42 | 738 | 2 | 0.0538 | 0.9545 | 0.1019 |
-| classifier→filter | all | 1954 | 1,111 | 1,877 | 843 | 0.3718 | 0.5686 | 0.4496 |
-| temporal | all | 651 | 449 | 282 | 202 | 0.6142 | 0.6897 | 0.6498 |
-| temporal+alert_gate | all | 651 | 445 | 170 | 206 | 0.7236 | 0.6836 | 0.7030 |
+| rgb | small | 36 | 16 | 643 | 20 | 0.0243 | 0.4444 | 0.0460 |
+| rgb | medium | 680 | 393 | 295 | 287 | 0.5712 | 0.5779 | 0.5746 |
+| rgb | large | 16 | 16 | 511 | 0 | 0.0304 | 1.0000 | 0.0589 |
+| rgb | all | 732 | 425 | 1,449 | 307 | 0.2268 | 0.5806 | 0.3262 |
+| +rgb_filter | small | 36 | 16 | 485 | 20 | 0.0319 | 0.4444 | 0.0596 |
+| +rgb_filter | medium | 680 | 389 | 223 | 291 | 0.6356 | 0.5721 | 0.6022 |
+| +rgb_filter | large | 16 | 14 | 421 | 2 | 0.0322 | 0.8750 | 0.0621 |
+| +rgb_filter | all | 732 | 419 | 1,129 | 313 | 0.2707 | 0.5724 | 0.3675 |
+| classifier | small | 36 | 17 | 297 | 16 | 0.0541 | 0.5152 | 0.0980 |
+| classifier | medium | 680 | 1,070 | 208 | 79 | 0.8372 | 0.9312 | 0.8817 |
+| classifier | large | 16 | 32 | 260 | 1 | 0.1096 | 0.9697 | 0.1969 |
+| classifier | all | 732 | 1,119 | 765 | 96 | 0.5939 | 0.9210 | 0.7222 |
+| classifier→filter | small | 36 | 17 | 263 | 16 | 0.0607 | 0.5152 | 0.1086 |
+| classifier→filter | medium | 680 | 1,053 | 205 | 96 | 0.8370 | 0.9164 | 0.8749 |
+| classifier→filter | large | 16 | 30 | 260 | 3 | 0.1034 | 0.9091 | 0.1858 |
+| classifier→filter | all | 732 | 1,100 | 728 | 115 | 0.6018 | 0.9053 | 0.7230 |
+| temporal | all | 244 | 171 | 101 | 73 | 0.6287 | 0.7008 | 0.6628 |
+| temporal+alert_gate | all | 244 | 170 | 61 | 74 | 0.7359 | 0.6967 | 0.7158 |
+
+### selcom_1280 (rgb)
+
+| Stage | Size | n_gt | TP | FP | FN | P | R | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| rgb | small | 36 | 24 | 555 | 12 | 0.0415 | 0.6667 | 0.0780 |
+| rgb | medium | 680 | 640 | 263 | 40 | 0.7087 | 0.9412 | 0.8086 |
+| rgb | large | 16 | 16 | 183 | 0 | 0.0804 | 1.0000 | 0.1488 |
+| rgb | all | 732 | 680 | 1,001 | 52 | 0.4045 | 0.9290 | 0.5636 |
+| +rgb_filter | small | 36 | 24 | 254 | 12 | 0.0863 | 0.6667 | 0.1529 |
+| +rgb_filter | medium | 680 | 613 | 97 | 67 | 0.8634 | 0.9015 | 0.8820 |
+| +rgb_filter | large | 16 | 15 | 37 | 1 | 0.2885 | 0.9375 | 0.4412 |
+| +rgb_filter | all | 732 | 652 | 388 | 80 | 0.6269 | 0.8907 | 0.7359 |
+| classifier | small | 36 | 25 | 22 | 1 | 0.5319 | 0.9615 | 0.6849 |
+| classifier | medium | 680 | 1,317 | 23 | 17 | 0.9828 | 0.9873 | 0.9850 |
+| classifier | large | 16 | 32 | 1 | 0 | 0.9697 | 1.0000 | 0.9846 |
+| classifier | all | 732 | 1,374 | 46 | 18 | 0.9676 | 0.9871 | 0.9772 |
+| classifier→filter | small | 36 | 25 | 20 | 1 | 0.5556 | 0.9615 | 0.7042 |
+| classifier→filter | medium | 680 | 1,277 | 22 | 57 | 0.9831 | 0.9573 | 0.9700 |
+| classifier→filter | large | 16 | 31 | 1 | 1 | 0.9688 | 0.9688 | 0.9688 |
+| classifier→filter | all | 732 | 1,333 | 43 | 59 | 0.9688 | 0.9576 | 0.9632 |
+| temporal | all | 244 | 236 | 293 | 8 | 0.4461 | 0.9672 | 0.6106 |
+| temporal+alert_gate | all | 244 | 229 | 95 | 15 | 0.7068 | 0.9385 | 0.8063 |
+
+### ir_model (ir_native)
+
+| Stage | Size | n_gt | TP | FP | FN | P | R | F1 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| ir_native | small | 2 | 1 | 0 | 1 | 1.0000 | 0.5000 | 0.6667 |
+| ir_native | medium | 697 | 679 | 36 | 18 | 0.9497 | 0.9742 | 0.9618 |
+| ir_native | large | 17 | 16 | 1 | 1 | 0.9412 | 0.9412 | 0.9412 |
+| ir_native | all | 716 | 696 | 37 | 20 | 0.9495 | 0.9721 | 0.9607 |
+| +ir_filter | small | 2 | 1 | 0 | 1 | 1.0000 | 0.5000 | 0.6667 |
+| +ir_filter | medium | 697 | 666 | 34 | 31 | 0.9514 | 0.9555 | 0.9535 |
+| +ir_filter | large | 17 | 16 | 1 | 1 | 0.9412 | 0.9412 | 0.9412 |
+| +ir_filter | all | 716 | 683 | 35 | 33 | 0.9513 | 0.9539 | 0.9526 |
+| temporal | all | 242 | 242 | 4 | 0 | 0.9837 | 1.0000 | 0.9918 |
+| temporal+alert_gate | all | 242 | 242 | 3 | 0 | 0.9878 | 1.0000 | 0.9938 |
 
 ## Per-stage commentary
 
+- **rgb** — Baseline RGB detector. Saturated by confusers — most FPs are birds. The R looks healthy (>0.9) but P is destroyed (<0.3).
+- **ir_native** — IR detector on the paired IR frame. The most useful single signal on this dataset (F1≈0.95).
+- **ir_grayscale** — IR weights on grayscale-RGB. Shown for symmetry with the RGB-only doc; not used in production on paired data.
+- **+rgb_filter** — Patch verifier on RGB dets only. Catches some bird FPs but doesn't reach IR's confuser robustness.
+- **+ir_filter** — Patch verifier on IR dets. Marginal effect since IR rarely hallucinates here.
+- **classifier** — sa32 trust-aware: for each frame, classifier picks which modality (or both) to credit. The headline number — this is where modality arbitration shows up.
+- **classifier→filter** — Classifier picks, then filter applied to the trusted side. So + filters out the residual after arbitration.
+- **temporal** — 3-frame segments, 2-of-3 voting on the raw detector firing pattern. Caps the per-segment FR%.
+- **temporal+alert_gate** — Production rule. The patch verifier runs only on the 3rd frame, gate-keeping the alert. So + temporal voting + confuser-veto on the decisive frame.
 
 ## Delivered
 
