@@ -1,0 +1,28 @@
+# Thermal V5-IR corpus + DRONE-DIVERSITY: adds the corrective-finetune set's
+# ~30k thermal drone frames (diverse scenes) to the positive class, to test
+# whether the held-out recall loss (the verifier's blocker) shrinks. Fused 517-D
+# (deployment-compatible). Run normally (real thermal, no --grayscale-input).
+pos:
+  - path: G:/drone/svanstrom_paired/IR/images          # auto 1280 + iop
+    max: 4000
+  - path: G:/drone/Anti-UAV-RGBT_yolo_converted/val/IR/images
+    stride: 3
+    max: 3000
+  - path: G:/drone/IR_dset_final/train/images
+    stride: 2
+    max: 4000
+  - path: G:/drone/IR_video_ir_dataset/train/images
+    prefixes: ["IR_DRONE_"]
+    stride: 2
+    max: 2000
+  - path: G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net.v1i.yolo26-maha-daxhh-cbam_tf-net/train/images
+    main_class: 1
+    max: 2000
+  - path: runs/corrective_finetune/dataset_v3/train/images   # NEW: 30k thermal drones
+    stride: 2
+    max: 8000
+
+neg:
+  - path: G:/drone/IR_video_ir_dataset/train/images
+    prefixes: ["IR_AIRPLANE_", "IR_BIRD_", "IR_HELICOPTER_"]
+  - path: G:/drone/cutpaste_confusers_v4/IR/images

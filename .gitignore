@@ -81,6 +81,10 @@ node_modules/
 *.webp
 *.pdf
 *.eps
+# Model MRI ships its curated report figures as committed assets (results/ stays
+# ignored by its directory rule, so per-run figures are unaffected).
+!mri/docs/**/*.png
+!mri/docs/**/*.jpg
 
 # SVGs are blocked globally EXCEPT the icon assets needed by PySide
 *.svg
@@ -110,6 +114,9 @@ node_modules/
 !README.md
 !docs/**/*.md
 !docs/*.md
+# Model MRI ships its curated reports + plan as committed docs. (results/ stays
+# ignored by the directory rule below, so per-run report.md is unaffected.)
+!mri/**/*.md
 
 # --- Training runs / outputs ---
 runs/
@@ -126,6 +133,9 @@ RGB model/*.yaml
 # --- Classifier artifacts ---
 classifier/runs/
 classifier/fusion_models/
+
+# --- Model MRI run outputs (npz/pt/figures are reproducible) ---
+mri/results/
 
 # --- Demo outputs (downloaded YT videos, benchmark renders) ---
 ir_gui/demo_outputs/
@@ -166,3 +176,6 @@ scripts/dataset/
 scripts/export/
 label_reviewer/
 generate_professor_plots.py
+
+# knowledge-system session snapshot (local hook state)
+.claude/.kb_session_snapshot

@@ -1,0 +1,29 @@
+# v3b IR detector "YOLO brain" report — drones vs thermal confusers in the
+# detector's FPN feature space. Mirrors the V5-IR training corpus so the report
+# represents the model that was actually trained.
+#   py -m mri --yolo runs/corrective_finetune/finetune_v3b/weights/best.pt \
+#       --config mri/configs/ir_v3b.yaml --train-mlp --feature-set fused \
+#       --out mri/results/ir_v3b_report --conf 0.40
+#
+# svan* auto-applies imgsz=1280 + IoP. CBAM drone is class 1 (B/D/P) -> main_class.
+pos:
+  - path: G:/drone/svanstrom_paired/IR/images
+    max: 4000
+  - path: G:/drone/Anti-UAV-RGBT_yolo_converted/val/IR/images
+    stride: 3
+    max: 3000
+  - path: G:/drone/IR_dset_final/train/images
+    stride: 2
+    max: 4000
+  - path: G:/drone/IR_video_ir_dataset/train/images
+    prefixes: ["IR_DRONE_"]
+    stride: 2
+    max: 2000
+  - path: G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net.v1i.yolo26-maha-daxhh-cbam_tf-net/train/images
+    main_class: 1
+    max: 2000
+
+neg:
+  - path: G:/drone/IR_video_ir_dataset/train/images
+    prefixes: ["IR_AIRPLANE_", "IR_BIRD_", "IR_HELICOPTER_"]
+  - path: G:/drone/cutpaste_confusers_v4/IR/images

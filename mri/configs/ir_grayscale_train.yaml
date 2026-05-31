@@ -1,0 +1,28 @@
+# Grayscale-mode V5 verifier training corpus (v3b on RGB->gray inputs).
+# Validated direction (modality probe 2026-05-31): grayscale mode hallucinates
+# heavily on confusers AND data is abundant; train+deploy in grayscale (no
+# thermal transfer needed). Run with --grayscale-input.
+#   py -m mri --yolo <v3b> --config mri/configs/ir_grayscale_train.yaml \
+#       --grayscale-input --train-mlp --feature-set fused --conf 0.25
+pos:
+  - path: G:/drone/svanstrom_paired/RGB/images        # svan auto 1280
+    prefixes: ["IR_DRONE_"]
+    max: 3500
+  - path: G:/drone/dataset/dataset/images/train       # general RGB drones
+    max: 3500
+  - path: G:/drone/RGB_video_rgb_dataset/train/images  # real-video RGB drones
+    prefixes: ["V_DRONE_"]
+    stride: 2
+    max: 2000
+
+neg:
+  - path: G:/drone/rgb_confusers_merged/images/train   # bird/plane/heli stills
+    stride: 2
+    max: 6000
+  - path: G:/drone/RGB_video_rgb_dataset/train/images   # real-video confusers
+    prefixes: ["V_BIRD_", "V_AIRPLANE_", "V_HELICOPTER_"]
+    max: 2000
+  - path: G:/drone/svanstrom_paired/RGB/images          # svan confusers (1280)
+    prefixes: ["IR_BIRD_", "IR_AIRPLANE_", "IR_HELICOPTER_"]
+    stride: 2
+    max: 3000
