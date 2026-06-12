@@ -11,7 +11,7 @@ the GUI-vs-eval recall gap.
 
 Usage examples:
   # Mimic the GUI exactly on a known-good clip
-  python eval/eval_video_temporal.py --video ir_gui/demo_outputs/yt_DiN4s-MWvPg.mp4 \\
+  python eval/eval_video_temporal.py --video gui/demo_outputs/yt_DiN4s-MWvPg.mp4 \\
     --mode grayscale --temporal on --use-roi-fallback on \\
     --imgsz 640 --conf 0.40 --frame-range 565:end
 
@@ -42,7 +42,7 @@ from datasets import load_config, resolve_path
 from run_manifest import write_manifest
 
 
-# ── _run_with_roi: lifted from ir_gui/pyside_engine.py:43 ────────────────
+# ── _run_with_roi: lifted from gui/pyside_engine.py:43 ────────────────
 # Copied (not imported) to avoid pulling Qt/UI deps into the eval script.
 
 def _run_yolo(model, frame, conf, imgsz, nms_iou, device):

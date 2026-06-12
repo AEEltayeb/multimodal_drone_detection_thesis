@@ -45,7 +45,7 @@ GROUPS = {
         ("G:/drone/Anti-UAV-RGBT_yolo_converted/val/IR/images", "", 640),
         ("G:/drone/IR_dset_final/train/images", "", 640),
         ("G:/drone/IR_video_ir_dataset/train/images", "IR_DRONE_", 640),
-        ("runs/corrective_finetune/dataset_v3/train/images", "", 640)],
+        ("models/ir/corrective_finetune/dataset_v3/train/images", "", 640)],
     ("thermal", "conf"): [
         ("G:/drone/svanstrom_paired/IR/images", CONF_PRE, 1280),
         ("G:/drone/IR_video_ir_dataset/train/images", CONF_PRE, 640)],
@@ -132,7 +132,7 @@ def main():
         "n_train": int(len(X)), "weight": WEIGHT,
     }, indent=2))
     print(f"\n  saved {OUT/'classifiers'/'mlp_aligned.pt'}")
-    print("  validate: py -m mri --yolo <v3b> --holdout-eval mri/results/ir_aligned/classifiers/mlp_aligned.pt \\")
+    print("  validate: py -m mri --yolo <v3b> --holdout-eval models/verifiers/ir_aligned/mlp_aligned.pt \\")
     print("            --pos CBAM:main_class=1 <thermal drone tests> --neg sea road  (CBAM held out of training)")
 
 

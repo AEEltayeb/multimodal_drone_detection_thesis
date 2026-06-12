@@ -18,7 +18,7 @@ pos:
   - path: G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net.v1i.yolo26-maha-daxhh-cbam_tf-net/train/images
     main_class: 1
     max: 2000
-  - path: runs/corrective_finetune/dataset_v3/train/images   # NEW: 30k thermal drones
+  - path: models/ir/corrective_finetune/dataset_v3/train/images   # NEW: 30k thermal drones
     stride: 2
     max: 8000
 

@@ -20,12 +20,12 @@ REPO = EVAL_DIR.parent
 
 # (model_name, weights_relpath, imgsz)
 SPECS = [
-    ("baseline",       "RGB model/Yolo26n_trained/weights/best.pt",                  1280),
-    ("hardneg_v3more", "RGB model/Yolo26n_hardneg_v3_more/weights/best.pt",          1280),
-    ("retrained_v2",   "RGB model/Yolo26n_retrained_v2/weights/best.pt",             1280),
-    ("selcom_1280",    "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    1280),
-    ("selcom_960",     "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    960),
-    ("selcom_640",     "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    640),
+    ("baseline",       "models/rgb/Yolo26n_trained/weights/best.pt",                  1280),
+    ("hardneg_v3more", "models/rgb/Yolo26n_hardneg_v3_more/weights/best.pt",          1280),
+    ("retrained_v2",   "models/rgb/Yolo26n_retrained_v2/weights/best.pt",             1280),
+    ("selcom_1280",    "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    1280),
+    ("selcom_960",     "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    960),
+    ("selcom_640",     "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",    640),
 ]
 
 DATASET = "G:/drone/_finetune_selcom_mixed_ft2/images/val"

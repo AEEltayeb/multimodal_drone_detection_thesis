@@ -75,9 +75,10 @@ def diagnose(raws, sep_summary, oof=None, y=None, threshold=0.5,
         out["classifier_keeps_confuser_frac"] = kept_conf      # lower = better
         out["classifier_recall_retention"] = recall_ret        # higher = better
         out["recall_cost"] = (1 - recall_ret) if recall_ret is not None else None
+        if kept_conf is not None:
+            out["fp_reduction"] = 1 - kept_conf          # classifier-only (out-of-fold); no image stream needed
         if raw_halluc_rate is not None and kept_conf is not None:
-            out["projected_fp_rate"] = raw_halluc_rate * kept_conf
-            out["fp_reduction"] = 1 - kept_conf
+            out["projected_fp_rate"] = raw_halluc_rate * kept_conf   # per-image: needs the bare hallucination rate
 
     # ── Verdict ──────────────────────────────────────────────────────────
     verdict = _decide(out, fp_rate_thr, sep_thr, recall_cost_thr)

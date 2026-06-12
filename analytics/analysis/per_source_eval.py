@@ -6,14 +6,14 @@ Runs the trained model on a test split, then groups results by source
 
 Usage:
     python scripts/analysis/per_source_eval.py \
-        --weights models/IR_dsetV6_188ep/best.pt \
+        --weights models/ir/IR_dsetV6_188ep/best.pt \
         --dataset G:\drone\IR_dsetV6 \
         --split test \
         --threshold 0.33
 
     # With per-object feature CSV export (for sample selection pipeline):
     python scripts/analysis/per_source_eval.py \
-        --weights models/IR_dsetV6_188ep/best.pt \
+        --weights models/ir/IR_dsetV6_188ep/best.pt \
         --dataset G:\drone\CST-AntiUAV_YOLO \
         --split train \
         --threshold 0.33 \

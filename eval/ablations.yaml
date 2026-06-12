@@ -12,11 +12,11 @@
 # All paths are relative to repo root (resolved by run_manifest.cache_identity_tag).
 
 default_stack:
-  rgb_weights:        "RGB model/Yolo26n_retrained_v2/weights/best.pt"
-  ir_weights:         "runs/corrective_finetune/finetune_v3b/weights/best.pt"
-  classifier_path:    "classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
-  patch_rgb_weights:  "classifier/runs/patches/confuser_filter4_rgb_v2_backup.pt"
-  patch_ir_weights:   "classifier/runs/patches/confuser_filter4_ir_v2_backup.pt"
+  rgb_weights:        "models/rgb/Yolo26n_retrained_v2/weights/best.pt"
+  ir_weights:         "models/ir/corrective_finetune/finetune_v3b/weights/best.pt"
+  classifier_path:    "models/routers/scene_aware_v3more_32feat/model.joblib"
+  patch_rgb_weights:  "models/patches/confuser_filter4_rgb_v2_backup.pt"
+  patch_ir_weights:   "models/patches/confuser_filter4_ir_v2_backup.pt"
   scoring:            trust_aware
   cascade:            filter_then_classifier
   imgsz:              1280
@@ -54,13 +54,13 @@ datasets:
 # Each clip is processed by eval_video_temporal.py with several condition
 # combinations; the driver expands these into per-condition cells.
 diagnostic_clips:
-  - path:        "ir_gui/demo_outputs/yt_DiN4s-MWvPg.mp4"
+  - path:        "gui/demo_outputs/yt_DiN4s-MWvPg.mp4"
     frame_range: "565:end"
     note:        "drone in sky after frame 565; before is held in hand"
-  - path:        "ir_gui/demo_outputs/yt_FQO3COJl5Us.mp4"
+  - path:        "gui/demo_outputs/yt_FQO3COJl5Us.mp4"
     frame_range: "1:end"
     note:        "drone in hand whole clip; easy-mode positive control"
-  - path:        "ir_gui/demo_outputs/yt_Qx1Hlot9Ye8.mp4"
+  - path:        "gui/demo_outputs/yt_Qx1Hlot9Ye8.mp4"
     frame_range: "163:end"
     note:        "drone in sky after frame 163; before is held in hand"
 
@@ -71,37 +71,37 @@ factors:
     overrides_yolo_cache: true
     levels:
       - name: rgb_old
-        rgb_weights: "RGB model/Yolo26n_trained/weights/best.pt"
+        rgb_weights: "models/rgb/Yolo26n_trained/weights/best.pt"
       - name: rgb_new       # default
-        rgb_weights: "RGB model/Yolo26n_retrained_v2/weights/best.pt"
+        rgb_weights: "models/rgb/Yolo26n_retrained_v2/weights/best.pt"
     datasets: [antiuav, svanstrom, rgb_dataset]
 
   B_patch_verifier:
     description: "Patch verifier weights — v1 / v2_backup / v3_backup / v4 current"
     levels:
       - name: pv_v1
-        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v1_backup.pt"
-        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v1_backup.pt"
+        patch_rgb_weights: "models/patches/confuser_filter4_rgb_v1_backup.pt"
+        patch_ir_weights:  "models/patches/confuser_filter4_ir_v1_backup.pt"
       - name: pv_v2         # default
-        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v2_backup.pt"
-        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v2_backup.pt"
+        patch_rgb_weights: "models/patches/confuser_filter4_rgb_v2_backup.pt"
+        patch_ir_weights:  "models/patches/confuser_filter4_ir_v2_backup.pt"
       - name: pv_v3
-        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb_v3_backup.pt"
-        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir_v3_backup.pt"
+        patch_rgb_weights: "models/patches/confuser_filter4_rgb_v3_backup.pt"
+        patch_ir_weights:  "models/patches/confuser_filter4_ir_v3_backup.pt"
       - name: pv_v4
-        patch_rgb_weights: "classifier/runs/patches/confuser_filter4_rgb.pt"
-        patch_ir_weights:  "classifier/runs/patches/confuser_filter4_ir.pt"
+        patch_rgb_weights: "models/patches/confuser_filter4_rgb.pt"
+        patch_ir_weights:  "models/patches/confuser_filter4_ir.pt"
     datasets: [svanstrom]   # confuser-rich; antiuav has no confusers so verifier is a no-op
 
   C_classifier:
     description: "Trust classifier — retrainedv2 / sceneaware / control40 / fusionnofn"
     levels:
       - name: clf_retrainedv2  # default
-        classifier_path: "classifier/fusion_models/retrained_v2_32feat/model.joblib"
+        classifier_path: "models/routers/retrained_v2_32feat/model.joblib"
       - name: clf_sceneaware
-        classifier_path: "classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
+        classifier_path: "models/routers/scene_aware_v3more_32feat/model.joblib"
       - name: clf_control40
-        classifier_path: "classifier/fusion_models/control_v3more_40feat/model.joblib"
+        classifier_path: "models/routers/control_v3more_40feat/model.joblib"
       - name: clf_fusionnofn
         classifier_path: "classifier/runs/reliability/fusion/fusion_no_fn_model.joblib"
     datasets: [antiuav, svanstrom]

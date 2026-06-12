@@ -29,8 +29,12 @@ def write_report(out_dir: Path, detector_path, specs, raws, sep_summary,
 
     A(f"# Model MRI — {Path(detector_path).parent.parent.name}\n")
     A(f"**Detector:** `{detector_path}`  ")
-    A(f"**Datasets:** {len(specs)} ({sum(s.role=='pos' for s in specs)} pos / "
-      f"{sum(s.role=='neg' for s in specs)} neg)\n")
+    if specs:
+        A(f"**Datasets:** {len(specs)} ({sum(s.role=='pos' for s in specs)} pos / "
+          f"{sum(s.role=='neg' for s in specs)} neg)\n")
+    else:  # resumed from a cached feature corpus — no image-folder specs
+        A(f"**Corpus:** resumed feature corpus — {diag.get('n_drone', 0):,} drone / "
+          f"{diag.get('n_confuser', 0):,} confuser detections (no image stream)\n")
 
     # ── Verdict ──────────────────────────────────────────────────────────
     A("## Verdict\n")
@@ -41,7 +45,11 @@ def write_report(out_dir: Path, detector_path, specs, raws, sep_summary,
     A("## Diagnostic signals\n")
     A("| Signal | Value | Meaning |")
     A("|---|---|---|")
-    A(f"| Raw hallucination rate | {_fmt(diag.get('raw_halluc_rate'), pct=True)} | FP per confuser image (bare detector) |")
+    _halluc = diag.get('raw_halluc_rate')
+    _hsrc = diag.get('halluc_external')
+    _hmean = (f"FP per confuser image (bare detector; {_hsrc})" if _hsrc
+              else "FP per confuser image (bare detector)")
+    A(f"| Raw hallucination rate | {(_fmt(_halluc, pct=True) if _halluc is not None else 'n/a (feature-only corpus)')} | {_hmean} |")
     if diag.get("raw_drone_prf"):
         p = diag["raw_drone_prf"]
         A(f"| Raw drone P/R/F1 | {p['precision']}/{p['recall']}/{p['f1']} | bare detector on positive sets |")
@@ -53,7 +61,8 @@ def write_report(out_dir: Path, detector_path, specs, raws, sep_summary,
     if diag.get("recall_cost") is not None:
         A(f"| Projected FP cut | {_fmt(diag.get('fp_reduction'), pct=True)} | confusers the classifier would reject |")
         A(f"| Recall retention | {_fmt(diag.get('classifier_recall_retention'), pct=True)} | true drones the classifier keeps |")
-        A(f"| Projected FP rate | {_fmt(diag.get('projected_fp_rate'), pct=True)} | hallucination after classifier |")
+        _pfr = diag.get('projected_fp_rate')
+        A(f"| Projected FP rate | {(_fmt(_pfr, pct=True) if _pfr is not None else 'n/a (needs image scan)')} | hallucination after classifier |")
     A("")
 
     # ── Per-dataset mining ───────────────────────────────────────────────

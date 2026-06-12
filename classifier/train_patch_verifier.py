@@ -204,8 +204,8 @@ def train_one_modality(manifest, modality, out_dir, epochs, batch_size, lr, devi
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--manifest", default="classifier/runs/patches/manifest.csv")
-    p.add_argument("--out", default="classifier/runs/patches")
+    p.add_argument("--manifest", default="models/patches/manifest.csv")
+    p.add_argument("--out", default="models/patches")
     p.add_argument("--epochs", type=int, default=10)
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--lr", type=float, default=3e-4)

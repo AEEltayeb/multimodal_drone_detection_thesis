@@ -15,11 +15,11 @@ EVAL_DIR = Path(__file__).resolve().parent
 REPO = EVAL_DIR.parent
 
 SPECS = [
-    ("baseline",     "RGB model/Yolo26n_trained/weights/best.pt"),
-    ("retrained_v2", "RGB model/Yolo26n_retrained_v2/weights/best.pt"),
-    ("selcom_1280",  "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
-    ("selcom_960",   "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
-    ("selcom_640",   "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
+    ("baseline",     "models/rgb/Yolo26n_trained/weights/best.pt"),
+    ("retrained_v2", "models/rgb/Yolo26n_retrained_v2/weights/best.pt"),
+    ("selcom_1280",  "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
+    ("selcom_960",   "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
+    ("selcom_640",   "models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt"),
 ]
 
 DATASET = "G:/drone/Anti-UAV-RGBT_yolo_converted/test/RGB"

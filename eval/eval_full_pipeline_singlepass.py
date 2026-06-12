@@ -374,7 +374,7 @@ def main():
         #   1. Paired data with native IR detector ("ir_model" in scope) -> use
         #      its dets.
         #   2. RGB-only data with cross-modal fallback ("ir_grayscale" in scope)
-        #      -> use its dets. This mirrors ir_gui/fusion/pipeline.py
+        #      -> use its dets. This mirrors gui/fusion/pipeline.py
         #      _process_grayscale (production grayscale mode), where the IR
         #      detector runs on a grayscale copy of the RGB frame and provides
         #      the IR-side detections to the classifier.

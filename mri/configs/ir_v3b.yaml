@@ -1,7 +1,7 @@
 # v3b IR detector "YOLO brain" report — drones vs thermal confusers in the
 # detector's FPN feature space. Mirrors the V5-IR training corpus so the report
 # represents the model that was actually trained.
-#   py -m mri --yolo runs/corrective_finetune/finetune_v3b/weights/best.pt \
+#   py -m mri --yolo models/ir/corrective_finetune/finetune_v3b/weights/best.pt \
 #       --config mri/configs/ir_v3b.yaml --train-mlp --feature-set fused \
 #       --out mri/results/ir_v3b_report --conf 0.40
 #

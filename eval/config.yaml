@@ -3,15 +3,15 @@
 # ══════════════════════════════════════════════════════════════
 
 # ── Model weights (defaults; CLI overrides) ──
-rgb_weights: "../RGB model/Yolo26n_retrained_v2/weights/best.pt"
-ir_weights: "../runs/corrective_finetune/finetune_v3b/weights/best.pt"
+rgb_weights: "../models/rgb/Yolo26n_retrained_v2/weights/best.pt"
+ir_weights: "../models/ir/corrective_finetune/finetune_v3b/weights/best.pt"
 
 # ── Fusion classifier ──
-classifier_path: "../classifier/fusion_models/scene_aware_v3more_32feat/model.joblib"
+classifier_path: "../models/routers/scene_aware_v3more_32feat/model.joblib"
 
 # ── Patch verifier weights ──
-patch_rgb_weights: "../classifier/runs/patches/confuser_filter4_rgb.pt"
-patch_ir_weights: "../classifier/runs/patches/confuser_filter4_ir.pt"
+patch_rgb_weights: "../models/patches/confuser_filter4_rgb.pt"
+patch_ir_weights: "../models/patches/confuser_filter4_ir.pt"
 
 # ── Datasets ──
 datasets:
@@ -101,7 +101,7 @@ datasets:
 
   youtube_ir:
     type: video
-    root: "../ir_gui/demo_outputs"
+    root: "../gui/demo_outputs"
     modality: ir
     videos:
       yt_EdOX8tJZDzw.mp4: HELICOPTER

@@ -134,7 +134,19 @@ def main():
                         help="Max frames per video (0 = all)")
     parser.add_argument("--video-dir", type=str, default=str(DEMO_OUT),
                         help="Directory containing yt_*.mp4 videos")
+    parser.add_argument("--mlp", action="store_true",
+                        help="Use V5 MLP filter (mlp_v5_ir_aligned) instead of CNN patch")
+    parser.add_argument("--mlp-thr", type=float, default=0.05,
+                        help="MLP: detection survives if P(drone) >= thr (recall-safe 0.05)")
+    parser.add_argument("--mlp-weights", type=str,
+                        default=str(REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"))
+    parser.add_argument("--ir-weights", type=str,
+                        default=str(REPO / "models/ir/corrective_finetune/finetune_v3b/weights/best.pt"),
+                        help="IR detector for --mlp (must be v3b: aligned MLP distilled from it)")
     args = parser.parse_args()
+
+    global OUT_ROOT
+    OUT_ROOT = SCRIPT_DIR / "runs" / ("eval_youtube_ir_mlp" if args.mlp else "eval_youtube_ir")
 
     video_dir = Path(args.video_dir)
 
@@ -170,18 +182,27 @@ def main():
     from ultralytics import YOLO
     with open(REPO / "ir_gui" / "fusion_settings.json") as f:
         settings = json.load(f)
-    ir_model = YOLO(settings["ir_model"])
+    ir_model = YOLO(args.ir_weights if args.mlp else settings["ir_model"])
 
-    print("Loading patch verifier...")
-    from patch_verifier import PatchVerifier
-    patch_ir_path = SCRIPT_DIR / "runs" / "patches" / "confuser_filter4_ir.pt"
-    ir_verifier = PatchVerifier(str(patch_ir_path))
+    mlp_hook = mlp = ir_verifier = _extract = None
+    if args.mlp:
+        from mlp_verifier import DetectInputHook, extract_detection_features, MLPVerifier
+        print(f"Loading V5 MLP filter: {Path(args.mlp_weights).name} (det={Path(args.ir_weights).parent.parent.name})")
+        mlp_hook = DetectInputHook(); mlp_hook.register(ir_model)
+        mlp = MLPVerifier(args.mlp_weights, device="cuda")
+        _extract = extract_detection_features
+    else:
+        print("Loading patch verifier...")
+        from patch_verifier import PatchVerifier
+        patch_ir_path = SCRIPT_DIR / "runs" / "patches" / "confuser_filter4_ir.pt"
+        ir_verifier = PatchVerifier(str(patch_ir_path))
 
     ir_conf = args.ir_conf
     patch_thr = args.patch_thr
     stride = args.stride
 
-    print(f"\nConfig: ir_conf={ir_conf}  patch_thr={patch_thr}  stride={stride}")
+    filt_desc = f"MLP P(drone)>={args.mlp_thr}" if args.mlp else f"patch_thr={patch_thr}"
+    print(f"\nConfig: ir_conf={ir_conf}  filter=[{filt_desc}]  stride={stride}")
 
     # ── Per-video results ────────────────────────────────────────────
     results_per_video = []
@@ -224,6 +245,8 @@ def main():
             processed += 1
 
             # Run IR YOLO
+            if mlp_hook is not None:
+                mlp_hook.clear()
             res = ir_model.predict(frame, conf=ir_conf, verbose=False, imgsz=640)
             boxes = res[0].boxes
             n_raw = len(boxes)
@@ -233,21 +256,31 @@ def main():
             if n_raw > 0:
                 ir_only_frames += 1
 
-            # Run patch filter on all detections at once
-            # predict_boxes returns P(confuser): high = confuser, low = drone
+            # Filter all detections at once.
+            # patch: predict_boxes -> P(confuser), survive if < thr.
+            # mlp:   predict_drone_probs -> P(drone), survive if >= thr.
             n_survived = 0
-            frame_labels = []
             if n_raw > 0:
                 boxes_xyxy = boxes.xyxy.cpu().numpy()
-                probs = ir_verifier.predict_boxes(frame, boxes_xyxy)
-                labels = ir_verifier.last_labels  # e.g. "airplane:0.85" or "pass(bird:0.12)"
-                # Detection SURVIVES filter when P(confuser) < threshold
-                n_survived = int((probs < patch_thr).sum())
-                frame_labels = list(zip(probs.tolist(), labels))
-                # Track what the filter thinks confusers are
-                for p, lbl in zip(probs.tolist(), labels):
-                    all_filter_labels.append({"frame": frame_idx, "prob": p, "label": lbl,
-                                              "rejected": p >= patch_thr})
+                if mlp is not None:
+                    h, w = frame.shape[:2]
+                    confs = boxes.conf.cpu().numpy()
+                    feats = np.stack([_extract(mlp_hook, (b[0], b[1], b[2], b[3]),
+                                               (h, w), float(c))
+                                      for b, c in zip(boxes_xyxy, confs)])
+                    pdrone = mlp.predict_drone_probs(feats)
+                    n_survived = int((pdrone >= args.mlp_thr).sum())
+                    for p in pdrone.tolist():
+                        all_filter_labels.append({"frame": frame_idx, "prob": float(p),
+                                                  "label": f"drone:{p:.2f}",
+                                                  "rejected": p < args.mlp_thr})
+                else:
+                    probs = ir_verifier.predict_boxes(frame, boxes_xyxy)
+                    labels = ir_verifier.last_labels  # "airplane:0.85" / "pass(bird:0.12)"
+                    n_survived = int((probs < patch_thr).sum())
+                    for p, lbl in zip(probs.tolist(), labels):
+                        all_filter_labels.append({"frame": frame_idx, "prob": p, "label": lbl,
+                                                  "rejected": p >= patch_thr})
 
                 ir_filter_dets += n_survived
                 if n_survived > 0:

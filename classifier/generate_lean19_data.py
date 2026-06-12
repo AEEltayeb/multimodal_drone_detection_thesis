@@ -346,7 +346,7 @@ def main():
     ap.add_argument("--skip-video", action="store_true")
     ap.add_argument("--include-yt", action="store_true")
     ap.add_argument("--yt-stride", type=int, default=3)
-    ap.add_argument("--output-dir", default="classifier/fusion_models/lean19")
+    ap.add_argument("--output-dir", default="models/routers/lean19")
     args = ap.parse_args()
 
     repo = Path(__file__).resolve().parent.parent

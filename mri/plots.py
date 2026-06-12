@@ -21,6 +21,7 @@ from . import stats  # noqa: E402
 
 _DRONE_C = "#1f77b4"
 _CONF_C = "#d62728"
+_LAYER_C = {"meta": "#7f7f7f", "p3": "#2ca02c", "p5": "#9467bd"}
 
 
 def _ensure(out_dir: Path) -> Path:
@@ -152,10 +153,92 @@ def fp_rate_bars(diag, out_path):
     plt.tight_layout(); plt.savefig(out_path, dpi=160); plt.close()
 
 
-def generate_all(X, y, schema, F, top, out_dir, want=None, diag=None):
+def auroc_by_layer(auroc, schema, out_path):
+    """Per-feature AUROC (drone vs confuser) as a jittered strip per layer."""
+    slices = schema.layer_slices()
+    layers = [(k, sl) for k, sl in slices.items() if auroc[sl].size]
+    rng = np.random.default_rng(0)
+    fig, ax = plt.subplots(figsize=(9, 5.5))
+    for i, (name, sl) in enumerate(layers):
+        vals = auroc[sl]
+        x = i + (rng.random(vals.size) - 0.5) * 0.55
+        ax.scatter(x, vals, s=14, alpha=0.45, color=_LAYER_C.get(name, "#555"))
+        ax.scatter([i], [vals.max()], s=140, marker="*", color="black", zorder=5)
+        ax.text(i, vals.max() + 0.012, f"max {vals.max():.3f}", ha="center", fontsize=9)
+    ax.axhline(0.5, color="gray", ls="--", alpha=0.7, label="chance (0.5)")
+    ax.set_xticks(range(len(layers)))
+    ax.set_xticklabels([f"{n}\n({auroc[sl].size} feats)" for n, sl in layers])
+    ax.set_ylabel("Per-feature AUROC (drone vs confuser)")
+    ax.set_ylim(0.45, 1.0)
+    ax.set_title("Per-feature discriminative power by layer (AUROC)")
+    ax.legend(loc="lower right"); plt.tight_layout(); plt.savefig(out_path, dpi=160); plt.close()
+
+
+def top_feature_auroc_bar(auroc, schema, out_path, n=20):
+    """Top-n individual features by AUROC, colored by layer."""
+    from matplotlib.patches import Patch
+    n = min(n, auroc.size)
+    order = np.argsort(auroc)[::-1][:n]
+    vals = auroc[order]
+    labels = [schema.column_label(int(i)) for i in order]
+    colors = [_LAYER_C.get(schema.locate(int(i))[0], "#555") for i in order]
+    fig, ax = plt.subplots(figsize=(8.5, max(5, n * 0.32)))
+    yp = np.arange(n)[::-1]
+    ax.barh(yp, vals, color=colors)
+    ax.set_yticks(yp); ax.set_yticklabels(labels, fontsize=7)
+    ax.set_xlim(0.5, min(1.0, float(vals.max()) + 0.05)); ax.set_xlabel("AUROC (drone vs confuser)")
+    ax.set_title(f"Top-{n} discriminative features by AUROC")
+    handles = [Patch(color=c, label=l) for l, c in _LAYER_C.items()]
+    ax.legend(handles=handles, fontsize=8, loc="lower right")
+    plt.tight_layout(); plt.savefig(out_path, dpi=160); plt.close()
+
+
+def roc_curve_plot(oof, y, out_path):
+    """Out-of-fold MLP ROC curve with AUC."""
+    from sklearn.metrics import roc_curve, auc
+    oof = np.asarray(oof, dtype=float); y = np.asarray(y)
+    valid = ~np.isnan(oof)
+    if valid.sum() < 2 or len(np.unique(y[valid])) < 2:
+        return None
+    fpr, tpr, _ = roc_curve(y[valid], oof[valid])
+    a = auc(fpr, tpr)
+    plt.figure(figsize=(7, 7))
+    plt.plot(fpr, tpr, color=_DRONE_C, lw=2.5, label=f"MLP verifier (AUC = {a:.4f})")
+    plt.plot([0, 1], [0, 1], "k--", alpha=0.4, label="chance")
+    plt.xlabel("False positive rate (confusers passed as drone)")
+    plt.ylabel("True positive rate (real drones kept)")
+    plt.title("Distilled verifier — out-of-fold ROC")
+    plt.legend(loc="lower right"); plt.grid(alpha=0.3)
+    plt.tight_layout(); plt.savefig(out_path, dpi=160); plt.close()
+    return a
+
+
+def fp_cut_vs_recall(oof, y, out_path, op_thr=0.5):
+    """Threshold sweep: confuser FP cut vs drone recall retained."""
+    oof = np.asarray(oof, dtype=float); y = np.asarray(y)
+    valid = ~np.isnan(oof); oof, y = oof[valid], y[valid]
+    drones, confs = y == 1, y == 0
+    if drones.sum() == 0 or confs.sum() == 0:
+        return None
+    taus = np.linspace(0, 1, 200)
+    keep = np.array([(oof[drones] >= t).mean() for t in taus])
+    cut = np.array([(oof[confs] < t).mean() for t in taus])
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.plot(keep, cut, color=_DRONE_C, lw=2.5)
+    ok, oc = (oof[drones] >= op_thr).mean(), (oof[confs] < op_thr).mean()
+    ax.scatter([ok], [oc], s=150, marker="*", color="black", zorder=5,
+               label=f"op @{op_thr:g}: keep {ok:.1%} drones, cut {oc:.1%} confusers")
+    ax.set_xlabel("Drone recall retained"); ax.set_ylabel("Confuser FP cut")
+    ax.set_xlim(0, 1.01); ax.set_ylim(0, 1.01)
+    ax.set_title("Verifier operating curve (threshold sweep)")
+    ax.grid(alpha=0.3); ax.legend(loc="lower left")
+    plt.tight_layout(); plt.savefig(out_path, dpi=160); plt.close()
+
+
+def generate_all(X, y, schema, F, top, out_dir, want=None, diag=None, auroc=None, oof=None):
     """Render the requested figures. Returns list of written paths."""
     out_dir = _ensure(Path(out_dir))
-    want = set(want or ["pca", "lda", "anova", "heatmap", "neurons"])
+    want = set(want or ["pca", "lda", "heatmap", "neurons", "auroc", "roc", "opcurve"])
     yolo_sl = slice(schema.layer_slices()["meta"].stop, X.shape[1])
     written = []
 
@@ -175,6 +258,13 @@ def generate_all(X, y, schema, F, top, out_dir, want=None, diag=None):
         _emit("top_neuron_kde.png", lambda p: top_neuron_kde(X, y, top, schema, p))
     # Only emit the FP-reduction bar chart when there is a hallucination rate to
     # plot (i.e. a real --neg image stream); otherwise the figure would be empty.
+    if "auroc" in want and auroc is not None:
+        _emit("auroc_by_layer.png", lambda p: auroc_by_layer(auroc, schema, p))
+        _emit("top_feature_auroc.png", lambda p: top_feature_auroc_bar(auroc, schema, p))
+    if "roc" in want and oof is not None:
+        _emit("verifier_roc.png", lambda p: roc_curve_plot(oof, y, p))
+    if "opcurve" in want and oof is not None:
+        _emit("operating_curve.png", lambda p: fp_cut_vs_recall(oof, y, p))
     if diag is not None and diag.get("raw_halluc_rate") is not None:
         _emit("fp_reduction.png", lambda p: fp_rate_bars(diag, p))
     return written

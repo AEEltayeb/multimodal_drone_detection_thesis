@@ -1,0 +1,291 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Methodology and System Design}{23}{chapter.3}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\newlabel{ch:methodology}{{3}{23}{Methodology and System Design}{chapter.3}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}Datasets and Their Roles}{23}{section.3.1}\protected@file@percent }
+\newlabel{sec:datasets}{{3.1}{23}{Datasets and Their Roles}{section.3.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Evaluation surfaces and their roles. ``Role'' distinguishes training surfaces, in-distribution evaluation surfaces, and OOD stress surfaces; no OOD surface contributes any training data. Benchmark and stress surfaces are evaluation-only and carry no split.}}{24}{table.caption.7}\protected@file@percent }
+\newlabel{tab:datasets}{{3.1}{24}{Evaluation surfaces and their roles. ``Role'' distinguishes training surfaces, in-distribution evaluation surfaces, and OOD stress surfaces; no OOD surface contributes any training data. Benchmark and stress surfaces are evaluation-only and carry no split}{table.caption.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Global composition of the data used in this thesis. (a) Training corpora (327{,}619 frames; counts from Tables~\ref {tab:ds_rgb_components}--\ref {tab:ds_ir_components} and Appendix~\ref {app:datasets}). (b) Canonical evaluation surfaces by source size (151{,}695 frames); the Tier-1 protocol evaluates an even-spread subset of at most 4{,}000 frames per surface (Section~\ref {sec:canonical_configs}).}}{24}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:datasets_pie}{{3.1}{24}{Global composition of the data used in this thesis. (a) Training corpora (327{,}619 frames; counts from Tables~\ref {tab:ds_rgb_components}--\ref {tab:ds_ir_components} and Appendix~\ref {app:datasets}). (b) Canonical evaluation surfaces by source size (151{,}695 frames); the Tier-1 protocol evaluates an even-spread subset of at most 4{,}000 frames per surface (Section~\ref {sec:canonical_configs})}{figure.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Ground-truth drone crops across datasets and modalities (red box $=$ GT; window $\approx 4\times $ the box). Svanstr\"om drones are $19$--$29$~px small silhouettes against open sky (the regime that makes birds and distant aircraft hard to separate and that drives the cascade), while Anti-UAV drones are an order of magnitude larger; the thermal (IR) view renders the same target as a bright blob rather than a dark silhouette (Section~\ref {sec:design_rationale}).}}{25}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:dataset_montage}{{3.2}{25}{Ground-truth drone crops across datasets and modalities (red box $=$ GT; window $\approx 4\times $ the box). Svanstr\"om drones are $19$--$29$~px small silhouettes against open sky (the regime that makes birds and distant aircraft hard to separate and that drives the cascade), while Anti-UAV drones are an order of magnitude larger; the thermal (IR) view renders the same target as a bright blob rather than a dark silhouette (Section~\ref {sec:design_rationale})}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Composite RGB Training Corpus (\texttt  {rgb\_dataset})}{25}{subsection.3.1.1}\protected@file@percent }
+\newlabel{sec:ds_rgb_corpus}{{3.1.1}{25}{Composite RGB Training Corpus (\texttt {rgb\_dataset})}{subsection.3.1.1}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Per-source composition of the composite RGB training corpus. Negatives include VIRAT surveillance, UA-DETRAC traffic, and BDD100K driving frames as background contrast.}}{26}{table.caption.10}\protected@file@percent }
+\newlabel{tab:ds_rgb_components}{{3.2}{26}{Per-source composition of the composite RGB training corpus. Negatives include VIRAT surveillance, UA-DETRAC traffic, and BDD100K driving frames as background contrast}{table.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Confuser Hard-Negative Corpus (\texttt  {rgb\_confusers\_merged})}{27}{subsection.3.1.2}\protected@file@percent }
+\newlabel{sec:ds_confusers}{{3.1.2}{27}{Confuser Hard-Negative Corpus (\texttt {rgb\_confusers\_merged})}{subsection.3.1.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Per-source composition of the RGB confuser hard-negative corpus. The test split (right column) is the \emph  {OOD RGB-confuser} evaluation surface used in Chapter~\ref {ch:hitl}.}}{27}{table.caption.11}\protected@file@percent }
+\newlabel{tab:ds_confusers}{{3.3}{27}{Per-source composition of the RGB confuser hard-negative corpus. The test split (right column) is the \emph {OOD RGB-confuser} evaluation surface used in Chapter~\ref {ch:hitl}}{table.caption.11}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces What the confuser corpora look like. Top: \texttt  {rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt  {New\_Dataset} source, labelled ``other''). Bottom: \texttt  {IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples.}}{28}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:confuser_examples}{{3.3}{28}{What the confuser corpora look like. Top: \texttt {rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt {New\_Dataset} source, labelled ``other''). Bottom: \texttt {IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples}{figure.caption.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Representative \texttt  {ft4} hallucinations on the OOD confuser corpus (context crops around the detection; red box $=$ false positive). Detector confidences are high ($0.82$--$0.86$) while the confuser filter's $P(\text  {drone})$ on the same detections is $0.001$--$0.077$: every example shown is suppressed at the production threshold ($0.25$). This is the per-detection discrimination the detector's decision head cannot express without recall cost.}}{29}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:confuser_fp_examples}{{3.4}{29}{Representative \texttt {ft4} hallucinations on the OOD confuser corpus (context crops around the detection; red box $=$ false positive). Detector confidences are high ($0.82$--$0.86$) while the confuser filter's $P(\text {drone})$ on the same detections is $0.001$--$0.077$: every example shown is suppressed at the production threshold ($0.25$). This is the per-detection discrimination the detector's decision head cannot express without recall cost}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.3}IR Detector Corpus (\texttt  {ir\_dset\_final})}{29}{subsection.3.1.3}\protected@file@percent }
+\newlabel{sec:ds_ir}{{3.1.3}{29}{IR Detector Corpus (\texttt {ir\_dset\_final})}{subsection.3.1.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.4}{\ignorespaces Per-source composition of \texttt  {ir\_dset\_final}. The Svanstr\"om IR partition (\texttt  {svan}) is the largest single source and is the reason Svanstr\"om IR evaluation in Chapter~\ref {ch:hitl} is in-distribution for the IR detector (Table~\ref {tab:svanstrom_audit}).}}{30}{table.caption.14}\protected@file@percent }
+\newlabel{tab:ds_ir_components}{{3.4}{30}{Per-source composition of \texttt {ir\_dset\_final}. The Svanstr\"om IR partition (\texttt {svan}) is the largest single source and is the reason Svanstr\"om IR evaluation in Chapter~\ref {ch:hitl} is in-distribution for the IR detector (Table~\ref {tab:svanstrom_audit})}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.4}Thermal Confuser Corpus (\texttt  {IR\_confusers})}{30}{subsection.3.1.4}\protected@file@percent }
+\newlabel{sec:ds_ir_confusers}{{3.1.4}{30}{Thermal Confuser Corpus (\texttt {IR\_confusers})}{subsection.3.1.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.5}Svanstr\"om Paired (\texttt  {svanstrom})}{31}{subsection.3.1.5}\protected@file@percent }
+\newlabel{sec:ds_svanstrom}{{3.1.5}{31}{Svanstr\"om Paired (\texttt {svanstrom})}{subsection.3.1.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.6}Anti-UAV RGBT (\texttt  {antiuav})}{31}{subsection.3.1.6}\protected@file@percent }
+\newlabel{sec:ds_antiuav}{{3.1.6}{31}{Anti-UAV RGBT (\texttt {antiuav})}{subsection.3.1.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.7}SelCom CCTV (\texttt  {selcom\_cctv})}{32}{subsection.3.1.7}\protected@file@percent }
+\newlabel{sec:ds_selcom}{{3.1.7}{32}{SelCom CCTV (\texttt {selcom\_cctv})}{subsection.3.1.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.8}YouTube Real-Video Diagnostic (19 Clips)}{32}{subsection.3.1.8}\protected@file@percent }
+\newlabel{sec:ds_youtube}{{3.1.8}{32}{YouTube Real-Video Diagnostic (19 Clips)}{subsection.3.1.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}Evaluation Protocol}{32}{section.3.2}\protected@file@percent }
+\newlabel{sec:eval_protocol}{{3.2}{32}{Evaluation Protocol}{section.3.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Drone size in native pixels (sampled GT boxes). Svanstr\"om drones cluster at the YOLOv26n small-object floor: a large fraction fall below the \texttt  {imgsz=640} resolvable size ($\sqrt  {\text  {area}}\approx 8$~px) but above the \texttt  {imgsz=1280} floor ($\approx 4$~px), which is why Svanstr\"om recall collapses at \texttt  {imgsz=640} and resolves at \texttt  {imgsz=1280} (Section~\ref {sec:resolution_arch}); Anti-UAV drones are an order of magnitude larger and supra-floor at either resolution.}}{33}{figure.caption.15}\protected@file@percent }
+\newlabel{fig:drone_size_hist}{{3.5}{33}{Drone size in native pixels (sampled GT boxes). Svanstr\"om drones cluster at the YOLOv26n small-object floor: a large fraction fall below the \texttt {imgsz=640} resolvable size ($\sqrt {\text {area}}\approx 8$~px) but above the \texttt {imgsz=1280} floor ($\approx 4$~px), which is why Svanstr\"om recall collapses at \texttt {imgsz=640} and resolves at \texttt {imgsz=1280} (Section~\ref {sec:resolution_arch}); Anti-UAV drones are an order of magnitude larger and supra-floor at either resolution}{figure.caption.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces The confuser problem, and why a downstream filter solves it. \emph  {Left}: the production RGB detector (\texttt  {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph  {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own ROI features and assigns $P(\text  {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides.}}{33}{figure.caption.16}\protected@file@percent }
+\newlabel{fig:confuser_problem}{{3.6}{33}{The confuser problem, and why a downstream filter solves it. \emph {Left}: the production RGB detector (\texttt {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own ROI features and assigns $P(\text {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides}{figure.caption.16}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Metrics and the IoP Rule}{34}{subsection.3.2.1}\protected@file@percent }
+\newlabel{sec:metrics}{{3.2.1}{34}{Metrics and the IoP Rule}{subsection.3.2.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Scoring-Rule Sensitivity (why trust-aware scoring)}{34}{subsection.3.2.2}\protected@file@percent }
+\newlabel{sec:scoring_audit}{{3.2.2}{34}{Scoring-Rule Sensitivity (why trust-aware scoring)}{subsection.3.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Canonical Configurations and Frame Budgets}{35}{subsection.3.2.3}\protected@file@percent }
+\newlabel{sec:canonical_configs}{{3.2.3}{35}{Canonical Configurations and Frame Budgets}{subsection.3.2.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.5}{\ignorespaces Canonical evaluation configuration per surface. Numbers measured at any other configuration are labelled as such and never share a table with canonical numbers.}}{36}{table.caption.17}\protected@file@percent }
+\newlabel{tab:eval_protocol}{{3.5}{36}{Canonical evaluation configuration per surface. Numbers measured at any other configuration are labelled as such and never share a table with canonical numbers}{table.caption.17}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.4}Unified Detection Cache}{36}{subsection.3.2.4}\protected@file@percent }
+\newlabel{sec:unified_cache}{{3.2.4}{36}{Unified Detection Cache}{subsection.3.2.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Svanstr\"om Usage Audit}{37}{section.3.3}\protected@file@percent }
+\newlabel{sec:svanstrom_audit}{{3.3}{37}{Svanstr\"om Usage Audit}{section.3.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.6}{\ignorespaces Svanstr\"om data appearance per component. The trust classifier has the most material overlap; Anti-UAV is fully clean and is used as the mitigation.}}{37}{table.caption.18}\protected@file@percent }
+\newlabel{tab:svanstrom_audit}{{3.6}{37}{Svanstr\"om data appearance per component. The trust classifier has the most material overlap; Anti-UAV is fully clean and is used as the mitigation}{table.caption.18}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Training Recipes}{37}{section.3.4}\protected@file@percent }
+\newlabel{sec:training_recipes}{{3.4}{37}{Training Recipes}{section.3.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.7}{\ignorespaces Detector training configurations. The baseline RGB and \texttt  {retrained\_v2} share a recipe but differ in training corpus (Section~\ref {sec:rgb_three_variants}). All training was on an NVIDIA RTX 3090 (24~GB VRAM); evaluation was on a GTX 1050 Ti (4~GB VRAM).}}{38}{table.caption.19}\protected@file@percent }
+\newlabel{tab:training_recipes}{{3.7}{38}{Detector training configurations. The baseline RGB and \texttt {retrained\_v2} share a recipe but differ in training corpus (Section~\ref {sec:rgb_three_variants}). All training was on an NVIDIA RTX 3090 (24~GB VRAM); evaluation was on a GTX 1050 Ti (4~GB VRAM)}{table.caption.19}{}}
+\@writefile{toc}{\contentsline {paragraph}{Backbone-freeze depth in confuser-injection fine-tuning.}{38}{paragraph*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Human-in-the-Loop Data Engine}{39}{section.3.5}\protected@file@percent }
+\newlabel{sec:hitl_method}{{3.5}{39}{Human-in-the-Loop Data Engine}{section.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}The Co-Evolution Problem}{39}{subsection.3.5.1}\protected@file@percent }
+\newlabel{sec:coevolution}{{3.5.1}{39}{The Co-Evolution Problem}{subsection.3.5.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Label Reviewer GUI}{39}{subsection.3.5.2}\protected@file@percent }
+\newlabel{sec:label_reviewer}{{3.5.2}{39}{Label Reviewer GUI}{subsection.3.5.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Label reviewer GUI with a Svanstr\"om frame on which V3 fires and the existing GT is missing. The reviewer's two-key resolution path turns the disagreement into either a corrected label (positive ingest) or a hard negative (negative-mining branch).}}{40}{figure.caption.21}\protected@file@percent }
+\newlabel{fig:label_reviewer}{{3.7}{40}{Label reviewer GUI with a Svanstr\"om frame on which V3 fires and the existing GT is missing. The reviewer's two-key resolution path turns the disagreement into either a corrected label (positive ingest) or a hard negative (negative-mining branch)}{figure.caption.21}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}The Co-Evolution Loop}{41}{subsection.3.5.3}\protected@file@percent }
+\newlabel{sec:hitl_ir}{{3.5.3}{41}{The Co-Evolution Loop}{subsection.3.5.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives.}}{41}{figure.caption.22}\protected@file@percent }
+\newlabel{fig:hitl_loop}{{3.8}{41}{The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives}{figure.caption.22}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}Reproducibility Infrastructure}{42}{section.3.6}\protected@file@percent }
+\newlabel{sec:reproducibility}{{3.6}{42}{Reproducibility Infrastructure}{section.3.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}Model MRI: Feature-Space Analysis}{42}{section.3.7}\protected@file@percent }
+\newlabel{sec:model_mri}{{3.7}{42}{Model MRI: Feature-Space Analysis}{section.3.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}What the Instrument Does}{43}{subsection.3.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}From Statistics to a Trained Filter}{44}{subsection.3.7.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.9}{\ignorespaces Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt  {mri/results/v5\_report\_regen/report.md}.}}{44}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:mri_report}{{3.9}{44}{Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt {mri/results/v5\_report\_regen/report.md}}{figure.caption.23}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.8}System Architecture and Component Design}{45}{section.3.8}\protected@file@percent }
+\newlabel{ch:architecture}{{3.8}{45}{System Architecture and Component Design}{section.3.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.1}Overview}{45}{subsection.3.8.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3.10}{\ignorespaces Multi-stage drone detection pipeline. The production confuser filter is the distilled \texttt  {mlp\_v5}, which runs \textbf  {per frame} because it reuses the detectors' already-computed ROI features rather than re-processing crops (Section~\ref {sec:distill_verifier}). It supersedes the MobileNetV3 patch filter (greyed), which was expensive enough that it had to be \emph  {alert-gated}: consulted only when the temporal smoother was about to fire (Section~\ref {sec:alert_gate}).}}{46}{figure.caption.24}\protected@file@percent }
+\newlabel{fig:pipeline}{{3.10}{46}{Multi-stage drone detection pipeline. The production confuser filter is the distilled \texttt {mlp\_v5}, which runs \textbf {per frame} because it reuses the detectors' already-computed ROI features rather than re-processing crops (Section~\ref {sec:distill_verifier}). It supersedes the MobileNetV3 patch filter (greyed), which was expensive enough that it had to be \emph {alert-gated}: consulted only when the temporal smoother was about to fire (Section~\ref {sec:alert_gate})}{figure.caption.24}{}}
+\@writefile{toc}{\contentsline {paragraph}{Two-filter fusion (trust-first).}{46}{paragraph*.25}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.2}Design Rationale: Fail-Open}{47}{subsection.3.8.2}\protected@file@percent }
+\newlabel{sec:design_rationale}{{3.8.2}{47}{Design Rationale: Fail-Open}{subsection.3.8.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.3}Trust-Aware Fusion}{47}{subsection.3.8.3}\protected@file@percent }
+\newlabel{sec:trust_fusion}{{3.8.3}{47}{Trust-Aware Fusion}{subsection.3.8.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.4}Alert-Gate Cascade (superseded patch path)}{48}{subsection.3.8.4}\protected@file@percent }
+\newlabel{sec:alert_gate}{{3.8.4}{48}{Alert-Gate Cascade (superseded patch path)}{subsection.3.8.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.5}Temporal Smoother}{49}{subsection.3.8.5}\protected@file@percent }
+\newlabel{sec:temporal}{{3.8.5}{49}{Temporal Smoother}{subsection.3.8.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.11}{\ignorespaces PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator.}}{49}{figure.caption.26}\protected@file@percent }
+\newlabel{fig:pyside_gui}{{3.11}{49}{PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator}{figure.caption.26}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.6}Resolution Dependency}{50}{subsection.3.8.6}\protected@file@percent }
+\newlabel{sec:resolution_arch}{{3.8.6}{50}{Resolution Dependency}{subsection.3.8.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.12}{\ignorespaces Inference-resolution dependency of Svanstr\"om drone recall. At \texttt  {imgsz=1280} the baseline detector reaches $R=0.961$; the \texttt  {imgsz=640} floor is illustrated with \texttt  {retrained\_v2} ($R=0.072$), the only variant measured at that size; the baseline's own \texttt  {imgsz=640} run is pending, so the two endpoints are different variants and the curve is indicative, not a single-model sweep.}}{50}{figure.caption.27}\protected@file@percent }
+\newlabel{fig:resolution}{{3.12}{50}{Inference-resolution dependency of Svanstr\"om drone recall. At \texttt {imgsz=1280} the baseline detector reaches $R=0.961$; the \texttt {imgsz=640} floor is illustrated with \texttt {retrained\_v2} ($R=0.072$), the only variant measured at that size; the baseline's own \texttt {imgsz=640} run is pending, so the two endpoints are different variants and the curve is indicative, not a single-model sweep}{figure.caption.27}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.7}RGB Drone Detector}{51}{subsection.3.8.7}\protected@file@percent }
+\newlabel{sec:rgb_detector}{{3.8.7}{51}{RGB Drone Detector}{subsection.3.8.7}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Three Training Stances}{51}{subsubsection*.28}\protected@file@percent }
+\newlabel{sec:rgb_three_variants}{{3.8.7}{51}{Three Training Stances}{subsubsection*.28}{}}
+\@writefile{toc}{\contentsline {subsubsection}{SelCom CCTV Fine-Tune}{52}{subsubsection*.29}\protected@file@percent }
+\newlabel{sec:selcom_finetune}{{3.8.7}{52}{SelCom CCTV Fine-Tune}{subsubsection*.29}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.8}IR Drone Detector}{52}{subsection.3.8.8}\protected@file@percent }
+\newlabel{sec:ir_detector}{{3.8.8}{52}{IR Drone Detector}{subsection.3.8.8}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Grayscale-RGB Operating Mode}{53}{subsubsection*.30}\protected@file@percent }
+\newlabel{sec:ir_grayscale_mode}{{3.8.8}{53}{Grayscale-RGB Operating Mode}{subsubsection*.30}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Cross-Modal Feature Alignment: a Thermal Filter from Grayscale Confusers}{53}{subsubsection*.31}\protected@file@percent }
+\newlabel{sec:ir_xmodal_verifier}{{3.8.8}{53}{Cross-Modal Feature Alignment: a Thermal Filter from Grayscale Confusers}{subsubsection*.31}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.9}Trust Classifier}{54}{subsection.3.8.9}\protected@file@percent }
+\newlabel{sec:trust_classifier}{{3.8.9}{54}{Trust Classifier}{subsection.3.8.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Feature Set}{54}{subsubsection*.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Hand-Engineered Variants (the comparison set)}{55}{subsubsection*.33}\protected@file@percent }
+\newlabel{sec:classifier_variants}{{3.8.9}{55}{Hand-Engineered Variants (the comparison set)}{subsubsection*.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{Scene-fingerprint over-fitting.}{56}{paragraph*.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Statistical Feature Selection: \texttt  {robust6} and \texttt  {robust8}}{56}{subsubsection*.35}\protected@file@percent }
+\newlabel{sec:feature_selection}{{3.8.9}{56}{Statistical Feature Selection: \texttt {robust6} and \texttt {robust8}}{subsubsection*.35}{}}
+\@writefile{toc}{\contentsline {paragraph}{Method.}{56}{paragraph*.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{57}{paragraph*.37}\protected@file@percent }
+\newlabel{eq:leakage}{{3.1}{57}{A leakage statistic}{equation.3.1}{}}
+\newlabel{fig:fusion_lda}{{3.13a}{57}{\relax }{figure.caption.38}{}}
+\newlabel{sub@fig:fusion_lda}{{a}{57}{\relax }{figure.caption.38}{}}
+\newlabel{fig:fusion_auroc}{{3.13b}{57}{\relax }{figure.caption.38}{}}
+\newlabel{sub@fig:fusion_auroc}{{b}{57}{\relax }{figure.caption.38}{}}
+\newlabel{fig:fusion_leakage}{{3.13c}{57}{\relax }{figure.caption.38}{}}
+\newlabel{sub@fig:fusion_leakage}{{c}{57}{\relax }{figure.caption.38}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.13}{\ignorespaces Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt  {classifier/fusion\_feature\_stats.py}.}}{57}{figure.caption.38}\protected@file@percent }
+\newlabel{fig:fusion_stats}{{3.13}{57}{Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt {classifier/fusion\_feature\_stats.py}}{figure.caption.38}{}}
+\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{57}{paragraph*.39}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.8}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{58}{table.caption.40}\protected@file@percent }
+\newlabel{tab:leakage}{{3.8}{58}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.40}{}}
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{58}{paragraph*.41}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Closing the grayscale hole: \texttt  {robust8}.}{58}{paragraph*.42}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Further free levers.}{59}{paragraph*.43}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.10}Patch Filter (Superseded Predecessor)}{59}{subsection.3.8.10}\protected@file@percent }
+\newlabel{sec:patch_verifier_arch}{{3.8.10}{59}{Patch Filter (Superseded Predecessor)}{subsection.3.8.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.11}Feature-Reuse Filter (\texttt  {mlp\_v5})}{60}{subsection.3.8.11}\protected@file@percent }
+\newlabel{sec:distill_verifier}{{3.8.11}{60}{Feature-Reuse Filter (\texttt {mlp\_v5})}{subsection.3.8.11}{}}
+\@setckpt{chapters/methodology}{
+\setcounter{page}{62}
+\setcounter{equation}{1}
+\setcounter{enumi}{3}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{0}
+\setcounter{mpfootnote}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{3}
+\setcounter{section}{8}
+\setcounter{subsection}{11}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{figure}{13}
+\setcounter{table}{8}
+\setcounter{float@type}{4}
+\setcounter{caption@flags}{2}
+\setcounter{continuedfloat}{0}
+\setcounter{subfigure}{3}
+\setcounter{subtable}{0}
+\setcounter{tabx@nest}{0}
+\setcounter{listtotal}{0}
+\setcounter{listcount}{0}
+\setcounter{liststart}{0}
+\setcounter{liststop}{0}
+\setcounter{citecount}{0}
+\setcounter{citetotal}{0}
+\setcounter{multicitecount}{0}
+\setcounter{multicitetotal}{0}
+\setcounter{instcount}{66}
+\setcounter{maxnames}{2}
+\setcounter{minnames}{1}
+\setcounter{maxitems}{3}
+\setcounter{minitems}{1}
+\setcounter{citecounter}{0}
+\setcounter{maxcitecounter}{0}
+\setcounter{savedcitecounter}{0}
+\setcounter{uniquelist}{0}
+\setcounter{uniquename}{0}
+\setcounter{refsection}{0}
+\setcounter{refsegment}{0}
+\setcounter{maxextratitle}{0}
+\setcounter{maxextratitleyear}{0}
+\setcounter{maxextraname}{0}
+\setcounter{maxextradate}{0}
+\setcounter{maxextraalpha}{0}
+\setcounter{abbrvpenalty}{50}
+\setcounter{highnamepenalty}{50}
+\setcounter{lownamepenalty}{25}
+\setcounter{maxparens}{3}
+\setcounter{parenlevel}{0}
+\setcounter{blx@maxsection}{0}
+\setcounter{mincomprange}{10}
+\setcounter{maxcomprange}{100000}
+\setcounter{mincompwidth}{1}
+\setcounter{afterword}{0}
+\setcounter{savedafterword}{0}
+\setcounter{annotator}{0}
+\setcounter{savedannotator}{0}
+\setcounter{author}{0}
+\setcounter{savedauthor}{0}
+\setcounter{bookauthor}{0}
+\setcounter{savedbookauthor}{0}
+\setcounter{commentator}{0}
+\setcounter{savedcommentator}{0}
+\setcounter{editor}{0}
+\setcounter{savededitor}{0}
+\setcounter{editora}{0}
+\setcounter{savededitora}{0}
+\setcounter{editorb}{0}
+\setcounter{savededitorb}{0}
+\setcounter{editorc}{0}
+\setcounter{savededitorc}{0}
+\setcounter{foreword}{0}
+\setcounter{savedforeword}{0}
+\setcounter{holder}{0}
+\setcounter{savedholder}{0}
+\setcounter{introduction}{0}
+\setcounter{savedintroduction}{0}
+\setcounter{namea}{0}
+\setcounter{savednamea}{0}
+\setcounter{nameb}{0}
+\setcounter{savednameb}{0}
+\setcounter{namec}{0}
+\setcounter{savednamec}{0}
+\setcounter{translator}{0}
+\setcounter{savedtranslator}{0}
+\setcounter{shortauthor}{0}
+\setcounter{savedshortauthor}{0}
+\setcounter{shorteditor}{0}
+\setcounter{savedshorteditor}{0}
+\setcounter{labelname}{0}
+\setcounter{savedlabelname}{0}
+\setcounter{institution}{0}
+\setcounter{savedinstitution}{0}
+\setcounter{lista}{0}
+\setcounter{savedlista}{0}
+\setcounter{listb}{0}
+\setcounter{savedlistb}{0}
+\setcounter{listc}{0}
+\setcounter{savedlistc}{0}
+\setcounter{listd}{0}
+\setcounter{savedlistd}{0}
+\setcounter{liste}{0}
+\setcounter{savedliste}{0}
+\setcounter{listf}{0}
+\setcounter{savedlistf}{0}
+\setcounter{location}{0}
+\setcounter{savedlocation}{0}
+\setcounter{organization}{0}
+\setcounter{savedorganization}{0}
+\setcounter{origlocation}{0}
+\setcounter{savedoriglocation}{0}
+\setcounter{origpublisher}{0}
+\setcounter{savedorigpublisher}{0}
+\setcounter{publisher}{0}
+\setcounter{savedpublisher}{0}
+\setcounter{language}{0}
+\setcounter{savedlanguage}{0}
+\setcounter{origlanguage}{0}
+\setcounter{savedoriglanguage}{0}
+\setcounter{pageref}{0}
+\setcounter{savedpageref}{0}
+\setcounter{textcitecount}{0}
+\setcounter{textcitetotal}{1}
+\setcounter{textcitemaxnames}{0}
+\setcounter{biburlbigbreakpenalty}{100}
+\setcounter{biburlbreakpenalty}{200}
+\setcounter{biburlnumpenalty}{0}
+\setcounter{biburlucpenalty}{0}
+\setcounter{biburllcpenalty}{0}
+\setcounter{smartand}{1}
+\setcounter{bbx:relatedcount}{0}
+\setcounter{bbx:relatedtotal}{0}
+\setcounter{section@level}{0}
+\setcounter{Item}{16}
+\setcounter{Hfootnote}{0}
+\setcounter{bookmark@seq@number}{56}
+\setcounter{LT@tables}{0}
+\setcounter{LT@chunks}{0}
+\setcounter{parentequation}{0}
+}

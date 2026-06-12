@@ -1,6 +1,6 @@
 # Example MRI config — equivalent to passing --pos/--neg on the CLI, but lets
 # you pin per-dataset imgsz / rule / caps. Run with:
-#   python -m mri --yolo "RGB model/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt" --config mri/configs/example_rgb.yaml --train-mlp
+#   python -m mri --yolo "models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt" --config mri/configs/example_rgb.yaml --train-mlp
 #
 # `rule: iop` + `imgsz: 1280` are auto-applied for paths containing svan/selcom,
 # but you can set them explicitly here for any dataset.

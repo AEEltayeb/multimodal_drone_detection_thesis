@@ -241,7 +241,7 @@ def add_obj(accum, per):
 def detection_patch_confusion(img_bgr, dets, gt_boxes, has_drone_gt, verifier):
     """Per-det TP/TN/FP/FN (overall + per size bucket).
     Verifier emits P(CONFUSER) — high prob = airplane/bird/heli. Matches
-    ir_gui/fusion/engine.py:286: reject when p >= threshold.
+    gui/fusion/engine.py:286: reject when p >= threshold.
     Prediction here: pred=1 (drone) iff p < PATCH_THRESHOLD.
     Returns ((tp,tn,fp,fn), per_bucket_dict)."""
     per = {b[0]: {"TP": 0, "TN": 0, "FP": 0, "FN": 0} for b in SIZE_BUCKETS}
@@ -307,7 +307,7 @@ def time_of_day_onehots(hour):
 
 
 def build_frame_features(rgb_dets, ir_dets, rgb_gray, ir_gray):
-    """Build the same 40-feature dict used by ir_gui/fusion/engine.py."""
+    """Build the same 40-feature dict used by gui/fusion/engine.py."""
     # -- add fusion/features.py to path --
     fusion_pkg = REPO / "ir_gui" / "fusion"
     if str(fusion_pkg.parent) not in sys.path:

@@ -3,8 +3,8 @@
 # ══════════════════════════════════════════════════════════════
 
 # ── Model weights ──
-rgb_weights: "../RGB model/Yolo26n_trained/weights/best.pt"
-ir_weights: "../runs/corrective_finetune/finetune_v3b/weights/best.pt"
+rgb_weights: "../models/rgb/Yolo26n_trained/weights/best.pt"
+ir_weights: "../models/ir/corrective_finetune/finetune_v3b/weights/best.pt"
 
 # ── Paired evaluation dataset (Anti-UAV-RGBT) ──
 dataset_root: "G:/drone/Anti-UAV-RGBT_yolo_converted/test"

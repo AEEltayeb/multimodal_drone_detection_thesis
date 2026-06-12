@@ -5,7 +5,7 @@ synth_yolo_for_patches.py
 Build a synthetic YOLO-format dataset from a classifier patch tree so the
 existing label_reviewer GUI can be used to review/relabel/delete patches.
 
-Input layout (e.g. classifier/runs/patches/ir):
+Input layout (e.g. models/patches/ir):
     <patches_root>/<class_name>/<image>.jpg
 
 Output layout:
@@ -15,8 +15,8 @@ Output layout:
     <out>/manifest.csv                 # link_name,orig_class,orig_path
 
 Usage:
-    python scripts/dataset_preparation/synth_yolo_for_patches.py classifier/runs/patches/ir
-    python scripts/dataset_preparation/synth_yolo_for_patches.py classifier/runs/patches/rgb --mode copy
+    python scripts/dataset_preparation/synth_yolo_for_patches.py models/patches/ir
+    python scripts/dataset_preparation/synth_yolo_for_patches.py models/patches/rgb --mode copy
 
 Then in the label reviewer (review_labels_gui.py) point:
     Images Dir -> <out>/images
@@ -60,7 +60,7 @@ def link_file(src: Path, dst: Path, mode: str) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("patches_root", type=Path,
-                    help="Root containing per-class subfolders (e.g. classifier/runs/patches/ir)")
+                    help="Root containing per-class subfolders (e.g. models/patches/ir)")
     ap.add_argument("--out", type=Path, default=None,
                     help="Output dir (default: <patches_root>_synth_review)")
     ap.add_argument("--mode", choices=["hardlink", "symlink", "copy"], default="hardlink",

@@ -1,146 +1,70 @@
-# ES Drone Detection
+# ES Drone Detection — Thesis Workspace
 
-Multi-sensor drone detection system using YOLOv26n, The system targets infrared (IR) drone detection with a human-in-the-loop dataset refinement pipeline that iteratively improves label quality using model predictions.
+Dual-modality (RGB + thermal IR) drone detection system with a trust-routing classifier,
+feature-space verifiers, an operator GUI, and a human-in-the-loop data engine — plus the
+MSc thesis built on it. This repo is the curated thesis workspace (full git history; the
+original heavyweight workspace lives in the sibling `ES_Drone_Detection/` folder as a
+frozen archive).
 
-## Project Structure
+## Where everything is
 
-```
-ES_Drone_Detection/
-├── configs/                    # Training and evaluation YAML configs
-│   ├── base.yaml               # Shared hyperparameters
-│   ├── ir_final_cleaned.yaml   # IR training config (final model)
-│   ├── ir_final_cleaned_eval.yaml  # IR evaluation config
-│   └── rgb_baseline.yaml       # RGB baseline config
-│
-├── drone_detector/             # RGB model
-│   └── drone_detection.py
-│
-├── models/                     # Model weights (not tracked)
-│   ├── pretrained/             # Base yolon26n pretrained weights
-│   └── IR_final_cleaned/       # Final IR model (best.pt)
-│
-├── notebooks/
-│   
-│
-├── runs/
-│   └── IR_FT_final_cleaned_s0/  # Evaluation artifacts (metrics, curves)
-│
-├── scripts/
-│   ├── train.py                # Training entry point
-│   ├── eval.py                 # Evaluation (threshold sweep, size breakdown, TN)
-│   ├── review_labels_gui.py    # Label reviewer GUI launcher
-│   ├── label_reviewer/         # Human-in-the-loop label review toolkit
-│   │   ├── core.py             # Review engine (4 modes)
-│   │   ├── gui.py              # Tkinter GUI
-│   │   └── predictor.py        # Model inference for review
-│   ├── dataset_preparation/    # Dataset building & merging scripts
-│   ├── eval/                   # Per-source evaluation tools
-│   └── analysis/               # Audits, statistics, deduplication
-│
-└── requirements.txt
-```
+| Directory | What's in it |
+|---|---|
+| `docs/` | **The thesis**: `thesis_working.tex` (+ Overleaf split in `thesis_working_distilling_overleaf/`), `figures/`, `references.bib`, `build_thesis.ps1`, dated analyses in `analysis/` |
+| `models/` | **All model weights, by role** — see the production stack table below |
+| `gui/` | **Operator GUI** (PySide6 "TALOS"): `pyside_app.py` + `fusion/` engine, alert-gate temporal logic, `fusion_settings.json` |
+| `label_reviewer/` | **Human-in-the-loop label review tool** (tkinter): `review_labels_gui.py` |
+| `mri/` | **Model MRI** — detector feature-space diagnosis (PCA/LDA/ANOVA, verifier training): `py -m mri` |
+| `thesis_eval/` | **Tier-1 unified eval harness** — detect-once caches + 60 s zero-GPU replay that produces the thesis numbers |
+| `eval/` | Evaluation library + harnesses (metrics, ablations, routing comparison) and `eval/results/` artifacts |
+| `classifier/` | Trust-classifier / verifier / patch-CNN training and feature code |
+| `training/` | RGB detector fine-tuning scripts + `dataset_preparation/` |
+| `scripts/` | Utility scripts: dataset prep, confuser mining (`auto_confuser_ft4.py`), runners (`run_afk_pipeline.py`) |
+| `knowledge/` | **The knowledge base** (CSV database of scripts/models/evals/findings + generated views). Read `knowledge/README.md`; write only via `knowledge/_tools/kb.py` |
+| `datasets/` | Local video eval sets (confuser videos, drone video tests, demo pairs). Big training corpora live on `G:/drone` |
+| `configs/` | Training/eval YAML configs |
+| `analytics/`, `notebooks/`, `tests/` | Spec analyses, result notebooks, smoke tests |
+| `archive/` | Swept legacy scripts (git-tracked, dated subfolders) — nothing is ever deleted |
 
-## Results — Final IR Model
+## Production stack (models/)
 
-**Dataset**: `ir_dset_final` — 129,130 images from 13 sources  
-**Architecture**: YOLOv26n, fine-tuned 70 epochs  
-**Optimal Threshold**: T* = 0.38 (F1-optimal, selected on val split)
+| Role | Weights | Notes |
+|---|---|---|
+| RGB detector | `models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt` | FT4; imgsz 1280 for Svanström/SelCom, 640 default |
+| IR detector | `models/ir/corrective_finetune/finetune_v3b/weights/best.pt` | v3b |
+| Trust router | `models/routers/robust8.joblib` | τ = 0.20 (sa32 / robust6 kept for comparison) |
+| RGB verifier | `models/verifiers/rgb_v5/mlp_v5.pt` | V5 distillation MLP, per-frame, thr 0.15 |
+| IR verifier | `models/verifiers/ir_aligned/mlp_aligned.pt` (+ `mlp_aligned_gray.pt`) | thermal + grayscale scalers |
+| Patch verifier (fallback) | `models/patches/confuser_filter4_{rgb,ir}_v2_backup.pt` | 5-class MobileNetV3, fail-open, thr 0.9 |
+| Comparison RGB detectors | `models/rgb/Yolo26n_*/weights/best.pt` | baseline, retrained_v2, selcom variants… |
+| IR lineage | `models/ir/IR_dsetV4/5/6…` | historical versions |
+| Pretrained | `models/pretrained/yolo11n.pt`, `yolo26n.pt` | training init |
 
-### TEST Split — Overall Metrics
+## Quickstart
 
-| Metric | Value | Note |
-|--------|------:|------|
-| Precision | 95.49% | YOLO .val() metrics |
-| Recall | 97.95% | YOLO .val() metrics |
-| F1 Score | 96.70% | YOLO .val() metrics |
-| mAP@0.5 | 97.70% | threshold-agnostic |
-| Precision @ T\*=0.38 | 96.52% | frozen operational threshold |
-| Recall @ T\*=0.38 | 96.95% | frozen operational threshold |
-| F1 @ T\*=0.38 | 96.73% | frozen operational threshold |
-| True Negative Rate | 98.6% | 3,309 / 3,355 negative images |
-| FPPI | 0.0137 | false positives per image |
+```powershell
+# Operator GUI
+py gui/pyside_app.py
 
-### Size-Based Breakdown (TEST @ T\*=0.38)
+# Reproduce the thesis numbers (zero-GPU replay from caches, ~60 s)
+py thesis_eval/pipeline_eval_unified.py
 
-| Size Bucket | Precision | Recall | TP | FP | FN | GT |
-|-------------|----------:|-------:|---:|---:|---:|---:|
-| Tiny | 94.81% | 95.53% | 3,380 | 185 | 158 | 3,720 |
-| Medium | 98.92% | 98.80% | 2,467 | 27 | 30 | 2,315 |
-| Large | 96.93% | 98.44% | 253 | 8 | 4 | 257 |
+# Build the thesis PDF (MiKTeX)
+powershell -ExecutionPolicy Bypass -File docs/build_thesis.ps1
 
-### Size-Based Breakdown (TEST @ T=0.40)
+# Regenerate thesis figures
+py docs/generate_thesis_figures.py   # set PYTHONUTF8=1 on Windows consoles
 
-| Size Bucket | Precision | Recall | TP | FP | FN | GT |
-|-------------|----------:|-------:|---:|---:|---:|---:|
-| Tiny | 94.88% | 94.88% | 3,357 | 181 | 181 | 3,720 |
-| Medium | 99.00% | 98.76% | 2,466 | 25 | 31 | 2,315 |
-| Large | 96.93% | 98.44% | 253 | 8 | 4 | 257 |
+# Label reviewer (HITL)
+py label_reviewer/review_labels_gui.py
 
-### Model Progression
-
-| Model | Sources | Images | TEST F1 | TEST mAP@0.5 |
-|-------|--------:|-------:|--------:|--------------:|
-| IR GoldV2 | 1 | 3.4K | 94.0% | 96.2% |
-| IR dsetV4 | 6 | 33K | 92.7% | 95.2% |
-| IR dsetV6 | 8 | 68K | 89.7% | 89.5% |
-| **IR Final** | **13** | **129K** | **96.7%** | **97.7%** |
-
-> See [`notebooks/ir_dset_final_results.ipynb`](notebooks/ir_dset_final_results.ipynb) for full visualizations, training curves, and per-source analysis.
-
-## Label Reviewer — Human-in-the-Loop Dataset Cleaning
-
-The label reviewer (`scripts/label_reviewer/`) is a GUI-based tool for iterative dataset refinement. It uses a **human-in-the-loop** approach where previous versions of the trained model are run on the dataset to surface labelling problems that the model struggles with:
-
-- **FP Review**: Shows images where the model predicts a drone but no ground truth exists — surfaces missing annotations and false positive patterns.
-- **FN Review**: Shows images where ground truth exists but the model fails to detect — reveals hard examples and incorrect labels.
-- **GT Mismatch Review**: Shows images where predictions and ground truth overlap poorly — catches misaligned or incorrectly sized bounding boxes.
-- **Full Review**: Manual inspection of all annotations for a given source.
-
-This iterative cycle (train → evaluate → review errors → fix labels → retrain) was critical to scaling the dataset from 3K to 129K images while maintaining label quality. Each dataset version was cleaned using the previous version's model to identify and correct systematic labelling errors.
-
-### Usage
-
-```bash
-python scripts/review_labels_gui.py
+# Knowledge base health
+py knowledge/_tools/kb.py validate
 ```
 
-The GUI allows selecting a dataset path, a model weights file, and a review mode. Corrections are saved as updated YOLO-format label files.
+## Method
 
-## Quick Start
-
-### Training
-```bash
-python scripts/train.py --config configs/ir_final_cleaned.yaml
-```
-
-### Evaluation
-```bash
-# VAL split — threshold sweep to find F1-optimal T*
-python scripts/eval.py --config configs/ir_final_cleaned_eval.yaml --split val
-
-# TEST split — frozen threshold from VAL
-python scripts/eval.py --config configs/ir_final_cleaned_eval.yaml --split test --threshold 0.38
-```
-
-The eval script produces: `metrics.json`, `size_breakdown.json`, `confusion_matrix.json`, `threshold_sweep.csv`, and `pr_curve.json`. It computes per-size-bucket TP/FP/FN, true negative rates, and FPPI — metrics that YOLO's built-in `.val()` does not provide.
-
-### Results Notebook
-```bash
-jupyter notebook notebooks/ir_dset_final_results.ipynb
-```
-
-## Key Concepts
-
-
-- **Dataset iterations**: GoldV2 (1-src) → dsetV4 (6-src) → dsetV6 (8-src) → **ir_dset_final (13-src, 129K images)**
-- **Human-in-the-loop cleaning**: Each dataset version was cleaned using the previous model's predictions to identify FP/FN/GT mismatches
-- **Evaluation protocol**: F1-optimal threshold selection on VAL, frozen evaluation on TEST, with per-size and true-negative analysis
-- **Run naming**: `{domain}_{type}_{dataset}_{seed}` (e.g., `IR_FT_final_cleaned_s0`)
-
-## Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-Core: `ultralytics`, `torch`, `opencv-python`, `numpy`, `matplotlib`, `pandas`, `tkinter` (stdlib)
+Every script/model/eval lives as a row in `knowledge/*.csv` (the source of truth).
+Before writing a new script, search `knowledge/scripts.csv`; after producing a number,
+record it (`/record`). Cleanup goes through lifecycle marks + `/sweep` — files are
+archived to `archive/<date>/`, never deleted. See `CLAUDE.md` and `knowledge/README.md`.

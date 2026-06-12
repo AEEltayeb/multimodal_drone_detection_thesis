@@ -25,7 +25,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 MODELS = {
     "M1_GoldV2": {
         "label": "GoldV2",
-        "weights": "models/IR_dsetV1_goldV2_300ep/best.pt",
+        "weights": "models/ir/IR_dsetV1_goldV2_300ep/best.pt",
         "threshold": 0.52,
         "config": "runs/IR_FT_goldV2_IRdsetV1_aug0_s0_pilot/config.yaml",
     },
@@ -37,25 +37,25 @@ MODELS = {
     },
     "M3_dsetV4": {
         "label": "dsetV4",
-        "weights": "models/IR_dsetV4_300ep/best.pt",
+        "weights": "models/ir/IR_dsetV4_300ep/best.pt",
         "threshold": 0.17,
         "config": "configs/ir_finetune_pub.yaml",
     },
     "M4_dsetV5": {
         "label": "dsetV5",
-        "weights": "models/IR_dsetV5_269ep/best.pt",
+        "weights": "models/ir/IR_dsetV5_269ep/best.pt",
         "threshold": 0.42,
         "config": "configs/ir_finetune_pub_v5.yaml",
     },
     "M5_dsetV6": {
         "label": "dsetV6",
-        "weights": "models/IR_dsetV6_118ep/best.pt",
+        "weights": "models/ir/IR_dsetV6_118ep/best.pt",
         "threshold": 0.33,
         "config": "configs/ir_finetune_pub_v6.yaml",
     },
     "M6_Final": {
         "label": "Final",
-        "weights": "models/IR_final_cleaned/weights/best.pt",
+        "weights": "models/ir/IR_final_cleaned/weights/best.pt",
         "threshold": 0.40,
         "config": "configs/ir_final_cleaned_eval.yaml",
     },

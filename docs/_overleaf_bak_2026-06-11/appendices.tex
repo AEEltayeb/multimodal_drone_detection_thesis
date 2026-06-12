@@ -1,0 +1,189 @@
+\appendix
+
+\chapter{Datasets in Detail}
+\label{app:datasets}
+
+This appendix consolidates the per-source / per-clip dataset metadata that the methodology chapter summarises. Numbers come from the dataset YAMLs (\texttt{rgb\_dataset/dataset.yaml}, \texttt{IR\_dset\_final/dataset.yaml}), the documentation file shipped with the confuser corpus (\texttt{rgb\_confusers\_merged/dataset\_documentation.md}), the Svanstr\"om paired-corpus meta file, and the YouTube extraction manifests.
+
+\section{Composite RGB Training Corpus}
+
+The full distribution by source prefix is given in Table~\ref{tab:ds_rgb_components}; the split policy is 80 / 10 / 10 with sequence-disjoint partitioning where the source did not already supply its own splits. Six negative-source rows (VIRAT, UA-DETRAC, BDD100K) contribute the 21.9\% background-negative fraction. The AirBird subset (10{,}000 images) is the bird hard-negative channel the baseline detector relies on; the composite corpus does not contain Svanstr\"om bird / airplane / helicopter splits, which are therefore OOD at evaluation time.
+% [source: dataset=rgb_dataset; file=rgb_dataset/dataset.yaml]
+
+\section{Confuser Hard-Negative Corpus}
+
+Per-source composition is in Table~\ref{tab:ds_confusers}. Split policy:
+
+\begin{itemize}
+    \item \textbf{Sources with existing splits} (Airplane Roboflow, New\_Dataset Roboflow): original train / valid / test partitions preserved.
+    \item \textbf{Sources without splits}: split by video / sequence ID at 80 / 10 / 10 to prevent leakage.
+    \begin{itemize}
+        \item Svanstr\"om: 165 video sequences split by sequence ID.
+        \item raihanrsd: 58 video folders split by folder.
+        \item Helicopter Kaggle: 20 hash-based pseudo-groups.
+    \end{itemize}
+    \item \textbf{Mislabeled frame removal}: 10 frames in the airplane / New\_Dataset sources contained visible drones and were excised before training.
+\end{itemize}
+
+\noindent The mined-hard-negative process for \texttt{retrained\_v2} ran the baseline detector on every confuser image and kept the 11{,}729 frames (43.4\%) on which the baseline fired; those mined frames were merged with the composite RGB corpus to produce the final 183{,}751-image \texttt{retrain\_dataset}. \texttt{hardneg\_v3more} differs in using a smaller, less aggressive merge.
+% [source: dataset=rgb_confusers_merged; file=rgb_confusers_merged/dataset_documentation.md]
+
+\section{IR Detector Corpus}
+
+The per-prefix distribution is in Table~\ref{tab:ds_ir_components}. The Svanstr\"om IR partition (\texttt{svan}, 21{,}637 frames) is the largest single Svanstr\"om appearance in any training corpus in this thesis and is the reason Svanstr\"om IR evaluation is in-distribution for the IR detector (Table~\ref{tab:svanstrom_audit}). The corpus state documented here is the state at the \texttt{Final} checkpoint; the V2--V6 revision history (Section~\ref{sec:ir_evolution}) operated on smaller predecessor variants of the same source families.
+
+\section{Svanstr\"om Paired}
+
+28{,}710 frames, sampled at stride~3 from 279 source video sequences. Per-class instance counts: drone 11{,}695; airplane 6{,}090; bird 5{,}298; helicopter 5{,}627. Native resolution $640{\times}512$ (RGB) with a co-registered IR channel at the same resolution. Annotators drew loose boxes around small drones, motivating the IoP@0.5 scoring rule of Section~\ref{sec:metrics}.
+
+\section{Anti-UAV RGBT}
+
+The converted YOLO test + val splits used for evaluation comprise 85{,}374 paired frames at $1920{\times}1080$ (RGB) and $640{\times}512$ (IR). Anti-UAV is a tracking benchmark in its native form; the per-frame detection evaluation reported in this thesis is computed by re-scoring the tracking benchmark's frame-level GT boxes with the IoU@0.5 matching rule.
+
+\section{SelCom CCTV}
+
+Single-camera source: fixed perimeter installation, HEVC 7~Mbps stream, \texttt{yuvj420p}, $1920{\times}1080$, 25~fps. Source clip $\sim$1:30, 2{,}076 extracted frames (1{,}953 positive + 123 explicit negative). Median drone $\sqrt{\text{area}} \approx 36.8$~px in the native frame (so $\sim$12~px at \texttt{imgsz=640}, $\sim$24~px at \texttt{imgsz=1280}). The 80 / 20 train / val split (20\% pure-SelCom validation, seed~0) is preserved across the \texttt{ft1} / \texttt{mixed\_ft1} / \texttt{mixed\_ft2} / \texttt{mixed\_ft2\_1280} variants; the strongest CCTV-evaluated fine-tune is \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280}, a comparison detector; the production RGB detector is \texttt{ft4} (Section~\ref{sec:production_stack}).
+% [source: dataset=selcom_cctv; file=SelCom CCTV manifest (see Section~\ref{sec:ds_selcom})]
+
+\section{Roboflow OOD Audit}
+
+Nine community datasets used as a read-only OOD audit, no training contribution to any production model. Three RGB-drone splits (\texttt{rgb\_drone\_*}, totalling 3{,}341 images), three RGB-confuser splits (airplane / bird / helicopter, totalling several thousand images), and three IR splits (\texttt{ir\_drone\_night}, \texttt{ir\_mixed\_cbam}, IR airplane / bird). Per-split image counts and the corresponding precision / recall / F1 tables are in \texttt{eval/results/roboflow\_ood/summary.csv}.
+
+\section{YouTube Real-Video Diagnostic}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Drone-positive YouTube clips. ``Extracted'' is the frame count used in evaluation after stride sampling; total native frame count is shown for context.}
+    \label{tab:youtube_drone_clips}
+    \begin{tabular}{lrrrr}
+        \toprule
+        Clip & FPS & Total frames & Stride & Extracted \\
+        \midrule
+        \texttt{drone\_and\_bird\_sky\_and\_trees\_short}     & 30.0 &   506 & 0 (full) & 114 \\
+        \texttt{drone\_attacked\_by\_bird\_mountain\_side\_view} & 30.0 & 400 & 3 & 133 \\
+        \texttt{drone\_over\_mountain\_attacked\_by\_birds}   & 30.0 &   325 & 3 & 108 \\
+        \texttt{drone\_seagull\_attack}                        & 30.0 & 1{,}146 & 0 (full) & 235 \\
+        \texttt{drone\_takeoff\_from\_ground\_and\_not\_hand\_short} & 60.0 & 1{,}379 & 0 (full) & 163 \\
+        \texttt{drone\_takeoff\_short}                         & 60.0 & 637 & 0 (full) & 116 \\
+        \texttt{drone\_takeoff\_short\_trees\_background\_dji} & 60.0 & 954 & 0 (full) & 166 \\
+        \texttt{flock\_of\_birds\_attack\_drone}              & 30.0 & 338 & 3 & 112 \\
+        \texttt{flock\_of\_seagulls\_attack\_drone\_beach}    & 60.0 & 1{,}010 & 3 & 336 \\
+        \texttt{two\_birds\_drone}                              & 30.0 & 456 & 0 (full) & 150 \\
+        \midrule
+        \textbf{Total} & & 7{,}151 & & \textbf{1{,}633} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\noindent Note: the aggregate ``9 clips / 1{,}234 GT instances'' figure used in Section~\ref{ch:experiments} reflects the subset of these clips that re-ran cleanly through the corrected-scoring pipeline; \texttt{flock\_of\_birds\_attack\_drone} was not in the re-run and is reported separately in Section~\ref{ch:experiments} where it carries the load.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Confuser-only YouTube clips. All frames are confuser-positive only; every detection in these clips is a false positive by construction.}
+    \label{tab:youtube_confuser_clips}
+    \begin{tabular}{lrrrr}
+        \toprule
+        Clip & FPS & Total frames & Stride & Extracted \\
+        \midrule
+        \texttt{airplanes\_airplanes\_compilation}             & 25.0 & 6{,}248 & 25 & 249 \\
+        \texttt{airplanes\_distant\_airplane\_over\_head\_flying\_away} & 29.0 & 1{,}606 & 29 & 55 \\
+        \texttt{birds\_birds\_flying\_overhead\_various\_sizes\_short} & 30.0 & 201 & 10 & 20 \\
+        \texttt{birds\_birds\_in\_slow\_motion\_flying\_various\_sizes\_compilation} & 50.0 & 13{,}550 & 50 & 271 \\
+        \texttt{birds\_distant\_birds\_flying\_in\_the\_sky\_short} & 30.0 & 462 & 23 & 20 \\
+        \texttt{birds\_flock\_of\_birds\_flying\_short}        & 30.0 & 259 & 12 & 21 \\
+        \texttt{birds\_flock\_of\_birds\_flying\_sunset}      & 24.0 & 492 & 24 & 20 \\
+        \texttt{helicopters\_helicopter\_compilation}          & 25.0 & 13{,}871 & 25 & 554 \\
+        \texttt{helicopters\_helicopter\_overhead\_short}      & 25.0 & 260 & 13 & 20 \\
+        \texttt{helicopters\_helicopter\_overhead\_very\_small\_airplane\_in\_background} & --- & --- & --- & 20 \\
+        \midrule
+        \textbf{Total} & & 36{,}949 & & \textbf{1{,}250} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\noindent The 10 confuser clips were drawn from public YouTube sources visually selected to span the three confuser categories at multiple ranges and viewing angles. Source URLs (encoded into the clip filenames after the \texttt{\_Media\_} marker) are preserved in \texttt{datasets/confuser\_videos/extraction\_manifest.json}; the encoded segment is the YouTube video ID. The aggregate confuser-FPPI numbers in Section~\ref{ch:experiments} use the 1{,}250-frame totals.
+
+\section{Licensing and Ethics}
+
+The public benchmark datasets (Anti-UAV, Svanstr\"om, the Roboflow community sets) are used under their published research licenses; the IR component sources (FLIR, DV5, CST, etc.) are similarly research-license open. The SelCom CCTV stream is deployment-partner proprietary and is not redistributable; only summary metrics and qualitative figures derived from it appear in this thesis. The YouTube clips are short, low-resolution excerpts used under fair-use for research and contain no personally identifying information; the encoded source IDs in the clip filenames are preserved so the originals can be located by an interested party. None of the corpora include human faces or location markers beyond what is visible in the original public datasets.
+
+% ======================================================================
+% APPENDIX B — GLOSSARY
+% ======================================================================
+% === BEGIN app:models (generated by docs/gen_models_appendix.py) ===
+\chapter{Models Evaluated}
+\label{app:models}
+
+This appendix lists the models the thesis actually discusses: the production pick at each cascade stage (\textbf{production}) and the comparison or ablation variants that carry a finding in the main text. The complete experimental registry, including every intermediate, superseded, and archived checkpoint, is retained in the project repository for reproducibility. The IR detector's full six-revision evolution is reported separately in Table~\ref{tab:ir_evolution}.
+
+\footnotesize
+\begin{longtable}{p{0.27\textwidth}lp{0.53\textwidth}}
+\toprule
+Model & Role & Note \\
+\midrule
+\endhead
+\multicolumn{3}{l}{\textbf{RGB detectors (YOLOv26n)}} \\
+\midrule
+\texttt{ft4} & \textbf{production} & SelCom-plus-confuser fine-tune; the only confuser-injection recipe that passed every drone-recall regression gate. \\
+\texttt{baseline} & comparison & Stage-1 reference; best small-drone recall at \texttt{imgsz=1280}; base for the SelCom fine-tunes. \\
+\texttt{hardneg\_v3more} & comparison & Hard-negative mining: lowers helicopter and airplane fire but leaves bird fire essentially unchanged. \\
+\texttt{retrained\_v2} & comparison & Aggressive confuser retrain; suppresses birds but collapses Svanstr\"om drone recall to $R=0.306$. \\
+\texttt{selcom\_mixed\_ft2\_1280} & comparison & CCTV (SelCom) fine-tune weights at \texttt{imgsz=1280}. \\
+\midrule
+\multicolumn{3}{l}{\textbf{IR detectors (YOLOv26n, thermal)}} \\
+\midrule
+\texttt{ir\_v3b} & \textbf{production} & Production IR detector; $F1=0.967$ on the fixed IR test split; two-epoch corrective fine-tune of \texttt{Final}. \\
+\texttt{Final} & comparison & Immediate parent of \texttt{v3b}; the full V2--V6 / \texttt{Final} trajectory is in Table~\ref{tab:ir_evolution}. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Trust classifiers (XGBoost fusion / routing)}} \\
+\midrule
+\texttt{robust8} & \textbf{production} & Production trust router: the six \texttt{robust6} features plus \texttt{rgb\_mean\_conf}, an \texttt{is\_grayscale} flag, and a per-class \texttt{trust\_rgb} threshold. \\
+\texttt{robust6} & comparison & Six statistically-selected, leakage-free features; the base extended into the shipped \texttt{robust8}. \\
+\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, superseded in production by \texttt{robust8}. \\
+\texttt{control40} & comparison & 40-feature control: best raw drone metrics but the worst confuser rejection. \\
+\texttt{fusion\_no\_fn\_v1.1} & comparison & Open-world fallback; the most conservative variant on the OOD confuser zoo. \\
+\midrule
+\multicolumn{3}{l}{\textbf{Confuser verifiers}} \\
+\midrule
+\texttt{mlp\_v5} & \textbf{production} & Production RGB verifier: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} ROI features, run per-frame. \\
+\texttt{mlp\_v5\_ir\_aligned} & \textbf{production} & Production IR verifier (one network, two per-modality scalers); held-out CBAM $F1\;0.699\to0.846$, FP $48\to15$, recall-safe. \\
+\texttt{mlp\_v5\_gray} & comparison & Grayscale-mode verifier; cuts held-out grayscale confuser FPs by ${\sim}96\%$. \\
+\texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch verifier; documented fallback on the photo-style \texttt{rgb\_dataset} surface. \\
+\bottomrule
+\caption{Models referenced in this thesis: the production pick at each cascade stage and the comparison or ablation variants discussed in the main text. The complete experimental registry is retained in the project repository.}
+\label{tab:models_evaluated}
+\end{longtable}
+\normalsize
+
+% === END app:models ===
+
+\chapter{Glossary of Abbreviations and Shorthand}
+\label{app:glossary}
+
+\begin{description}
+    \item[C-UAS] Counter-Unmanned Aerial Systems. The defensive use-case context for this thesis.
+    \item[UAV] Unmanned Aerial Vehicle, used interchangeably with ``drone'' for consumer-class quadcopters in this thesis.
+    \item[YOLO] You Only Look Once. The single-stage object-detection family~\cite{redmon2016yolo}; this thesis uses YOLOv26n via the Ultralytics framework~\cite{ultralytics2024}.
+    \item[CNN] Convolutional Neural Network. The patch verifier is a MobileNetV3-class CNN~\cite{howard2019mobilenetv3}.
+    \item[HITL] Human-in-the-Loop. The dataset / model co-development protocol of Section~\ref{sec:hitl_ir}.
+    \item[OOD] Out-Of-Distribution. Imagery drawn from a different population than the model's training distribution.
+    \item[FPPI] False Positives Per Image. The per-frame false-alarm count, used as the primary metric on confuser-only evaluation surfaces.
+    \item[FPR] False Positive Rate. In this thesis: the frame-level fraction of confuser-only frames with at least one detection.
+    \item[IoU] Intersection over Union. The standard detection-matching rule; used for Anti-UAV scoring.
+    \item[IoP] Intersection over Prediction. The matching rule used for Svanstr\"om RGB scoring (Section~\ref{sec:metrics}); $\text{IoP} = |B_\text{pred} \cap B_\text{gt}| / |B_\text{pred}|$.
+    \item[S1 / S2 / S3] Cascade stages: S1 = RGB detector alone; S2 = + trust classifier; S3 = + patch verifier alert gate.
+    \item[ft4] \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280}. The production RGB detector (SelCom$+$confuser fine-tune); the only confuser-injection config that passed every drone-recall regression gate (Section~\ref{sec:training_recipes}).
+    \item[robust6] The leakage-aware six-feature trust classifier (per-modality detection confidence $+$ box geometry) selected statistically (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
+    \item[robust8] The production trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features (\texttt{rgb\_mean\_conf} and an \texttt{is\_grayscale} regime flag) and a tuned per-class \texttt{trust\_rgb} decision threshold; closes \texttt{robust6}'s grayscale recall hole at a documented real-video-confuser-fire cost.
+    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost), superseded in production by \texttt{robust8} (Section~\ref{sec:feature_selection}).
+    \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature, failure-model scores dropped).
+    \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate trust classifier (40-feature with failure-model scores retained); deprecated.
+    \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
+    \item[v2 (patch verifier)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch verifier; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
+    \item[\texttt{mlp\_v5}] The distilled feature-space confuser verifier (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch verifier on confuser-rich surfaces and runs per-frame.
+    \item[\texttt{mlp\_v5\_ir\_aligned}] The cross-modal IR confuser verifier (Section~\ref{sec:grayscale_verifier}): one network with two per-modality input scalers, serving the thermal-deploy and grayscale-fallback paths.
+    \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
+    \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
+    \item[\texttt{imgsz}] Ultralytics short for input letterbox size. Drives small-object recall (Section~\ref{sec:resolution_arch}).
+    \item[\texttt{patch\_thr}] The decision threshold on $p_\text{confuser}$ at the patch-verifier alert gate. Production: 0.9 on Svanstr\"om-like inputs, 0.7 on real-video.
+\end{description}

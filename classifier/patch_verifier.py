@@ -4,7 +4,7 @@ patch_verifier.py — Inference wrapper for per-modality patch verifiers.
 Loads a model checkpoint saved by train_patch_verifier.py and exposes a
 simple interface:
 
-    vf = PatchVerifier("classifier/runs/patches/patch_verifier_rgb.pt")
+    vf = PatchVerifier("models/patches/patch_verifier_rgb.pt")
     p_drone = vf.predict_crop(bgr_image, xyxy_box)
 
 For a whole-frame + list of boxes, use predict_boxes() which returns one
@@ -14,7 +14,7 @@ roughly one forward pass.
 The IR verifier was trained on real thermal crops. In the GUI's
 grayscale-replicate mode, the "IR" frame is actually a desaturated RGB;
 the caller is responsible for deciding when to trust the IR verifier
-(see `is_real_thermal` heuristic in ir_gui/fusion/engine.py).
+(see `is_real_thermal` heuristic in gui/fusion/engine.py).
 """
 
 from __future__ import annotations

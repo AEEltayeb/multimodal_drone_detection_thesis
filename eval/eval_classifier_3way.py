@@ -362,19 +362,21 @@ def main():
     ap.add_argument("--video-rgb-cache-tag", default="selcom_1280_sz1280")
     ap.add_argument("--conf", type=float, default=0.25)
     ap.add_argument("--clf-32",
-                    default="classifier/fusion_models/retrained_v2_32feat/model.joblib")
+                    default="models/routers/retrained_v2_32feat/model.joblib")
     ap.add_argument("--clf-40",
-                    default="classifier/fusion_models/control_v3more_40feat/model.joblib")
+                    default="models/routers/control_v3more_40feat/model.joblib")
     ap.add_argument("--clf-13",
-                    default="classifier/fusion_models/lean13/model.joblib")
+                    default="models/routers/lean13/model.joblib")
     ap.add_argument("--clf-10",
-                    default="classifier/fusion_models/lean10/model.joblib")
+                    default="models/routers/lean10/model.joblib")
+    ap.add_argument("--clf-17",
+                    default="models/routers/lean17/model.joblib")
     ap.add_argument("--clf-19",
-                    default="classifier/fusion_models/lean19/model.joblib")
+                    default="models/routers/lean19/model.joblib")
     ap.add_argument("--auv-cache",
-                    default="classifier/fusion_models/retrained_v2_32feat/cache_antiuav.json")
+                    default="models/routers/retrained_v2_32feat/cache_antiuav.json")
     ap.add_argument("--svan-cache",
-                    default="classifier/fusion_models/retrained_v2_32feat/cache_svanstrom.json")
+                    default="models/routers/retrained_v2_32feat/cache_svanstrom.json")
     args = ap.parse_args()
 
     repo = Path(__file__).resolve().parent.parent
@@ -412,6 +414,7 @@ def main():
     preds_by_clf = {}
     for name, path in [("lean10", args.clf_10),
                        ("lean13", args.clf_13),
+                       ("lean17", args.clf_17),
                        ("lean19", args.clf_19),
                        ("32feat", args.clf_32),
                        ("40feat", args.clf_40)]:
@@ -461,7 +464,7 @@ def main():
     lines.append("\n## Overall\n")
     lines.append("| classifier | n_features | acc | F1m | F1w | ms/frame |")
     lines.append("|---|---:|---:|---:|---:|---:|")
-    nfeats = {"lean10": 10, "lean13": 13, "lean19": 19, "32feat": 32, "40feat": 40}
+    nfeats = {"lean10": 10, "lean13": 13, "lean17": 17, "lean19": 19, "32feat": 32, "40feat": 40}
     for name, res in results.items():
         lines.append(f"| {name} | {nfeats.get(name,'?')} | {res['acc']:.4f} | "
                      f"{res['f1_macro']:.4f} | {res['f1_weighted']:.4f} | "

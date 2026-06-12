@@ -5,7 +5,7 @@ dataset_version: "final_cleaned"
 dataset_yaml: "G:/drone/IR_dset_final/dataset.yaml"
 
 # ── Model ──
-pretrained_weights: "models/IR_final_cleaned/weights/best.pt"
+pretrained_weights: "models/ir/IR_final_cleaned/weights/best.pt"
 image_size: 640
 
 # ── Evaluation ──

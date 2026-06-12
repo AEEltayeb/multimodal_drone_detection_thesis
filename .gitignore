@@ -63,9 +63,9 @@ node_modules/
 !package.json
 !package-lock.json
 !tsconfig.json
-!ir_gui/ui/public/manifest.json
-!ir_gui/settings.json
-!ir_gui/fusion_settings.json
+!gui/ui/public/manifest.json
+!gui/settings.json
+!gui/fusion_settings.json
 !classifier/config.yaml
 !configs/*.yaml
 !configs/**/*.yaml
@@ -88,8 +88,8 @@ node_modules/
 
 # SVGs are blocked globally EXCEPT the icon assets needed by PySide
 *.svg
-!ir_gui/assets/icons/*.svg
-!ir_gui/ui/public/vite.svg
+!gui/assets/icons/*.svg
+!gui/ui/public/vite.svg
 
 # --- Videos ---
 *.mp4
@@ -127,22 +127,20 @@ backup/
 benchmarks/
 
 # --- YOLO / training results ---
-RGB model/Yolo26n_*/
-RGB model/*.yaml
+training/*.yaml
 
 # --- Classifier artifacts ---
 classifier/runs/
-classifier/fusion_models/
 
 # --- Model MRI run outputs (npz/pt/figures are reproducible) ---
 mri/results/
 
 # --- Demo outputs (downloaded YT videos, benchmark renders) ---
-ir_gui/demo_outputs/
-ir_gui/saved_alert_windows/
+gui/demo_outputs/
+gui/saved_alert_windows/
 
 # --- Flet legacy test scripts ---
-ir_gui/flet_app/_test_image*.py
+gui/flet_app/_test_image*.py
 
 # --- Scratch / debug scripts (underscore prefix) ---
 _check_*.py
@@ -174,7 +172,12 @@ report/images/
 temp_labels/
 scripts/dataset/
 scripts/export/
-label_reviewer/
+# label_reviewer/ is the (tracked) HITL tool; only its session outputs are ignored
+label_reviewer/.cache/
+label_reviewer/.last_session.json
+label_reviewer/review_*/
+label_reviewer/compare_labels_*/
+label_reviewer/roboflow_*/
 generate_professor_plots.py
 
 # knowledge-system session snapshot (local hook state)

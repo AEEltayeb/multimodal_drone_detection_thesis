@@ -381,7 +381,7 @@ def main():
     ap.add_argument("--categories", nargs="*", default=None)
     ap.add_argument("--rgb-models", nargs="*", default=None)
     ap.add_argument("--classifier", type=str, default=None,
-                    help="Classifier name under classifier/fusion_models/<name>/model.joblib "
+                    help="Classifier name under models/routers/<name>/model.joblib "
                          "(e.g. control_v3more_40feat), OR an explicit relative path to a "
                          ".joblib file (e.g. classifier/runs/reliability/fusion/fusion_no_fn_model_v1.1.joblib). "
                          "Defaults to scene_aware_v3more_32feat.")
@@ -394,7 +394,7 @@ def main():
     global CLASSIFIER_PATH
     if args.classifier:
         # Two accepted forms:
-        #   (a) bare name -> classifier/fusion_models/<name>/model.joblib
+        #   (a) bare name -> models/routers/<name>/model.joblib
         #   (b) relative path ending in .joblib -> use as-is
         if args.classifier.endswith(".joblib"):
             CLASSIFIER_PATH = REPO / args.classifier

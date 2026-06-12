@@ -14,7 +14,7 @@ Sources:
     IR:  G:/drone/IR_dset_final/{train,test}/  (YOLO labels)
     RGB: G:/drone/dataset/dataset/             (YOLO labels)
   Confusers (hard-negative mining):
-    IR:  ir_gui/demo_outputs/yt_*.mp4          (thermal YouTube)
+    IR:  gui/demo_outputs/yt_*.mp4          (thermal YouTube)
     RGB: D:/Downloads/youtube_classifier_videos/*.mp4
 
 Usage:

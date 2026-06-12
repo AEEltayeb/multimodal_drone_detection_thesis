@@ -1,0 +1,201 @@
+% --------------------------
+% ---- DECLARE PACKAGES ----
+% --------------------------
+\documentclass[12pt,a4paper,oneside,openright]{book}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=3cm,right=3cm]{geometry}
+\usepackage[fontsize=13pt]{scrextend}
+\usepackage[parfill]{parskip}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage[font=scriptsize,skip=5pt,justification=centering]{caption}
+\usepackage{subcaption}
+\usepackage[backend=bibtex,style=ieee,natbib=true]{biblatex}
+\usepackage{hyperref}
+\usepackage{csquotes}
+\usepackage[bottom]{footmisc}
+\usepackage{xspace}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% TikZ diagrams (fig:pipeline, fig:hitl_loop) are pre-rendered to PDF in figures/
+% (sources: figures/fig_pipeline.tex, figures/fig_hitl_loop.tex) to keep Overleaf
+% compile time within the free-tier timeout. Re-render with: pdflatex <source>.tex
+
+% ------------------------
+% ---- DOCUMENT SETUP ----
+% ------------------------
+\pagestyle{plain}
+\raggedbottom
+
+\titleformat{\chapter}[display]
+    {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{10pt}{\LARGE}
+\titlespacing*{\chapter}{0pt}{0pt}{20pt}
+
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\renewcommand{\footnotesize}{\fontsize{11pt}{13pt}\selectfont}
+\setlength{\footnotesep}{0.5cm}
+\setlength{\skip\footins}{1.5cm}
+
+% ------------------------
+% ---- MACROS ------------
+% ------------------------
+\newcommand{\ie}{\textit{i.e.,}\xspace}
+\newcommand{\eg}{\textit{e.g.,}\xspace}
+\newcommand{\etc}{\textit{etc.}\xspace}
+\newcommand{\etal}{\textit{et al.}\xspace}
+
+% ---- BIBLIOGRAPHY ----
+\addbibresource{references.bib}
+
+% ------------------------
+% ---- DOCUMENT START ----
+% ------------------------
+\begin{document}
+\pagenumbering{gobble}
+
+% ------------------
+% ---- TITLE PAGE ----
+% ------------------
+\begin{titlepage}
+
+\begin{center}
+    \large{\textbf{UNIVERSITY OF SALERNO}}
+    \vspace{3mm}
+    \\ \large{DEPARTMENT OF COMPUTER SCIENCE}
+    \vspace{5mm}
+\end{center}
+
+% Logo: layout matches tesi_master; drop figures/unisa-logo.png in to enable.
+% \begin{figure}[!htb]
+%     \centering
+%     \includegraphics[width=5cm]{figures/unisa-logo.png}
+% \end{figure}
+
+\begin{center}
+    \vspace{2mm}
+    \large{MASTER OF SCIENCE IN}
+    \\  \large{\textbf{COMPUTER SCIENCE}}
+    \vspace{4mm}
+    \\ \normalsize{MASTER'S DEGREE THESIS}
+    \vspace{10mm}
+\end{center}
+
+\vspace{10mm}
+\begin{center}
+    \LARGE{\textbf{Multi-Modal Drone Detection with Trust-Aware Sensor Fusion and Confuser-Aware Gating}}
+\end{center}
+
+\vspace*{\fill}
+
+\begin{minipage}[t]{1\textwidth}
+    \begin{multicols}{2}
+        {\normalsize{\textsc{Supervisor:}}{\normalsize\vspace{2mm}
+        \\ \normalsize{Prof.\ TODO\_Supervisor\_Name}}} \\
+
+        % {\normalsize{\textsc{Co-supervisor:}}{\normalsize\vspace{2mm}
+        % \\ \normalsize{TODO\_Co\_Supervisor}}} \\
+
+         \columnbreak
+
+         \begin{flushright}
+            {\normalsize{\textsc{Candidate:}}{\normalsize\vspace{1mm}
+            \\ \normalsize{\textbf{Ahmed Eltayeb}}\\
+            \vspace{2mm}
+            \normalsize{Student ID: TODO\_Student\_ID}}} \\
+         \end{flushright}
+    \end{multicols}
+\end{minipage}
+
+\begin{center}
+    \vspace{3mm}
+    {\normalsize{\textbf{Academic year:}}{\normalsize\vspace{1mm}
+    \\ \normalsize{2025/2026}}}
+\end{center}
+
+\end{titlepage}
+
+\doublespacing
+
+% ------------------
+% ---- DEDICATION ----
+% ------------------
+\cleardoublepage
+\thispagestyle{empty}
+\vspace*{\stretch{7}}
+\begin{flushright}
+\itshape Dedicated to\ldots % TODO: add dedication
+\end{flushright}
+\vspace*{\stretch{2}}
+\cleardoublepage
+
+% ------------------
+% ---- ABSTRACT ----
+% ------------------
+\chapter*{Abstract}
+
+Consumer unmanned aerial vehicles (UAVs) are now inexpensive, widely available, and routinely implicated in unauthorised surveillance, contraband delivery, and airspace disruption. Visual drone detectors based on the YOLO family of single-stage architectures, trained on drone corpora that already include confuser negatives, reach high drone-class precision and recall on standard benchmarks but still hallucinate extensively on confuser-only frames (birds, airplanes, helicopters with no drone present). On the Svanstr\"om~\cite{svanstrom2021real} benchmark at \texttt{imgsz=1280}, the baseline RGB detector reaches drone $P=0.940$ and $R=0.961$ while firing on 94.4\% of bird-only frames, 74.6\% of airplane-only frames, and 66.2\% of helicopter-only frames. Adding the Svanstr\"om confuser splits to the training set as additional hard negatives reduces helicopter and airplane fire rates but leaves bird fire rate essentially unchanged at 94.2\%; an aggressive retraining suppresses bird fire to 3.4\% but collapses Svanstr\"om drone recall to $R=0.306$. The bird/small-drone confusion is the residual failure mode that cannot be cleaned up at the detector stage.
+% [source: ledger=retrainedv2-recall-collapse; eval=rgb_svan_baseline; run=eval/diagnose_failures.py; cache=eval/results/_failure_diagnosis/svanstrom_1280_by_category.csv; config=svan_iop_1280]
+
+This thesis presents a multi-stage detection architecture that catches that residual at the system level rather than at the detector weights. The pipeline pairs an RGB YOLO detector and a thermal-infrared (IR) YOLO detector with a trust-aware XGBoost fusion classifier that chooses which modality to believe per frame. A per-frame confuser verifier then filters the trusted modality's detections: a distilled feature-space MLP that reuses the detector's own ROI features (\texttt{mlp\_v5} on RGB, \texttt{mlp\_v5\_ir\_aligned} on IR), which supersedes an earlier MobileNetV3 patch verifier. The cascade's behaviour depends on the classifier and the evaluation surface. In the classifier-comparison configuration, the \texttt{scene\_aware\_v3more\_32feat} classifier-plus-verifier chain brings OOD-zoo confuser fire rate from 52.1\% to 10.3\% (the classifier alone reaches 20.5\%; the open-world \texttt{fusion\_no\_fn\_v1.1} chain reaches 0.8\%); the production trust classifier is the grayscale-hardened \texttt{robust8} (Section~\ref{sec:feature_selection}). On Svanstr\"om paired drones with intersection-over-prediction (IoP) scoring, trust-aware F1 falls from 0.950 (S1, drone $P=0.940$, $R=0.961$) to 0.895 at the production operating point ($\mathtt{patch\_thr}=0.9$), a 5.5-pp in-distribution cost. On the real-video diagnostic, however, the production cascade with temporal smoothing \emph{gains} segment-level drone F1 over the Stage-1 RGB number (0.760 $\to$ 0.826 for baseline RGB) while still cutting confuser FPR three-fold.
+% [source: ledger=trust-classifier-conditional; eval=svan_s3_sa32_thr08; run=(EVIDENCE_LEDGER sweep); config=svan_iop_1280_s9]
+
+The system is evaluated on Svanstr\"om, Anti-UAV RGBT, nine Roboflow out-of-distribution datasets, and 19 curated YouTube clips (10 confuser-only, 9 drone-positive with bird-vs-drone scenes). One unexpected finding emerges from the real-video diagnostic: the IR detector, trained exclusively on thermal imagery, achieves $F1=0.636$ on grayscale-converted RGB drone video and ties the RGB baseline on the hardest single bird-cluttered clip ($F1=0.837$ vs $0.840$), while cutting confuser FPPI to a third of the baseline. The cross-modal transfer was not designed for; the grayscale-RGB mode existed as a deployment fallback for cases where thermal hardware is unavailable. A scoring-rule audit documents a 28-percentage-point F1 swing between dual-modality and trust-aware scoring of identical detections, which is independent of the IoU/IoP choice and motivates explicit scoring disclosure in any multi-modal detection comparison. A human-in-the-loop label reviewer drives six IR-detector revisions on a fixed held-out test split. Precision and recall do not climb monotonically: V3 reaches $F1=0.611$, a precision-mining cycle lifts V4 to $F1=0.765$, V5 regresses to $F1=0.737$ when a large batch of new positives is injected in bulk instead of through the per-batch review loop, and a corpus-wide cleanup recovers V6 ($F1=0.931$) and the production v3b ($F1=0.967$). The regression is reported because it is informative: it characterises a known failure mode of unsupervised data ingestion in HITL loops.
+% [source: ledger=ir-grayscale-fallback; eval=vid_drone_ir_gray; run=eval/eval_video_tests.py; config=video_drone_iop]
+
+\tableofcontents
+\newpage
+\pagenumbering{arabic}
+\setcounter{chapter}{0}
+
+
+% ======================================================================
+%  CHAPTER FILES
+%  Fast editing on Overleaf (avoids the free-tier compile timeout):
+%  uncomment \includeonly below and list ONLY the chapter you are editing,
+%  e.g. \includeonly{chapters/methodology}. Overleaf then typesets just
+%  that file in a few seconds; cross-references to other chapters resolve
+%  from cached .aux (or show as ?? until a full build). Leave \includeonly
+%  commented out to produce the complete PDF.
+% ======================================================================
+% \includeonly{chapters/methodology}
+
+\include{chapters/introduction}
+\include{chapters/related_work}
+\include{chapters/methodology}
+\include{chapters/empirical}
+\include{chapters/conclusion}
+\include{chapters/appendices}
+
+% ----------------------
+% ---- BIBLIOGRAPHY ----
+% ----------------------
+\backmatter
+\sloppy
+\printbibliography[heading=bibintoc, title=Bibliography]
+
+% Draft compile: ToC/LoT/LoF disabled to save Overleaf compile time.
+% Re-enable both lines for the final submission compile.
+% \listoftables
+% \listoffigures
+
+\end{document}

@@ -13,14 +13,14 @@ from datasets import read_yolo_labels
 from metrics import iou_iop
 
 # Load model
-clf_data = joblib.load(REPO / "classifier/fusion_models/scene_aware_v3more_32feat/model.joblib")
+clf_data = joblib.load(REPO / "models/routers/scene_aware_v3more_32feat/model.joblib")
 classifier = clf_data["model"]
 feat_cols = clf_data["features"]
 
 # Load YOLO models
 from ultralytics import YOLO
-m_base = YOLO(str(REPO / "RGB model/Yolo26n_trained/weights/best.pt"))
-m_ir = YOLO(str(REPO / "models/IR_final_cleaned/weights/best.pt"))
+m_base = YOLO(str(REPO / "models/rgb/Yolo26n_trained/weights/best.pt"))
+m_ir = YOLO(str(REPO / "models/ir/IR_final_cleaned/weights/best.pt"))
 
 test_img_dir = Path("G:/drone/dataset/dataset/images/test")
 test_lbl_dir = Path("G:/drone/dataset/dataset/labels/test")

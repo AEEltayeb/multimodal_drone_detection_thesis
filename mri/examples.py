@@ -47,21 +47,29 @@ def spatial_heatmap(fmap, channels, img_shape) -> np.ndarray | None:
 
 
 def pick_best_per_spec(provenance, X, y, top_idx, n=8):
-    """Per spec name, pick the row index maximizing activation on the top
-    neurons. Drones score on signed positive activation; confusers on absolute
-    (the discriminative-pattern magnitude). Returns {spec: row_index}."""
+    """Per spec: the highest-activation DRONE if the spec contains any (so a
+    drone/pos dataset yields a drone panel, not a hallucinated-confuser one),
+    otherwise the highest-activation confuser. Drones score on signed-positive
+    activation, confusers on absolute magnitude. Returns {spec: row_index}."""
     sel = [int(i) for i in top_idx[:n]]
-    best: dict[str, tuple[float, int]] = {}
+    best_drone: dict[str, tuple[float, int]] = {}
+    best_conf: dict[str, tuple[float, int]] = {}
     for row, prov in enumerate(provenance):
         feat = X[row]
+        spec = prov["spec"]
         if y[row] == 1:
             score = float(sum(feat[i] for i in sel if feat[i] > 0))
+            if spec not in best_drone or score > best_drone[spec][0]:
+                best_drone[spec] = (score, row)
         else:
             score = float(sum(abs(feat[i]) for i in sel))
-        spec = prov["spec"]
-        if spec not in best or score > best[spec][0]:
-            best[spec] = (score, row)
-    return {spec: row for spec, (_s, row) in best.items()}
+            if spec not in best_conf or score > best_conf[spec][0]:
+                best_conf[spec] = (score, row)
+    out: dict[str, int] = {}
+    for spec in set(best_drone) | set(best_conf):
+        src = best_drone if spec in best_drone else best_conf
+        out[spec] = src[spec][1]
+    return out
 
 
 def render_example(extractor, prov, channels_by_layer, title, out_path,

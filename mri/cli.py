@@ -74,8 +74,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--max-per-source", type=int, default=0, help="Cap dets mined per dataset (0=all).")
     p.add_argument("--quick", action="store_true", help="Smoke preset: stride x5, max 200/source.")
     # Analyses / training
-    p.add_argument("--stats", default="pca,lda,anova,heatmap,neurons",
-                   help="Comma list: pca,lda,anova,heatmap,neurons.")
+    p.add_argument("--stats", default="pca,lda,heatmap,neurons,auroc,roc,opcurve",
+                   help="Comma list: pca,lda,anova,heatmap,neurons,auroc,roc,opcurve.")
     p.add_argument("--examples", action="store_true", default=True,
                    help="Render one spatial activation panel per dataset (live scan only).")
     p.add_argument("--no-examples", dest="examples", action="store_false",
@@ -90,6 +90,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--fp-rate-thr", type=float, default=0.05)
     p.add_argument("--sep-thr", type=float, default=0.90)
     p.add_argument("--recall-cost-thr", type=float, default=0.10)
+    p.add_argument("--halluc-rate", type=float, default=None,
+                   help="Externally-measured bare-detector hallucination rate (FP per "
+                        "confuser image) to inject when resuming a feature-only corpus "
+                        "that cannot measure it. Report labels it as a detector eval.")
+    p.add_argument("--halluc-note", default="detector eval on confuser images",
+                   help="Provenance note shown next to an injected --halluc-rate.")
     # Held-out deployment eval (honest gate vs the in-pool CV verdict)
     p.add_argument("--holdout-eval", metavar="MLP_WEIGHTS",
                    help="Evaluate this trained verifier (.pt) on the --pos/--neg "
@@ -240,12 +246,20 @@ def run(args):
         raws, sep_summary, oof=oof, y=y, threshold=0.5,
         fp_rate_thr=args.fp_rate_thr, sep_thr=args.sep_thr,
         recall_cost_thr=args.recall_cost_thr)
+    # Inject an externally-measured detector hallucination rate when the corpus
+    # itself cannot supply one (feature-only --resume); keep it clearly labeled.
+    if args.halluc_rate is not None and diag.get("raw_halluc_rate") is None:
+        diag["raw_halluc_rate"] = float(args.halluc_rate)
+        diag["halluc_external"] = args.halluc_note
+        kc = diag.get("classifier_keeps_confuser_frac")
+        if kc is not None:
+            diag["projected_fp_rate"] = float(args.halluc_rate) * kc
     print(f"\n  VERDICT: {diag['verdict_text']}\n  ({diag['rationale']})\n")
 
     # ── Plots ────────────────────────────────────────────────────────────
     want = [s.strip() for s in args.stats.split(",") if s.strip()]
     figures = plots.generate_all(X, y, schema, F, top, out_dir / "images",
-                                 want=want, diag=diag)
+                                 want=want, diag=diag, auroc=auroc, oof=oof)
 
     # ── Per-dataset spatial activation examples ──────────────────────────
     # Needs live feature maps, so only in a full --pos/--neg scan (not --resume).

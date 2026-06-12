@@ -36,8 +36,8 @@ def sequence_split(df, test_size=0.25, seed=42):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", default="classifier/fusion_models/lean13/fusion_dataset_lean13.csv")
-    ap.add_argument("--output-dir", default="classifier/fusion_models/lean10")
+    ap.add_argument("--csv", default="models/routers/lean13/fusion_dataset_lean13.csv")
+    ap.add_argument("--output-dir", default="models/routers/lean10")
     args = ap.parse_args()
     repo = Path(__file__).resolve().parent.parent
     csv_path = (repo / args.csv) if not Path(args.csv).is_absolute() else Path(args.csv)
