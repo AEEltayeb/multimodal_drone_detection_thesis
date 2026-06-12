@@ -1543,7 +1543,8 @@ class TalosWindow(QMainWindow):
         else:
             # File pickers: tailor the filter to weights vs. classifier bundles.
             if key in ("rgb_model", "ir_model", "rgb_patch_weights", "ir_patch_weights",
-                       "mlp_verifier_weights", "ir_mlp_verifier_weights"):
+                       "mlp_verifier_weights", "ir_mlp_verifier_weights",
+                       "ir_mlp_verifier_weights_gray"):
                 filt = "Weights (*.pt *.pth *.onnx *.engine);;All Files (*)"
             elif key == "fusion_model":
                 filt = "Classifier (*.joblib *.pkl *.json);;All Files (*)"

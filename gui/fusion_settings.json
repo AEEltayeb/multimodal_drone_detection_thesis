@@ -34,6 +34,7 @@
   "mlp_alert_gate_conf": 0.3,
   "use_ir_mlp_verifier": true,
   "ir_mlp_verifier_weights": "C:/Users/User/Desktop/UNISA projects/Drone detection/es proj 3 thesis workspace/ES_Drone_Thesis/models/verifiers/ir_aligned/mlp_aligned.pt",
+  "ir_mlp_verifier_weights_gray": "C:/Users/User/Desktop/UNISA projects/Drone detection/es proj 3 thesis workspace/ES_Drone_Thesis/models/verifiers/ir_aligned/mlp_aligned_gray.pt",
   "ir_mlp_threshold": 0.15,
   "ir_mlp_filter_mode": "per_frame",
   "ir_mlp_alert_gate_conf": 0.3,
@@ -58,5 +59,6 @@
   "require_hits": 10,
   "rgb_avg_conf_thresh": 0.3,
   "ir_avg_conf_thresh": 0.35,
-  "ir_gray_avg_conf_thresh": 0.1
+  "ir_gray_avg_conf_thresh": 0.1,
+  "router_conf": 0.25
 }

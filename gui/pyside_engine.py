@@ -247,6 +247,7 @@ class TalosEngine:
             ir_mlp_threshold=float(s.get("ir_mlp_threshold", 0.25)),
             ir_mlp_filter_mode=str(s.get("ir_mlp_filter_mode", "per_frame")),
             ir_mlp_alert_gate_conf=float(s.get("ir_mlp_alert_gate_conf", 0.4)),
+            router_conf=float(s.get("router_conf", 0.25)),
         )
         if mode == "Single Model":
             kwargs["ir_weights"] = kwargs["rgb_weights"]
@@ -255,6 +256,16 @@ class TalosEngine:
             # (hooked on ir_model) is never hit. Single-IR routes its verifier
             # through the rgb MLP slot (see pyside_app), so skip loading here.
             kwargs["use_ir_mlp_verifier"] = False
+        elif mode == "Grayscale Fusion":
+            # mlp_v5_ir_aligned is ONE network with per-modality input scalers:
+            # thermal scaler for real IR, grayscale scaler for gray(RGB) frames.
+            # Feeding gray crops through the thermal scaler under-cuts P(drone) ~2x.
+            gray_w = s.get("ir_mlp_verifier_weights_gray", "")
+            if gray_w and Path(gray_w).exists():
+                kwargs["ir_mlp_verifier_weights"] = gray_w
+                log("IR MLP: grayscale scaler (mlp_aligned_gray)")
+            elif kwargs.get("use_ir_mlp_verifier"):
+                log("IR MLP: ir_mlp_verifier_weights_gray not set — using thermal scaler on gray input")
         self.fe = FusionEngine(**kwargs)
         log("Models loaded")
 
@@ -367,7 +378,26 @@ class TalosEngine:
             rt, it = self.rgb_temporal, self.ir_temporal
 
             if is_infer:
-                vis, trust, probs = self._infer(mode, frame_l, frame_r, s, fe, rt, it, ts)
+                try:
+                    vis, trust, probs = self._infer(mode, frame_l, frame_r, s, fe, rt, it, ts)
+                except Exception:
+                    # A per-frame failure must NOT kill the loop thread silently
+                    # (symptom: video freezes on frame 1). Show the error on the
+                    # frame and keep playing raw.
+                    import traceback
+                    traceback.print_exc()
+                    err = traceback.format_exc().strip().splitlines()[-1][:110]
+                    vis = frame_l.copy()
+                    if frame_r is not None:
+                        r = frame_r if len(frame_r.shape) == 3 else cv2.cvtColor(frame_r, cv2.COLOR_GRAY2BGR)
+                        if r.shape[0] != vis.shape[0]:
+                            r = cv2.resize(r, (int(r.shape[1]*vis.shape[0]/r.shape[0]), vis.shape[0]))
+                        vis = np.hstack([vis, r])
+                    elif mode != "Single Model":
+                        vis = np.hstack([vis, vis])  # keep writer geometry (2x width)
+                    cv2.putText(vis, f"INFER ERROR: {err}", (10, 30),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2, cv2.LINE_AA)
+                    trust, probs = 0, last_probs
                 last_ms = (time.perf_counter() - t0) * 1000
                 last_probs = probs
             else:
@@ -507,7 +537,7 @@ class TalosEngine:
         t_yolo = time.perf_counter()
         if s.get("mlp_cascade_order", "classifier_then_filter") == "classifier_then_filter":
             # Trust-first: classify on RAW dets, then verify ONLY the trusted modality
-            feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), gray, gray)
+            feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), gray, gray, is_grayscale=1)
             trust, probs = fe.classify(feats)
             orig_trust = trust
             (trust, rgb_dets, rgb_src, ir_dets, ir_src,
@@ -527,7 +557,7 @@ class TalosEngine:
                     gate_open=_mlp_gate_open(fe, ir_dets, branch="ir"))
             else:
                 self._last_ir_mlp = None
-            feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), gray, gray)
+            feats = fe.extract_features(_wrap(rgb_dets), _wrap(ir_dets), gray, gray, is_grayscale=1)
             trust, probs = fe.classify(feats)
             orig_trust = trust
         t_clf = time.perf_counter()

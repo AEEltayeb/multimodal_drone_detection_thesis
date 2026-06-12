@@ -119,12 +119,16 @@ class FusionEngine:
         ir_mlp_alert_gate_conf: float = 0.4,
         # kept for back-compat; ignored (ir_conf is shared across modes)
         ir_conf_grayscale: Optional[float] = None,
+        # conf floor for ROUTER FEATURE computation (training regime = 0.25).
+        # Set equal to rgb_conf only if the router was retrained at that floor.
+        router_conf: float = 0.25,
     ):
         self.cascade_order = cascade_order if cascade_order in (
             "filter_then_classifier", "classifier_then_filter"
         ) else "filter_then_classifier"
         self.rgb_conf = rgb_conf
         self.ir_conf = ir_conf
+        self.router_conf = float(router_conf)
         self.grayscale_run_ir_filter = bool(grayscale_run_ir_filter)
         self.nms_iou = nms_iou
         self.imgsz = imgsz
@@ -145,7 +149,12 @@ class FusionEngine:
         bundle = joblib.load(fusion_model_path)
         self.fusion_clf = bundle["model"]
         self.feature_names = bundle["features"]
-        print(f"[Fusion] Ready. {len(self.feature_names)} features.")
+        # robust8-style bundles carry a trust_rgb decision threshold (tau): apply
+        # label=1 iff P(trust_rgb)>=tau else argmax (argmax alone suppresses the
+        # rare trust_rgb class — the known grayscale hole). Older bundles have no tau.
+        self.fusion_tau = bundle.get("tau")
+        print(f"[Fusion] Ready. {len(self.feature_names)} features"
+              + (f", tau={self.fusion_tau}" if self.fusion_tau is not None else "") + ".")
 
         # MLP V5 feature-distillation verifier (optional). When enabled it
         # REPLACES the RGB patch verifier — it reads YOLO's internal P3/P5
@@ -309,8 +318,21 @@ class FusionEngine:
         return {f"{prefix}_best_{k}": v for k, v in tf.items()}
 
     def extract_features(self, rgb_dets, ir_dets, rgb_gray, ir_gray,
-                          feature_mode="all"):
-        """Build feature dict from detections and frames."""
+                          feature_mode="all", is_grayscale=0):
+        """Build feature dict from detections and frames.
+
+        is_grayscale: 1 when the IR branch is fed gray(RGB) instead of real
+        thermal (Grayscale Fusion mode). Consumed by the robust8 router;
+        harmless extra key for older bundles (sa32/robust6 ignore it).
+
+        Detections below router_conf (default 0.25 = the regime ALL shipped
+        routers were trained at) are excluded from FEATURE computation only —
+        they still live in the detection/filter path. Running the detector
+        lower (recall mode) without this guard drags rgb_mean_conf down with
+        sub-floor junk and makes robust8 over-reject. Override router_conf in
+        settings ONLY to test a router retrained at a different floor."""
+        rgb_dets = [d for d in rgb_dets if d.conf >= self.router_conf]
+        ir_dets = [d for d in ir_dets if d.conf >= self.router_conf]
         rgb_h, rgb_w = rgb_gray.shape[:2]
         ir_h, ir_w = ir_gray.shape[:2]
 
@@ -340,14 +362,26 @@ class FusionEngine:
         feats["rgb_only_detect"] = int(rgb_detected and not ir_detected)
         feats["ir_only_detect"] = int(not rgb_detected and ir_detected)
 
+        # Regime flag for the robust8 router (f8): is the IR branch gray(RGB)?
+        feats["is_grayscale"] = int(is_grayscale)
+
         return feats
 
     def classify(self, feats):
-        """Run XGBoost fusion classifier. Returns (label, probs)."""
+        """Run XGBoost fusion classifier. Returns (label, probs).
+        Bundles with a tau (robust8) use the thresholded trust_rgb rule
+        (matches thesis_eval/pipeline_eval_unified.batch_labels)."""
+        missing = [f for f in self.feature_names if f not in feats]
+        if missing:
+            raise KeyError(f"fusion classifier expects features missing from the GUI "
+                           f"feature dict: {missing} — check extract_features()")
         X = np.array([[feats[f] for f in self.feature_names]])
-        label = int(self.fusion_clf.predict(X)[0])
-        probs = self.fusion_clf.predict_proba(X)[0].tolist()
-        return label, probs
+        probs = self.fusion_clf.predict_proba(X)[0]
+        if self.fusion_tau is not None and len(probs) > 1:
+            label = 1 if float(probs[1]) >= float(self.fusion_tau) else int(np.argmax(probs))
+        else:
+            label = int(self.fusion_clf.predict(X)[0])
+        return label, probs.tolist()
 
     def _select_trusted(self, label, rgb_dets, ir_dets):
         """Pick trusted/suppressed detections based on trust label."""
@@ -586,13 +620,13 @@ class FusionEngine:
                     ir_is_real_thermal=False,
                     ir_verifier_enabled=self.grayscale_run_ir_filter,
                     skip_ir_ood_gate=True)
-            feats = self.extract_features(rgb_kept, ir_kept, rgb_gray, ir_gray)
+            feats = self.extract_features(rgb_kept, ir_kept, rgb_gray, ir_gray, is_grayscale=1)
             label, probs = self.classify(feats)
             original_label = label
             vetoed = bool(rgb_drp or ir_drp)
             trusted, suppressed = self._select_trusted(label, rgb_kept, ir_kept)
         else:
-            feats = self.extract_features(rgb_dets, ir_dets, rgb_gray, ir_gray)
+            feats = self.extract_features(rgb_dets, ir_dets, rgb_gray, ir_gray, is_grayscale=1)
             label, probs = self.classify(feats)
             original_label = label
             label, rgb_patch_probs, ir_patch_probs, vetoed = self.patch_veto(
