@@ -5,7 +5,23 @@
 # Project State
 
 ## 📍 Resume Here
-_Updated: 2026-06-14 (SESSION 9b — shipped composition switched to filt→clf; thesis 146pp, audit 200/200)_
+_Updated: 2026-06-14 (PUBLISH — ES_Drone_Thesis pushed to GitHub, runnable clone; prior: SESSION 9b)_
+
+> **2026-06-14 (PUBLISH — pushed to GitHub `AEEltayeb/dorne_thesis`):** Made the repo a runnable, self-
+> contained clone (weights + thesis + figures + all code, ~1.19 GB, plain git, NO LFS; `main` @ `fe4d735`).
+> Remote `origin` added (was zero remotes); auth cached via Git Credential Manager. Replaced the inherited
+> ES_Drone_Detection `.gitignore` (it hid `models/`/`*.pt`/`*.csv` → only 686 of 148k files tracked) with a
+> purpose-built one that EXCLUDES raw `datasets/`, videos, regenerable caches (`thesis_eval/cache`,
+> `eval/results`, `eval/cache`, `mri/results`), patch training-crops (`models/patches/{ir,rgb,*_synth_review}/`
+> — the `.pt` weights + OOD calib at `models/patches/` root ARE kept), and the long-path ablation dumps
+> (`docs/analysis/full_pipeline_ablations/{csvs,raw_results}/`, which exceed Windows MAX_PATH 260 and would
+> break clone checkout). GUI portability (PySide path only): `gui/fusion_settings.json` paths now repo-relative,
+> resolved in `flet_app/settings_dialog.load_settings()` against `REPO_ROOT`. Verified filter→classifier cascade
+> works with the no-reject router (`thesis_eval/_cascade_noreject_smoke.py`; never rejects). 11 legacy scripts
+> repointed off `ES_Drone_Detection`. `requirements.txt` expanded (PySide6/flet/scipy/seaborn/…) + README
+> "Run on a fresh clone". Push needed **HTTP/1.1 + postBuffer 2 GB** (HTTP/2 aborted: curl 28). Memory:
+> `project_github_remote.md`. Known bloat (kept, not blocking): `classifier/fusion_models/` dups
+> `models/routers/` (~160 MB; live eval scripts still reference the old path).
 
 > **2026-06-14 (SESSION 9b — shipped COMPOSITION = `filt→clf[robust8-nr]`):** User spotted that filter-then-
 > router beats router-then-filter for the no-reject router. Confirmed by extending `part_c` to compute
