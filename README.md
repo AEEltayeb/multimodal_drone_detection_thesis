@@ -69,8 +69,11 @@ py gui/pyside_app.py
 # Reproduce the thesis numbers (zero-GPU replay from caches, ~60 s)
 py thesis_eval/pipeline_eval_unified.py
 
-# Build the thesis PDF (MiKTeX)
-powershell -ExecutionPolicy Bypass -File docs/build_thesis.ps1
+# Build the thesis PDF (needs MiKTeX/TeX Live). LIVE thesis = the multi-file Overleaf project:
+cd docs/thesis_working_distilling_overleaf
+pdflatex -interaction=nonstopmode main.tex ; bibtex main ; pdflatex -interaction=nonstopmode main.tex ; pdflatex -interaction=nonstopmode main.tex ; cd ../..
+#   -> main.pdf (146 pp). NOTE: docs/build_thesis.ps1 builds the OLDER single-file
+#      docs/thesis_working.tex snapshot (159 pp) instead.
 
 # Regenerate thesis figures
 py docs/generate_thesis_figures.py   # set PYTHONUTF8=1 on Windows consoles

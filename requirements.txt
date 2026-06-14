@@ -33,3 +33,4 @@ uvicorn
 requests
 yt-dlp
 tqdm
+openpyxl        # gui/check_pairing.py (RGB/IR pairing-check utility)
