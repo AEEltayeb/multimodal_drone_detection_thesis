@@ -1,0 +1,6 @@
+# humanify lint — thesis_working.tex
+AI-filler words (1): L1338:notably
+over-certain language (9): L263:always, L522:proves, L525:proves, L540:always, L912:proven, L1163:always, L1371:always, L1612:proves, L1649:proven
+marketing language (0): 
+sentence length: mean=24.7 sd=13.3 (low sd => uniform/robotic); run-ons>40w: 68
+AGENT: rewrite to remove filler, vary length, drop marketing; CALIBRATE certainty to the ledger — supported+high stays firm, conditional/partial -> hedge (suggests/indicates). Preserve every number/claim/citation; keep the author's voice.

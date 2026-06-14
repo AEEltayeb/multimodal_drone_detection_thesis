@@ -258,31 +258,29 @@ def fig_ir_evolution():
 
 # ── Fig 6.6: Resolution Sensitivity ──────────────────────────────────
 def fig_resolution():
-    """Bar: Svanström drone recall at imgsz 640 vs 1280. 640 measured on retrained_v2
-    (baseline@640 pending); 1280 is baseline. See caption for attribution."""
-    imgsz   = ["640\n(retrained_v2)", "1280\n(baseline)"]
-    recall  = [0.072, 0.961]
+    """Grouped bars: Svanström drone recall, 2 models x 2 imgsz, ONE harness (round-5 sweep:
+    stride-7 n=4102, IoP@0.5, conf 0.25). Reads eval/results/svan_resolution_sweep.json."""
+    sweep = json.load(open(RESULTS / "svan_resolution_sweep.json"))
+    models = [("baseline", "#27ae60"), ("retrained_v2", "#e74c3c")]
+    sizes = [640, 1280]
 
-    fig, ax = plt.subplots(figsize=(5, 4))
-    colors  = ["#e74c3c", "#27ae60"]
-    bars = ax.bar(imgsz, recall, color=colors, edgecolor="white", width=0.4)
-
-    for bar, r in zip(bars, recall):
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.02,
-                f"{r:.3f}", ha='center', fontweight='bold', fontsize=13)
-
+    x = np.arange(len(sizes)); w = 0.32
+    fig, ax = plt.subplots(figsize=(5.6, 4))
+    for i, (m, c) in enumerate(models):
+        rec = [sweep[f"{m}@{s}"]["recall"] for s in sizes]
+        bars = ax.bar(x + (i - 0.5) * w, rec, w, label=m, color=c, edgecolor="white")
+        for bar, r in zip(bars, rec):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
+                    f"{r:.3f}", ha="center", fontweight="bold", fontsize=11)
+    ax.set_xticks(x); ax.set_xticklabels([str(s) for s in sizes])
     ax.set_xlabel("Inference Resolution (imgsz)")
     ax.set_ylabel("Drone Recall")
-    ax.set_title("Svanström Drone Recall vs Resolution\n(native 640×512)")
-    ax.set_ylim(0, 1.1)
+    ax.set_title("Svanström Drone Recall vs Resolution, per model\n"
+                 "(one harness: stride-7, n=4,102, IoP@0.5)")
+    ax.set_ylim(0, 1.12)
+    ax.legend(loc="upper left")
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
-
-    # Add annotation
-    ax.annotate("13.3× improvement",
-                xy=(1, 0.961), xytext=(0.3, 0.7),
-                arrowprops=dict(arrowstyle="->", color="#27ae60", lw=2),
-                fontsize=12, color="#27ae60", fontweight='bold')
 
     fig.tight_layout()
     fig.savefig(OUT_DIR / "fig6_6_resolution.pdf")

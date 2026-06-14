@@ -6,7 +6,7 @@ and ranks by miss rate / false positive rate.
 
 Usage:
     python scripts/eval_per_source.py \
-        --weights "ES_Drone_Detection/IR_gold_rgbcfg/IR_gold_rgbcfg/weights/best.pt" \
+        --weights "models/ir/corrective_finetune/finetune_v3b/weights/best.pt" \
         --dataset "G:\drone\IR_dset_gold_duplicates_removed"
 """
 

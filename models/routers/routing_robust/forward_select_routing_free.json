@@ -1,0 +1,147 @@
+{
+  "steps": [
+    {
+      "feature": "robust6",
+      "n": 6,
+      "overall": 0.8609318705595638,
+      "thermal": 0.8810111805125348,
+      "grayscale": 0.36117711117711115,
+      "gray_trust_rgb_R": 0.08333333333333333,
+      "leakage": null
+    },
+    {
+      "feature": "rgb_mean_conf",
+      "n": 7,
+      "overall": 0.8811087502350685,
+      "thermal": 0.8990983102309268,
+      "grayscale": 0.4228019734652012,
+      "gray_trust_rgb_R": 0.14583333333333334,
+      "leakage": 0.003424146665183
+    },
+    {
+      "feature": "pos_euclidean_diff",
+      "n": 8,
+      "overall": 0.8904912627967935,
+      "thermal": 0.9077737419581661,
+      "grayscale": 0.6071933788564743,
+      "gray_trust_rgb_R": 0.1875,
+      "leakage": 0.0698401954808837
+    },
+    {
+      "feature": "bg_delta_diff",
+      "n": 9,
+      "overall": 0.8955427210448039,
+      "thermal": 0.9128550025148778,
+      "grayscale": 0.6050577319050225,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0105783646443031
+    },
+    {
+      "feature": "contrast_diff",
+      "n": 10,
+      "overall": 0.897816277769961,
+      "thermal": 0.9152963594177213,
+      "grayscale": 0.6818745625231606,
+      "gray_trust_rgb_R": 0.14583333333333334,
+      "leakage": 0.0249314749928557,
+      "gray_gain_ci": [
+        0.03693651497561256,
+        0.36770734681662043
+      ]
+    },
+    {
+      "feature": "area_diff",
+      "n": 11,
+      "overall": 0.9006898593327437,
+      "thermal": 0.9185453370814611,
+      "grayscale": 0.6023846455941428,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.1100415267179406
+    },
+    {
+      "feature": "rgb_best_dist_to_center",
+      "n": 12,
+      "overall": 0.9030898561528771,
+      "thermal": 0.9209053202393829,
+      "grayscale": 0.6049611320149629,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.730339327979488
+    },
+    {
+      "feature": "aspect_ratio_diff",
+      "n": 13,
+      "overall": 0.8996459545889637,
+      "thermal": 0.9172668997732664,
+      "grayscale": 0.6082968933846127,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0925587624731014
+    },
+    {
+      "feature": "ir_mean_conf",
+      "n": 14,
+      "overall": 0.9053844393413931,
+      "thermal": 0.9238900704720412,
+      "grayscale": 0.5603142106738671,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0024825814917307
+    }
+  ],
+  "winner": {
+    "feature": "contrast_diff",
+    "n": 10,
+    "overall": 0.897816277769961,
+    "thermal": 0.9152963594177213,
+    "grayscale": 0.6818745625231606,
+    "gray_trust_rgb_R": 0.14583333333333334,
+    "leakage": 0.0249314749928557,
+    "gray_gain_ci": [
+      0.03693651497561256,
+      0.36770734681662043
+    ]
+  },
+  "artifact_dropped": [
+    "brightness_ratio",
+    "ir_edge_density",
+    "ir_img_mean",
+    "ir_img_std",
+    "ir_sky_ground_ratio",
+    "rgb_best_local_contrast",
+    "rgb_best_target_bg_delta",
+    "rgb_blurriness",
+    "rgb_img_mean",
+    "scene_entropy_diff"
+  ],
+  "excluded_from_pool": [
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std",
+    "rgb_best_target_bg_delta",
+    "ir_best_target_bg_delta",
+    "rgb_n_dets",
+    "ir_n_dets",
+    "rgb_detected",
+    "ir_detected",
+    "both_detect",
+    "neither_detect",
+    "rgb_only_detect",
+    "ir_only_detect",
+    "ir_img_std",
+    "rgb_img_dynamic_range",
+    "ir_img_dynamic_range",
+    "rgb_img_entropy",
+    "ir_img_entropy",
+    "rgb_sky_ground_ratio",
+    "ir_sky_ground_ratio",
+    "rgb_edge_density",
+    "ir_edge_density",
+    "rgb_blurriness",
+    "ir_blurriness",
+    "det_count_diff",
+    "total_dets",
+    "scene_entropy_mean",
+    "scene_entropy_diff",
+    "brightness_ratio"
+  ]
+}

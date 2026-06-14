@@ -1,0 +1,84 @@
+{
+  "tag": "lean19_v2_ABC",
+  "n_features": 22,
+  "features": [
+    "rgb_max_conf",
+    "ir_max_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_log_bbox_area",
+    "rgb_best_aspect_ratio",
+    "ir_best_aspect_ratio",
+    "rgb_best_pos_y",
+    "ir_best_pos_y",
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std",
+    "rgb_best_pos_x",
+    "ir_best_pos_x",
+    "rgb_best_dist_to_center",
+    "ir_best_dist_to_center",
+    "rgb_best_target_bg_delta",
+    "ir_best_target_bg_delta",
+    "xmodal_centroid_dist",
+    "xmodal_scale_ratio",
+    "xmodal_conf_ratio"
+  ],
+  "use_class_weights": true,
+  "n_train": 47346,
+  "n_test": 17846,
+  "accuracy": 0.9742799506892301,
+  "f1_macro": 0.9690047236726423,
+  "per_dataset": {
+    "antiuav": {
+      "n": 14088,
+      "acc": 0.9805508233957978,
+      "f1_macro": 0.9241477805803838
+    },
+    "svanstrom": {
+      "n": 3354,
+      "acc": 0.9841979725700656,
+      "f1_macro": 0.9747702951570847
+    },
+    "video_airplanes_distant_airplane_over_head_flying_away": {
+      "n": 55,
+      "acc": 0.7090909090909091,
+      "f1_macro": 0.4148936170212766
+    },
+    "video_drone_drone_and_bird_sky_and_trees_short": {
+      "n": 114,
+      "acc": 0.7017543859649122,
+      "f1_macro": 0.5987639553429027
+    },
+    "video_drone_drone_seagull_attack": {
+      "n": 235,
+      "acc": 0.6510638297872341,
+      "f1_macro": 0.6138303678404986
+    }
+  },
+  "feature_importance": {
+    "rgb_max_conf": 0.05398609861731529,
+    "ir_max_conf": 0.08282781392335892,
+    "rgb_best_log_bbox_area": 0.03158145397901535,
+    "ir_best_log_bbox_area": 0.018982723355293274,
+    "rgb_best_aspect_ratio": 0.016802506521344185,
+    "ir_best_aspect_ratio": 0.18956609070301056,
+    "rgb_best_pos_y": 0.029758084565401077,
+    "ir_best_pos_y": 0.011881876736879349,
+    "rgb_best_local_contrast": 0.007046733517199755,
+    "ir_best_local_contrast": 0.01221531629562378,
+    "rgb_img_mean": 0.00992443785071373,
+    "ir_img_mean": 0.013020853511989117,
+    "rgb_img_std": 0.014692211523652077,
+    "rgb_best_pos_x": 0.004147389438003302,
+    "ir_best_pos_x": 0.03161485120654106,
+    "rgb_best_dist_to_center": 0.007348834071308374,
+    "ir_best_dist_to_center": 0.005036408547312021,
+    "rgb_best_target_bg_delta": 0.01524230744689703,
+    "ir_best_target_bg_delta": 0.007480071857571602,
+    "xmodal_centroid_dist": 0.23661069571971893,
+    "xmodal_scale_ratio": 0.17872200906276703,
+    "xmodal_conf_ratio": 0.021511293947696686
+  }
+}

@@ -17,8 +17,8 @@ import cv2
 import numpy as np
 from ultralytics import YOLO
 
-WORKSPACE = Path(r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection")
-IR_WEIGHTS = WORKSPACE / "runs" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt"
+WORKSPACE = Path(__file__).resolve().parents[3]   # ES_Drone_Thesis/ (resident; was ES_Drone_Detection)
+IR_WEIGHTS = WORKSPACE / "models" / "ir" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt"
 
 # All RGB datasets with labels
 RGB_DATASETS = [

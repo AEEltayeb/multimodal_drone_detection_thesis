@@ -1,0 +1,22 @@
+IR drone detection progress:
+
+Dataset collection / criteria 
+
+
+Dsetv4: 
+Size Breakdown (T=0.17)
+
+  DEV
+  Size            P        R     TP     FP     FN     GT
+  tiny       0.9500   0.8681   1672     88    254   1930
+  medium     0.9484   0.9599    790     43     33    822
+  large      0.9417   0.9076    226     14     23    246
+
+  TEST
+  Size            P        R     TP     FP     FN     GT
+  tiny       0.9533   0.8611   1674     82    270   1937
+  medium     0.9614   0.9651    747     30     27    781
+  large      0.9331   0.9824    223     16      4    227
+
+
+

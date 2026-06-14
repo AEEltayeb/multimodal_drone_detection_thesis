@@ -1,0 +1,50 @@
+<!-- GENERATED from eval_configs.csv by knowledge/_tools/kb.py — do not hand-edit. -->
+
+# eval_configs (44 rows)
+
+| id | dataset | n_samples | imgsz | scoring_rule | conf_thr | notes |
+|---|---|---|---|---|---|---|
+| svan_iop_1280 | svanstrom | 28710 | 1280 | iop | 0.25 | IoP@0.5; full stride=1; drone-class. src docs/EVIDENCE_LEDGER.md §3,§7 |
+| svan_iop_1280_s9 | svanstrom | 3190 | 1280 | iop | 0.25 | stride=9 sample; used for head-to-head comparisons. §7,§13.1 |
+| antiuav_iou_1280_s5 | antiuav |  | 1280 | iou |  | stride=5; 2026-05-18 ablation. §3.2 |
+| antiuav_iou_640_s5 | antiuav | 17075 | 640 | iou |  | stride=5; V5 head-to-head surface. §13.1 |
+| ir_final_640 | ir_dset_final | 9612 | 640 | iou |  | test split; ir_version_comparison 2026-05-16. §4.1 |
+| selcom_iop_1280 | selcom_mixed_ft2_val | 311 | 1280 | iop | 0.25 | 295 GT boxes; pure-selcom held-out val. §3.4,§13.1 |
+| confuser_zoo_1280 | rgb_confusers_merged | 2633 | 1280 |  |  | no GT; every detection=FP (fire rate). §7 |
+| confuser_test_640 | confuser_test | 2633 | 640 |  |  | no GT; halluc/img. V5 head-to-head. §13.1 |
+| rgb_dataset_iou_640 | rgb_dataset_test | 507 | 640 | iou |  | stride=34 sample; photo-style content. §13.1,§13.4 |
+| clf_3way_300 | 3way_300frame | 300 |  |  |  | 100 each antiuav/svanstrom/video; 3-way drone/confuser/bg classifier eval. f1=macro-F1(F1m), extra=accuracy. §5.1 |
+| video_drone_iop | drone_video_tests | 1359 | per-model | iop | 0.25 | 9 drone videos, 1234 GT; per-model imgsz (selcom 1280). §9.4.2 |
+| video_confuser | confuser_video_tests | 1250 | per-model |  | 0.25 | 10 confuser videos; frame-level FPR (no GT). §9.4.3 |
+| roboflow_rgb_drone_640 | rgb_drone_roboflow |  | 640 | iou | 0.25 | OOD; raw detector; missing-label caveat -> relative ordering only. §8.1 |
+| clf_own_holdout | per-classifier |  |  |  |  | EACH row = that classifier's OWN train-time test split. NOT cross-comparable; excluded from comparison-view meaning. f1 = test F1 or f1_macro as noted. |
+| svan_iop_640_may10 | svanstrom |  | 640 | iop | 0.25 | May-10 ablation default; imgsz UNKNOWN (§11 open). §5,§6 |
+| patch_catch_svan_1280_s9 | svanstrom | 3190 | 1280 | iop | 0.25 | stride=9; per-bucket patch-verifier catch-rate audit. §6.1 |
+| roboflow_ir_drone_640 | ir_drone_night;ir_mixed_cbam |  | 640 | iou | 0.25 | OOD IR drone; ir_drone_night heavily sensor-augmented (worst-case probe). §8.3 |
+| roboflow_ir_confuser_640 | ir_airplane_hors2;ir_airplane_plane;ir_bird |  | 640 | iou | 0.25 | OOD IR confusers; no GT every det=FP. §8.4 |
+| pipe_video_drone_iop | drone_video_tests | 1359 | per-model | iop | 0.25 | 9 drone videos 1234 GT; FULL pipeline RGB->IRgray->sa32->temporal->patch_thr0.7; per-frame + 3-frame segment. §9.5 |
+| pipe_video_confuser | confuser_video_tests | 1250 | per-model |  | 0.25 | 10 confuser videos; full pipeline; per-frame + segment FPR. §9.5 |
+| svan_persize_1280 | svanstrom |  | 1280 | iop | 0.25 | per-size drone+confuser buckets; check n_gt>0. §12 |
+| selcom_holdout_persize | selcom_mixed_ft2_val | 311 | per-model | iop | 0.25 | selcom held-out per-size, 6 RGB models. §12 |
+| antiuav_per_model | antiuav |  | per-model | iou | 0.25 | per-model RGB on Anti-UAV (saturated). §12 |
+| dual_clf_v3_surfaces | multi |  | per-surface |  |  | dual classifier v3 vs sa32 across confuser/video/rgb/antiuav. §[2026-05-26] |
+| distill_cv_5fold | distill_train_3351 | 3351 |  |  |  | 5-fold CV; 664 drone TP/2687 confuser FP; 261-D (5 meta+256 p5). Phase-2 CV only. §[2026-05-27] |
+| selcom_iop_1280_persrc | selcom_mixed_ft2_val | 311 | 1280 | iop | 0.5 | selcom_val for V5 selcom-source ablation (mixed vs pure). §13.2 |
+| cbam_ir_640 | cbam_thermal_valid | 180 | 640 | iou | 0.40 | Held-out thermal bird/drone/plane (drone=class1). NOTE: CBAM train now in V5-IR mining -> in-domain/optimistic. |
+| ir_confuser_halluc_640 | ir_video_test_confuser;cutpaste_confusers_v4_ir |  | 640 | iou | 0.40 | Held-out thermal confuser-only halluc surfaces (no drones). ir_video prefixes IR_AIRPLANE/BIRD/HELICOPTER; cutpaste synthetic. |
+| e2e_latency | mixed |  |  |  |  | END-TO-END pipeline latency per architecture (detector+classifier+verifier+temporal), ms/frame on deployment hardware. Record one evals row per pipeline/arch with latency_ms set. Partial coverage exists: eval/eval_pipeline_v5_quick.py (verifier-stage + per-frame overhead, §13.7). |
+| rgb_gray_heldout_640 | rgb_dataset_test;rgb_confusers_merged_test (fed grayscale-3ch) |  | 640 | iou | 0.25 | Held-out grayscale-deploy eval (RGB->gray). Drone surface rgb_dataset photos has weak bare recall (0.21, detector limit). |
+| dual_verifier_pipeline | paired_video |  |  |  |  | FUTURE EVAL: dual-verifier fusion (RGB mlp_v5 + IR mlp_v5_ir_aligned), trust-first order, router soft-weight on trust_both conflict. Compare vs single-verifier baseline; verify always-on IR verifier stays recall-neutral under sa32 AND the new replacement classifier. One evals row per (router x verifier-config). |
+| svan_ir_iop_640 | svanstrom_paired_IR | 1000 | 640 | iop | 0.40 | IR thermal Svanstrom (v3b detector), 1000 strided frames, IoP@0.5, drone-class. Offline verifier-matrix surface svanstrom_ir added to pipeline_cache.py 2026-06-02. |
+| svan_iop_email | svanstrom | 28710 | rgb1280/ir640 | iop | 0.25 | email-recompute full paired Svan; TRUST-AWARE scoring; robust6+V5MLP; ir conf 0.40 |
+| antiuav_iou_email | antiuav | 85374 | rgb640/ir640 | iou | 0.25 | email-recompute full paired Anti-UAV; TRUST-AWARE; robust6+V5MLP; ir conf 0.40 |
+| svan_gray_pipe_1280 | svanstrom_gray | 4000 | 1280 | iop | 0.25 | RGB->gray fallback fed to v3b IR; full-pipeline clf->filter cascade; eval/compare_routing_pipeline.py |
+| antiuav_iou_640_may10 | antiuav |  | 640 | iou | 0.25 | May-10 ablation Anti-UAV; imgsz=640 confirmed from cell.json (rgb=retrained_v2, ir=v3b) |
+| antiuav_iou_640_4k | antiuav | 4000 | 640 | iou | 0.25 | LOCKED standard 2026-06-09: Anti-UAV imgsz 640 (CHANGE from thesis 1280) + n=4000 strided (saturated floor). Canonical Anti-UAV config superseding antiuav_iou_1280_s5. |
+| confuser_zoo_640 | rgb_confusers_merged | 2633 | 640 |  |  | LOCKED standard 2026-06-09: RGB confuser zoo imgsz 640 (CHANGE from confuser_zoo_1280). No GT; every det=FP (fire-rate). |
+| ir_confusers_640 | IR_confusers | 5938 | 640 |  | 0.40 | NEW 2026-06-09: thermal IR confusers (airplane4281/bird1200/heli457), v3b @640. Replaces cbam_ir_640 as the thermal IR-confuser surface (bigger + not in-domain). No drones; every det=FP (fire-rate). |
+| rgb_bird_confuser_640 | rgb_bird_confuser | 1731 | 640 |  | 0.25 | NEW 2026-06-09: standalone RGB bird confuser (ft4 @640). Candidate to merge into rgb_confusers_merged after eval. No drones; every det=FP (fire-rate). |
+| tier1_unified | 13-surface thesis standard (svan/antiuav/rgb_test/ir_test/selcom/rgb_conf/ir_conf/gray_conf/svan_gray/svan_rawrgb/video) | 4000 even-spread cap; all-if-smaller | 640 std; 1280 svan-RGB+selcom | iop | 0.25 | THESIS FINAL standard (Tier-1=final 2026-06-10). Rules per surface: IoP svan/selcom/video + IoU antiuav/test-splits + fire-rate confusers; per-modality trust-aware (no union); 95pct bootstrap CIs. Cache thesis_eval/cache; replay thesis_eval/pipeline_eval_unified.py |
+| video_temporal_2of3 | 19 YouTube clips (9 drone 1359f + 10 confuser 1250f) consecutive | 2609 | 640 | iop | 0.25 | Sliding 3-frame 2-of-3 windows per clip; grayrgb_paired regime (ft4 + v3b-on-gray is_grayscale=1); patch_thr 0.7; mlp rgb@0.25 gray@0.25; thesis_eval/temporal_replay.py |
+| dut_antiuav_960 | dut_antiuav_test | 2200 | 960 | iou | 0.25 | grayrgb_paired: ft4+v3b(gray) @960; stride1 all frames; patch ON; thesis_eval unified cache |
+| dut_antiuav_640 | dut_antiuav_test | 2200 | 640 | iou | 0.25 | grayrgb_paired: ft4+v3b(gray) @640; stride1 all frames; patch ON |

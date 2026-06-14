@@ -1,7 +1,7 @@
 \chapter{Empirical Evaluation}
 \label{ch:hitl}
 
-This chapter answers the three research questions. It opens with the system-level result: the full-pipeline ablation (Section~\ref{sec:pipeline_ablation}) that isolates what every stage contributes on every canonical surface, under the single protocol of Section~\ref{sec:eval_protocol}. Temporal (segment-level) evidence follows on the consecutive-frame video surface (Section~\ref{sec:temporal_results}). The component deep-dives (Section~\ref{sec:components_eval}) then examine each stage (the RGB detector's three training stances, the IR detector's six-revision HITL case study, the trust-classifier comparison, and the filter comparison), including the design-evolution evidence measured under earlier configurations, always labelled as such. The Model MRI findings (Section~\ref{sec:mri_findings}) and the grayscale cross-modal finding (Section~\ref{sec:grayscale}) close the results; threats to validity and limitations close the chapter. Every table states its $n$; headline cells carry 95\% bootstrap confidence intervals in brackets.
+This chapter answers the three research questions. It opens with the system-level result: the full-pipeline ablation (Section~\ref{sec:pipeline_ablation}) that isolates what every stage contributes on every canonical surface, under the single protocol of Section~\ref{sec:eval_protocol}. Temporal (segment-level) evidence follows on the consecutive-frame video surface (Section~\ref{sec:temporal_results}). The component deep-dives (Section~\ref{sec:components_eval}) then examine each stage (the RGB detector's three training stances, the IR detector's six-revision HITL case study, the trust-classifier comparison, and the filter comparison), including the design-evolution evidence measured under earlier configurations, always labelled as such. The Model MRI findings (Section~\ref{sec:mri_findings}) and the grayscale cross-modal finding (Section~\ref{sec:grayscale}) close the results; threats to validity and limitations close the chapter. Every table states its $n$; headline cells carry $95\%$ bootstrap confidence intervals in brackets. Such an interval is the central $95\%$ range of the metric over $1{,}000$ resamples of the evaluation frames drawn with replacement: it indicates how much the number would move under a different sample of frames, so two cells whose intervals do not overlap differ by more than sampling noise.
 
 % ======================================================================
 \section{Full-Pipeline Ablation}
@@ -9,7 +9,7 @@ This chapter answers the three research questions. It opens with the system-leve
 \label{ch:experiments}
 
 \paragraph{Stack under test.}
-The production stack: RGB detector \texttt{ft4}, IR detector \texttt{v3b}, trust router \texttt{robust8} ($\tau=0.20$), per-frame filters \texttt{mlp\_v5} (RGB, threshold $0.25$) and \texttt{mlp\_v5\_ir\_aligned} (thermal scaler at $0.05$ on thermal channels; grayscale scaler at $0.25$ on grayscale-fed channels). Ablation arms swap exactly one element at a time: the router (\texttt{sa32}, the strongest hand-engineered classifier; \texttt{robust6}, the six-feature statistical base), the filter (the superseded MobileNetV3 patch CNN at \texttt{patch\_thr}$=$0.5), the composition order (classifier$\to$filter vs filter$\to$classifier), or the stage's presence. All cells replay the same cached detections (Section~\ref{sec:unified_cache}); scoring is per-modality trust-aware (Section~\ref{sec:scoring_audit}).
+The production stack: RGB detector \texttt{ft4}, IR detector \texttt{v3b}, trust router \texttt{robust8} ($\tau=0.20$), and the two per-frame confuser filters. Two different threshold stages should not be conflated. A \emph{detector confidence floor} discards a detection before it enters the pipeline; these caches run both detectors at \texttt{conf}$=$0.25 (the routing classifier's training setting). The deployment IR floor is $0.40$, but because the filter rescores every surviving detection the evaluation is insensitive to that floor and uses one value for both detectors (Section~\ref{sec:design_rationale}). A \emph{filter threshold} is then applied to the filter's own $P(\text{drone})$ output, the probability above which a surviving detection is accepted as a drone: \texttt{mlp\_v5} (RGB) at $0.25$, and \texttt{mlp\_v5\_ir\_aligned} at $0.05$ under its thermal input scaler and $0.25$ under its grayscale scaler. The IR filter's $0.05$ is therefore a filter threshold on thermal input, not the IR detector's deployment floor. Ablation arms swap exactly one element at a time: the router (\texttt{sa32}, the strongest hand-engineered classifier; \texttt{robust6}, the six-feature statistical base), the filter (the superseded MobileNetV3 patch CNN at \texttt{patch\_thr}$=$0.5), the composition order (classifier$\to$filter vs filter$\to$classifier), the router's reject discipline (a single global reject-probability floor, the \texttt{rej$\geq$0.8} rows), or the stage's presence. All cells replay the same cached detections (Section~\ref{sec:unified_cache}); scoring is per-modality trust-aware (Section~\ref{sec:scoring_audit}).
 
 \subsection{Paired Drone Benchmarks: the Cost Side}
 \label{sec:pipeline_paired}
@@ -18,20 +18,27 @@ On drone-positive paired surfaces the question is what the pipeline \emph{costs}
 
 \begin{table}[htbp]
     \centering
-    \caption{Full-pipeline ablation, Svanstr\"om paired ($n=4{,}000$ of 28{,}710, RGB @1280 / IR @640, IoP@0.5, trust-aware). \texttt{clf} $=$ trust router; \texttt{filt} $=$ per-frame filter(s). The production cell is \texttt{clf$\to$filt[robust8]}; the pipeline \emph{raises} recall over bare while adding 33~pp precision.}
+    \caption{Full-pipeline ablation, Svanstr\"om paired ($n=4{,}000$ frames, even-strided across the full 28{,}710-frame set, not the first $4{,}000$; RGB @1280 / IR @640, IoP@0.5). \emph{RGB only}/\emph{IR only} score that detector alone against its own ground truth; every row below the second rule is trust-aware and \emph{sums both modalities} (RGB-side scored vs RGB GT $+$ IR-side vs IR GT), so its TP/FP/FN base is both modalities' drones combined, not the frame count. \texttt{clf} $=$ $+$trust router; \texttt{filt} $=$ $+$per-frame filter; \texttt{clf$\to$filt} $=$ router then filter. The shipped production cell is \texttt{filt$\to$clf[robust8-nr]} (filter then the no-reject router; \texttt{robust8} with the reject class is the adjacent ablation, Section~\ref{sec:classifier_results}); the pipeline \emph{raises} recall over bare ($0.948\to0.991$) while adding $\sim$29~pp precision. \texttt{clf$\to$filt} is the same router in the other order (Section~\ref{sec:classifier_results} on why \texttt{filt$\to$clf} is shipped).}
     \label{tab:ablation_svanstrom}
     \begin{tabular}{lcccccl}
         \toprule
         cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
         \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)   & 1532 & 1845 & 141 & 0.454 & 0.916 & 0.607 [0.590--0.623] \\
+        IR only (\texttt{v3b}, vs IR GT)     & 1610 &  174 &  31 & 0.903 & 0.981 & 0.940 [0.931--0.949] \\
+        \midrule
         bare (both detectors)        & 3142 & 2019 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
-        filt only (mlp)              & 3043 &  352 & 271 & 0.896 & 0.918 & 0.907 [0.900--0.915] \\
+        filt only (\texttt{mlp\_v5}, RGB)    & 3043 &  353 & 271 & 0.896 & 0.918 & 0.907 [0.900--0.914] \\
+        filt only (\texttt{aligned}, IR)     & 3142 & 2018 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
         filt only (patch)            & 3004 &  782 & 310 & 0.793 & 0.907 & 0.846 [0.836--0.855] \\
+        clf only [robust8-nr]        & 3136 & 1997 &  27 & 0.611 & 0.992 & 0.756 [0.745--0.768] \\
         clf only [robust8]           & 3092 &  354 &  31 & 0.897 & 0.990 & 0.941 [0.935--0.947] \\
         clf only [robust6]           & 3132 &  286 &  34 & 0.916 & 0.989 & 0.951 [0.946--0.957] \\
         clf only [sa32]              & 3137 &  187 &  30 & 0.944 & 0.991 & 0.967 [0.962--0.971] \\
-        \textbf{clf$\to$filt [robust8]} & 2993 & 195 & 130 & \textbf{0.939} & \textbf{0.958} & \textbf{0.949 [0.943--0.954]} \\
+        clf$\to$filt [robust8-nr]    & 3037 & 330 & 126 & 0.902 & 0.960 & 0.930 [0.923--0.937] \\
+        clf$\to$filt [robust8]       & 2993 & 195 & 130 & 0.939 & 0.958 & 0.949 [0.943--0.954] \\
         clf$\to$filt [sa32]          & 3039 &  162 & 128 & 0.949 & 0.960 & 0.955 [0.949--0.960] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 3037 & 332 & 29 & \textbf{0.901} & \textbf{0.991} & \textbf{0.944 [0.938--0.950]} \\
         filt$\to$clf [robust8]       & 2996 &  196 &  35 & 0.939 & 0.989 & 0.963 [0.957--0.968] \\
         \bottomrule
     \end{tabular}
@@ -40,20 +47,27 @@ On drone-positive paired surfaces the question is what the pipeline \emph{costs}
 
 \begin{table}[htbp]
     \centering
-    \caption{Full-pipeline ablation, Anti-UAV paired ($n=4{,}000$ of 85{,}374, both modalities @640, IoU@0.5, trust-aware). The no-harm control: every pipeline cell is within $\sim$1~pp of bare or above it.}
+    \caption{Full-pipeline ablation, Anti-UAV paired ($n=4{,}000$ frames, even-strided across the 85{,}374-frame set, both modalities @640, IoU@0.5). Row conventions as in Table~\ref{tab:ablation_svanstrom} (\emph{RGB/IR only} score one detector vs its own GT; the trust-aware rows sum both modalities). The no-harm control: every pipeline cell is within $\sim$1~pp of bare or above it, the shipped no-reject \texttt{robust8-nr} included (this saturated surface rarely rejects, so dropping the reject class changes nothing here).}
     \label{tab:ablation_antiuav}
     \begin{tabular}{lcccccl}
         \toprule
         cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
         \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)   & 3657 &  41 &  68 & 0.989 & 0.982 & 0.985 [0.982--0.988] \\
+        IR only (\texttt{v3b}, vs IR GT)     & 3775 & 133 & 173 & 0.966 & 0.956 & 0.961 [0.956--0.966] \\
+        \midrule
         bare (both detectors)        & 7432 & 174 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
-        filt only (mlp)              & 7430 & 171 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        filt only (\texttt{mlp\_v5}, RGB)    & 7430 & 172 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        filt only (\texttt{aligned}, IR)     & 7432 & 173 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
         filt only (patch)            & 7430 & 174 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        clf only [robust8-nr]        & 7430 & 160 &  81 & 0.979 & 0.989 & 0.984 [0.981--0.986] \\
         clf only [robust8]           & 7408 & 141 &  93 & 0.981 & 0.988 & 0.984 [0.982--0.987] \\
         clf only [robust6]           & 7384 & 156 & 170 & 0.979 & 0.978 & 0.978 [0.975--0.981] \\
         clf only [sa32]              & 7426 & 135 &  75 & 0.982 & 0.990 & 0.986 [0.984--0.988] \\
-        \textbf{clf$\to$filt [robust8]} & 7406 & 139 & 95 & \textbf{0.982} & \textbf{0.987} & \textbf{0.984 [0.982--0.987]} \\
+        clf$\to$filt [robust8-nr]    & 7428 & 157 & 83 & 0.979 & 0.989 & 0.984 [0.982--0.987] \\
+        clf$\to$filt [robust8]       & 7406 & 139 & 95 & 0.982 & 0.987 & 0.984 [0.982--0.987] \\
         clf$\to$filt [sa32]          & 7424 & 134 &  77 & 0.982 & 0.990 & 0.986 [0.984--0.988] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 7428 & 157 & 81 & \textbf{0.979} & \textbf{0.989} & \textbf{0.984 [0.982--0.987]} \\
         filt$\to$clf [robust8]       & 7406 & 139 &  93 & 0.982 & 0.988 & 0.985 [0.982--0.987] \\
         \bottomrule
     \end{tabular}
@@ -62,19 +76,19 @@ On drone-positive paired surfaces the question is what the pipeline \emph{costs}
 
 Five readings, each attributable to one element.
 
-\emph{The pipeline maintains recall, and in fact raises it (RQ1).} On Svanstr\"om the production cell's recall is \emph{higher} than bare ($0.948 \to 0.958$) while precision rises $0.609 \to 0.939$. The recall gain is consistent with a routing effect under per-modality scoring: the router stops the system being scored on the modality that is blind on a given frame, so its misses leave the books (bare FN $172 \to 31$ at the router stage). No new detection is created downstream; the architecture cannot do that. On Anti-UAV the pipeline is no-harm by every cell, which is exactly the role of a saturated control.
+\emph{The pipeline maintains recall, and in fact raises it (RQ1).} On Svanstr\"om the production cell's recall is \emph{higher} than bare ($0.948 \to 0.991$) while precision rises $0.609 \to 0.901$. That precision gain is RGB-side: the bare detector's confuser false positives (the RGB-only row alone carries $1{,}845$ of them) are removed by the \texttt{mlp\_v5} filter, whose drone/confuser separability is established independently by the Model MRI (Section~\ref{sec:mri_findings}). The recall gain is a separate, routing effect under per-modality scoring: the router stops the system being scored on the modality that is blind on a given frame, so its misses leave the books (bare FN $172 \to 27$ at the router stage). No new detection is created downstream; the architecture cannot do that. On Anti-UAV the pipeline is no-harm by every cell, which is exactly the role of a saturated control.
 
-\emph{The router and the filter suppress different false positives (RQ2).} On Svanstr\"om, the router alone removes $82\%$ of bare FPs ($2019 \to 354$); the filter alone removes $83\%$ ($2019 \to 352$); composed, they reach $195$. Each stage alone leaves a failure mode the other catches: the router cannot veto an individual confuser detection inside a trusted frame, and the filter cannot recover a frame whose trusted modality is wrong.
+\emph{In the shipped stack the filter suppresses the false positives; the reject class is a complementary net we trade away (RQ2).} The shipped no-reject router routes every frame, so on Svanstr\"om it removes almost no bare false positives on its own ($2019 \to 1997$); the \texttt{mlp\_v5} filter does that work ($2019 \to 353$ alone, $\to 330$ composed). The reject-class \texttt{robust8} ablation tells the complementary half of the story: its router \emph{alone} removes $82\%$ of bare FPs ($2019 \to 354$) by vetoing whole untrustworthy frames, a different failure mode than the filter's per-detection veto, which is why composing \texttt{robust8} with the filter reaches $195$ FP. Each stage catches what the other misses: the filter cannot recover a frame whose trusted modality is wrong, and the reject class cannot veto a single confuser detection inside a trusted frame. We ship the no-reject router and delegate false-positive removal to the filter (Section~\ref{sec:classifier_results}); \texttt{robust8} keeps that second net at the recall cost quantified throughout this section.
 
-\emph{Composition order is a recall/precision dial.} \texttt{filt$\to$clf} keeps recall at the router's level ($0.989$) because the router re-routes on the filtered detections; \texttt{clf$\to$filt} trades $3$~pp of that recall for the filter's final say on precision. Both orders are within $1.5$~pp F1; the shipped order (\texttt{clf$\to$filt}) is chosen for its lower false-alert count on confuser surfaces (Table~\ref{tab:ablation_confusers}).
+\emph{Composition order is a recall/precision dial, and for the no-reject router \texttt{filt$\to$clf} is the better side of it.} \texttt{filt$\to$clf} keeps recall at the router's level ($0.991$ on Svanstr\"om) because the router re-routes on the already-filtered detections; \texttt{clf$\to$filt} trades $\sim$3~pp of that recall ($0.960$) for marginal precision. With a reject class the order mattered for confuser suppression (reject vetoes whole frames \emph{before} the filter, the historic reason \texttt{clf$\to$filt} was shipped), but the no-reject router never vetoes a confuser frame, so the two orders give \emph{identical} confuser fire (Table~\ref{tab:ablation_confusers}); with that tie broken we ship \texttt{filt$\to$clf} for the recall (Svanstr\"om F1 $0.944$ vs $0.930$, DUT $0.837$ vs $0.792$).
 
-\emph{\texttt{sa32} edges \texttt{robust8} in-domain; \texttt{robust8} is shipped anyway.} The 32-feature \texttt{sa32} leads every in-domain cell by $0.2$--$1.8$~pp. It also requires an expensive per-frame OpenCV feature pass, was trained against a superseded detector's calibration, and leaks scene statistics (Section~\ref{sec:feature_selection}). \texttt{robust8} gives up that margin for eight free features, a $404\times$ cheaper decision, and materially better OOD behaviour (Table~\ref{tab:ablation_confusers}); \texttt{robust6} sits between them, confirming the statistical selection held its in-domain ground.
+\emph{Why the no-reject router is shipped.} Among the reject-class routers, the 32-feature \texttt{sa32} leads every in-domain cell by $0.2$--$1.8$~pp, but it needs an expensive per-frame OpenCV pass, was trained against a superseded detector's calibration, and leaks scene statistics (Section~\ref{sec:feature_selection}); \texttt{robust8} matches it within a point on eight free features at a $404\times$ cheaper decision, with \texttt{robust6} between them. On the confuser-rich Svanstr\"om flagship the reject class earns its keep (at the shipped \texttt{filt$\to$clf} order, $\texttt{robust8}$ $0.963$ vs the no-reject $0.944$, at far lower confuser fire). The shipped router is nonetheless the no-reject \texttt{robust8-nr}: a single global router must serve paired, single-modality, and degraded-channel deployments alike, and the reject class collapses recall on the latter two (Tables~\ref{tab:ablation_dut},~\ref{tab:ablation_solo}); averaged across surfaces the no-reject router leads ($0.834$ vs $0.733$ mean composed F1). \texttt{robust8}/\texttt{robust6}/\texttt{sa32} are retained as ablations and the trade is detailed in Section~\ref{sec:classifier_results}.
 
-\emph{Dual-modality routing beats either modality alone (RQ3).} Table~\ref{tab:rq3} compares each modality bare (scored against its own GT) with the routed system on the same frames. The per-surface reversal is the point: on Svanstr\"om the IR detector dominates ($F1$ $0.940$ vs RGB's $0.607$); on Anti-UAV the RGB detector does ($0.985$ vs $0.961$). A fixed single-modality choice loses badly somewhere; the router pays on both surfaces, and its value concentrates exactly where the weaker modality would otherwise be scored on frames it cannot see, which is why per-modality scoring, not a union, is the only fair accounting (Section~\ref{sec:scoring_audit}).
+\emph{Dual-modality routing earns its keep on coverage (RQ3).} Table~\ref{tab:rq3} scores each modality against its own GT and the routed system trust-aware on the same frames. The per-surface reversal is the point: IR dominates Svanstr\"om ($0.940$ vs RGB's $0.607$), RGB dominates Anti-UAV ($0.985$ vs IR's $0.961$); a fixed single-modality choice loses badly somewhere. Under trust-aware scoring the routed no-reject system tracks or edges the stronger modality on each surface (Svanstr\"om $0.944$, just above IR-only's $0.940$; Anti-UAV $0.984$), because that rule deliberately does not charge a modality for what it cannot see (Section~\ref{sec:scoring_audit}). The decisive RQ3 evidence is therefore the \emph{coverage} comparison (Table~\ref{tab:modality_ab}), where every modality's ground truth always counts: there the routed system reaches $0.909$ on Svanstr\"om against RGB-only $0.582$ and IR-only $0.632$, the coverage a single camera physically cannot match.
 
 \begin{table}[htbp]
     \centering
-    \caption{RQ3: single modality vs routed pipeline (bare per-modality rows vs the production cell). Each modality is scored against its own GT; the routed row is trust-aware. The modality ranking \emph{reverses} between surfaces; routing wins on both.}
+    \caption{RQ3: single modality vs routed pipeline (bare per-modality rows vs the production cell). Each modality is scored against its own GT; the routed row is trust-aware. The modality ranking \emph{reverses} between surfaces; under trust-aware scoring the routed no-reject system tracks the stronger modality (the fair, coverage-scored comparison that isolates routing's value is Table~\ref{tab:modality_ab}).}
     \label{tab:rq3}
     \begin{tabular}{lll}
         \toprule
@@ -82,11 +96,48 @@ Five readings, each attributable to one element.
         \midrule
         RGB only (\texttt{ft4}, bare)  & 0.607 [0.590--0.623] & 0.985 [0.982--0.988] \\
         IR only (\texttt{v3b}, bare)   & 0.940 [0.931--0.949] & 0.961 [0.956--0.966] \\
-        \textbf{Routed (production)}   & \textbf{0.949 [0.943--0.954]} & \textbf{0.984 [0.982--0.987]} \\
+        \textbf{Routed (production, \texttt{robust8-nr}, filt$\to$clf)}   & \textbf{0.944 [0.938--0.950]} & \textbf{0.984 [0.982--0.987]} \\
         \bottomrule
     \end{tabular}
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (A_bare + B_pipeline)]
+
+\paragraph{A clean in-domain check: DUT Anti-UAV (\emph{test split}).}
+The two surfaces above are IR-dominant (Svanstr\"om) or saturated (Anti-UAV). The DUT Anti-UAV \emph{test split}~\cite{zhao2022dutantiuav} adds an RGB-strong, confuser-free check: an all-drone RGB benchmark on which the RGB detector \texttt{ft4} is in-domain (DUT was one source in the composite \texttt{rgb\_dataset} it trained on), paired with the thermal \texttt{v3b} detector fed grayscale-converted RGB, i.e.\ the no-thermal cross-domain fallback. \textbf{The grayscale-IR column measures this fallback mode, not the IR detector's native thermal performance}: on real thermal it reaches $F1\,0.940$ (Svanstr\"om, Table~\ref{tab:rq3}) and $0.961$ (Anti-UAV); the much lower numbers here reflect a thermal model run on grayscale RGB, an input it was never trained on, and should not be read as the IR detector's capability. Only the official test split is used (no DUT frame here was a training image for the router or filters). Because no confuser is present, every filter veto can only remove a true positive, so the pipeline's one available contribution is precision. We report at \texttt{imgsz}$=$960, the resolution-optimal setting for this small-drone surface (Section~\ref{sec:resolution_arch}; drones down to $25\times9$~px need the pixels).
+
+\begin{table}[htbp]
+    \centering
+    \caption{Full-pipeline ablation, DUT Anti-UAV \emph{test split} ($n=2{,}200$ frames, $2{,}245$ GT drones, RGB \texttt{ft4} $+$ grayscale-IR \texttt{v3b}, both @960, IoU@0.5, trust-aware). The grayscale-IR channel is the IR detector's no-thermal \emph{fallback} mode (thermal model on grayscale RGB), not its native thermal performance. The full test split is used (not strided). Row conventions as in Table~\ref{tab:ablation_svanstrom} (\emph{RGB/IR only} score one detector vs its own GT; the trust-aware rows sum both modalities). Confuser-free (all-drone): filters can only delete true positives, so here the pipeline buys precision, not FP suppression. \texttt{filt$\to$clf[robust8-nr]} (the shipped no-reject router) is the production configuration; dropping the reject class recovers the recall \texttt{robust8} surrenders on this clean surface (at \texttt{filt$\to$clf}, $R\,0.583\to0.808$, F1 $0.707\to0.837$).}
+    \label{tab:ablation_dut}
+    \begin{tabular}{lcccccl}
+        \toprule
+        cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
+        \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)            & 1917 & 104 &  328 & 0.949 & 0.854 & 0.899 [0.889--0.908] \\
+        grayscale-IR only (\texttt{v3b}, vs IR GT)    & 1113 & 375 & 1132 & 0.748 & 0.496 & 0.596 [0.576--0.616] \\
+        \midrule
+        RGB \texttt{ft4} $+$ grayscale-IR \texttt{v3b} & 3030 & 479 & 1460 & 0.864 & 0.675 & 0.758 [0.747--0.769] \\
+        filt only (\texttt{mlp\_v5}, RGB)        & 2820 & 455 & 1670 & 0.861 & 0.628 & 0.726 [0.715--0.739] \\
+        filt only (\texttt{aligned\_gray}, IR)   & 2796 & 423 & 1694 & 0.869 & 0.623 & 0.725 [0.715--0.736] \\
+        filt only (patch)            & 2931 & 470 & 1559 & 0.862 & 0.653 & 0.743 [0.732--0.754] \\
+        clf only [robust8-nr]        & 3024 & 464 &  522 & 0.867 & 0.853 & 0.860 [0.850--0.869] \\
+        clf only [robust8]           & 2586 & 302 & 1301 & 0.895 & 0.665 & 0.763 [0.749--0.778] \\
+        clf only [robust6]           & 2415 & 374 & 1808 & 0.866 & 0.572 & 0.689 [0.674--0.705] \\
+        clf only [sa32]              & 2651 & 430 & 1480 & 0.860 & 0.642 & 0.735 [0.721--0.750] \\
+        clf$\to$filt [robust8-nr]    & 2580 & 389 & 966 & 0.869 & 0.728 & 0.792 [0.781--0.803] \\
+        clf$\to$filt [robust8]       & 2234 & 253 & 1653 & 0.898 & 0.575 & 0.701 [0.686--0.717] \\
+        clf$\to$filt [sa32]          & 2265 & 361 & 1866 & 0.863 & 0.548 & 0.670 [0.655--0.686] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 2580 & 389 & 614 & \textbf{0.869} & \textbf{0.808} & \textbf{0.837 [0.827--0.849]} \\
+        filt$\to$clf [robust8]       & 2182 & 243 & 1564 & 0.900 & 0.583 & 0.707 [0.691--0.725] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results_dut/tier1_results.json (dut_antiuav_960 A_bare + B_pipeline); run=thesis_eval/pipeline_eval_unified.py; ledger=dut-resolution-pipeline]
+
+Two readings. First, dropping the reject class is what makes the fused stack competitive on a clean RGB surface: the shipped \texttt{filt$\to$clf[robust8-nr]} reaches F1 $0.837$ (recall $0.808$), recovering the recall the reject-class \texttt{robust8} surrenders here (its \texttt{filt$\to$clf} is $0.707$, recall $0.583$, because it rejects $24\%$ of these confuser-free frames). The gain is the router's; the per-frame filters remain a small recall tax on confuser-free footage, where they can only delete true positives (\texttt{filt only (mlp)} is the weakest cell at $0.726$). Second, the strongest single configuration is still RGB-alone: \texttt{ft4} reaches $F1\,0.899$ against its own ground truth (per-modality bare), above the fused $0.837$, because the cross-domain grayscale-IR channel (standalone $F1\,0.596$ in its fallback mode, far below its native thermal $F1\,0.940$ of Table~\ref{tab:rq3}) drags the fused number down. On an RGB-strong surface the fused stack buys a live second channel and a bounded precision floor rather than peak F1; the no-reject router is what keeps that cost small.
+
+\paragraph{Why the shipped router drops the reject class.}
+The four-class \texttt{robust8} can output \texttt{reject} (trust neither modality), which on a clean drone surface discards recoverable recall: it is the DUT gap above, where the router rejects $24\%$ of confuser-free frames, and the single-modality collapse of Table~\ref{tab:ablation_solo}. The shipped router removes the reject class entirely (\texttt{robust8-nr}: the same eight features, the neither-correct rows dropped in training, an argmax route to RGB, IR, or both), delegating all false-positive removal to the per-frame filter. The effect is exactly what the per-surface diagnosis predicts. On the IR-dominant Svanstr\"om and the saturated Anti-UAV, which rarely reject, it barely moves ($-1.9$~pp and $0$~pp F1 against \texttt{robust8}); on the clean RGB-strong DUT it recovers drone recall $0.575 \to 0.728$ (F1 $0.701 \to 0.792$) and on the single-modality surfaces it turns the routing collapse back into the bare detector (Table~\ref{tab:ablation_solo}). Averaged across drone surfaces the no-reject router leads on composed F1 ($0.834$ vs $0.733$). The cost is paid in confuser fire that the filter no longer has the reject net behind it to compound: RGB confuser frame fire rises $0.0015 \to 0.011$ (still $\sim$1~\%, and damped further by temporal voting, Section~\ref{sec:temporal_results}), thermal $0.217 \to 0.237$, and real-video-confuser fire $0.073 \to 0.225$ (Table~\ref{tab:temporal_production}). We judge that trade worth the recall; \texttt{robust8} is retained throughout as the ablation that quantifies what the reject class buys.
 
 \subsection{Out-of-Distribution Confusers: the Benefit Side}
 \label{sec:pipeline_confusers}
@@ -95,34 +146,37 @@ On confuser-only surfaces no drone is present; every surviving detection is a fa
 
 \begin{table}[htbp]
     \centering
-    \caption{Confuser-surface FP reduction. RGB confusers: $n=2{,}633$ (full test split) @640. IR confusers: $n=4{,}000$ of 5{,}237 (even spread) @640. Grayscale confusers: the same RGB confuser frames through the grayscale-fed IR channel (router bypassed; the grayscale finding's configuration, Section~\ref{sec:grayscale}). Fire $=$ fraction of frames with $\geq$1 surviving detection.}
+    \caption{Confuser-surface FP reduction. RGB confusers: $n=2{,}633$ (full test split) @640. IR confusers: $n=4{,}000$ of 5{,}237 (even spread) @640. Grayscale confusers: the same RGB confuser frames through the grayscale-fed IR channel (router bypassed; the grayscale finding's configuration, Section~\ref{sec:grayscale}). Fire $=$ fraction of frames with $\geq$1 surviving detection. The shipped \texttt{filt$\to$clf[robust8-nr]} equals \texttt{filt only (mlp)} (and equals \texttt{clf$\to$filt[robust8-nr]} to the digit, since a no-reject router never vetoes a confuser frame, so composition order is immaterial here); the \texttt{robust8} ablation reaches $0.0015$ (RGB) by adding the reject net, the suppression the shipped stack trades for recall.}
     \label{tab:ablation_confusers}
     \begin{tabular}{lccc}
         \toprule
         cell & RGB confusers & IR confusers & grayscale confusers \\
         \midrule
         bare                      & 0.304 [0.287--0.321] & 0.294 [0.280--0.309] & 0.238 [0.222--0.255] \\
+        clf only [robust8-nr]     & 0.304 [0.287--0.321] & 0.294 [0.280--0.309] & --- \\
         clf only [robust8]        & 0.049 [0.041--0.057] & 0.273 [0.259--0.287] & --- \\
         clf only [robust6]        & 0.035 [0.028--0.043] & 0.223 [0.209--0.235] & --- \\
         clf only [sa32]           & 0.003 [0.001--0.005] & 0.263 [0.249--0.277] & --- \\
         filt only (mlp)           & 0.011 [0.007--0.015] & 0.237 [0.224--0.250] & 0.008 [0.004--0.011] \\
         filt only (patch)         & 0.102 [0.091--0.114] & 0.246 [0.233--0.260] & 0.204 [0.189--0.222] \\
-        \textbf{clf$\to$filt [robust8]} & \textbf{0.0015 [0.000--0.003]} & 0.217 [0.204--0.230] & --- \\
+        \textbf{filt$\to$clf [robust8-nr]} & \textbf{0.011 [0.007--0.015]} & \textbf{0.237 [0.224--0.250]} & --- \\
+        clf$\to$filt [robust6]    & 0.0011 [0.000--0.003] & 0.179 [0.167--0.191] & --- \\
+        clf$\to$filt [robust8]    & 0.0015 [0.000--0.003] & 0.217 [0.204--0.230] & --- \\
         \bottomrule
     \end{tabular}
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (rgb_confuser, ir_confusers, gray_confuser C_confuser)]
 
-Four observations. First, the \emph{filter} is the decisive stage on RGB confusers: the per-frame \texttt{mlp\_v5} cuts FP detections $835 \to 29$ ($-96.5\%$) where the patch CNN manages $835 \to 282$. The feature-reuse filter is not only $46$--$72\times$ faster than the CNN it replaced; it is $\sim$10$\times$ stronger on the surface that matters. Second, \emph{composition compounds}: the production cell fires on $0.15\%$ of RGB confuser frames ($4$ of $2{,}633$; \texttt{robust6} and \texttt{sa32} compositions reach $0.11\%$ and $0.08\%$), a trajectory from nearly one frame in three at the bare detector to roughly one in seven hundred. Third, the same filter weights transfer to the grayscale channel through nothing but the per-modality input scaler: $656 \to 21$ FP ($-96.8\%$) on grayscale-converted confusers, where the thermal scaler on the same frames manages only $656 \to 280$. The per-modality standardisation of Section~\ref{sec:ir_xmodal_verifier} is load-bearing, not a detail. (\texttt{sa32}'s near-zero router-only rate in the RGB column partly reflects its conservatism when the second modality is absent, the same conservatism that costs it recall on operational video, Section~\ref{sec:classifier_results}.)
+Four observations. First, the \emph{filter} is the decisive stage on RGB confusers: the per-frame \texttt{mlp\_v5} cuts FP detections $835 \to 29$ ($-96.5\%$) where the patch CNN manages $835 \to 282$. The feature-reuse filter is not only $46$--$72\times$ faster than the CNN it replaced; it is $\sim$10$\times$ stronger on the surface that matters. Second, \emph{the reject class compounds with the filter, and the shipped stack trades part of that away}: the \texttt{robust8} ablation drives RGB confuser fire to $0.15\%$ ($4$ of $2{,}633$ frames; \texttt{robust6} and \texttt{sa32} compositions reach $0.11\%$ and $0.08\%$) by stacking reject on top of the filter, but the shipped no-reject \texttt{robust8-nr} leaves that work to the filter alone and sits at $1.1\%$ ($29$ of $2{,}633$): a trajectory from nearly one frame in three at the bare detector to roughly one in ninety, the deliberate cost of the recall recovered on the clean and single-modality surfaces. Third, the same filter weights transfer to the grayscale channel through nothing but the per-modality input scaler: $656 \to 21$ FP ($-96.8\%$) on grayscale-converted confusers, where the thermal scaler on the same frames manages only $656 \to 280$. The per-modality standardisation of Section~\ref{sec:ir_xmodal_verifier} is load-bearing, not a detail. (\texttt{sa32}'s near-zero router-only rate in the RGB column partly reflects its conservatism when the second modality is absent, the same conservatism that costs it recall on operational video, Section~\ref{sec:classifier_results}.)
 % [source: thesis_eval/results/tier1_results.json (rgb_confuser, gray_confuser C_confuser)]
 
-Fourth, the limit: \emph{thermal confusers resist}. On the \texttt{IR\_confusers} surface the best composition (\texttt{robust6}, $0.179$) cuts fire by only $39\%$ from bare, and the production cell by $26\%$. The surface is airplane-dominated ($76\%$ of frames) and the airplane category is every filter generation's weakest (Section~\ref{sec:verifier_results}); the aligned filter's confuser training is also grayscale-harvested rather than thermal-native, and these Roboflow-sourced thermal airplanes are OOD to it. In paired thermal deployments the router's modality arbitration carries more of the thermal-confuser burden than the filter does; closing the thermal airplane gap with native thermal confuser crops is recorded as future work (Section~\ref{sec:limits}).
+Fourth, the limit: \emph{thermal confusers resist}. On the \texttt{IR\_confusers} surface the best composition (the \texttt{robust6} ablation, $0.179$) cuts fire by only $39\%$ from bare, and the shipped no-reject cell ($0.237$) by only $19\%$. The surface is airplane-dominated ($76\%$ of frames) and the airplane category is every filter generation's weakest (Section~\ref{sec:verifier_results}); the aligned filter's confuser training is also grayscale-harvested rather than thermal-native, and these Roboflow-sourced thermal airplanes are OOD to it. In paired thermal deployments the router's modality arbitration carries more of the thermal-confuser burden than the filter does; closing the thermal airplane gap with native thermal confuser crops is recorded as future work (Section~\ref{sec:limits}).
 % [source: thesis_eval/results/tier1_results.json (ir_confusers C_confuser)]
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig_pipeline_ablation}
-    \caption{Pipeline ablation at a glance. (a) Drone-positive paired surfaces: the router supplies most of the F1 lift and the filter finishes it; Anti-UAV confirms no-harm. Whiskers are 95\% bootstrap CIs. (b) Confuser surfaces: bare $\to$ patch $\to$ \texttt{mlp\_v5} $\to$ router $\to$ composed frame fire rates, with near-total suppression on RGB ($30.3\% \to 0.15\%$) and grayscale ($23.8\% \to 0.8\%$) and measured resistance on thermal airplanes. Generated from \texttt{tier1\_results.json} by \texttt{thesis\_eval/gen\_ablation\_figure.py}.}
+    \caption{Pipeline ablation at a glance, drawn for the reject-class \texttt{robust8} cascade (the strongest-suppression configuration; the shipped no-reject \texttt{robust8-nr} trades part of the confuser suppression for recall, Table~\ref{tab:ablation_confusers}). (a) Drone-positive paired surfaces: the router supplies most of the F1 lift and the filter finishes it; Anti-UAV confirms no-harm. Whiskers are 95\% bootstrap CIs. (b) Confuser surfaces: bare $\to$ patch $\to$ \texttt{mlp\_v5} $\to$ router $\to$ composed frame fire rates, with near-total suppression on RGB ($30.3\% \to 0.15\%$ composed) and grayscale ($23.8\% \to 0.8\%$) and measured resistance on thermal airplanes; the shipped no-reject stack delegates suppression to the filter alone and sits at $1.1\%$ on RGB. Generated from \texttt{tier1\_results.json} by \texttt{thesis\_eval/gen\_ablation\_figure.py}.}
     \label{fig:pipeline_ablation}
 \end{figure}
 
@@ -133,19 +187,25 @@ The in-distribution test splits and the CCTV val set are single-modality surface
 
 \begin{table}[htbp]
     \centering
-    \caption{Solo-surface filter ablation (single modality vs own GT). IR test split: $n=4{,}000$ of 9{,}612; RGB test split: $n=4{,}000$ of 17{,}209; SelCom: full 311. The filter's in-distribution cost is the honest counterweight to its OOD benefit.}
+    \caption{Solo-surface ablation (single modality vs own GT). IR test split: $n=4{,}000$ of 9{,}612; RGB test split: $n=4{,}000$ of 17{,}209; SelCom: full 311. The \texttt{clf} rows show the router on a single live channel: the reject-class \texttt{robust8} collapses recall (it routes against a dead second modality), while the shipped no-reject \texttt{robust8-nr} degrades gracefully to the bare detector, which is why single-modality deployments can run the full router. The filter's in-distribution recall cost is the honest counterweight to its OOD benefit.}
     \label{tab:ablation_solo}
     \begin{tabular}{llccc}
         \toprule
         surface & cell & $P$ & $R$ & F1 [95\% CI] \\
         \midrule
         IR test split & bare (\texttt{v3b})   & 0.942 & 0.981 & 0.961 [0.955--0.967] \\
+        IR test split & clf [robust8]         & 0.947 & 0.923 & 0.935 [0.928--0.942] \\
+        IR test split & clf [robust8-nr]      & 0.942 & 0.981 & 0.961 [0.955--0.967] \\
         IR test split & filt (aligned, thermal) & 0.943 & 0.973 & 0.958 [0.952--0.964] \\
         IR test split & filt (patch)          & 0.949 & 0.931 & 0.940 [0.933--0.947] \\
         RGB test split & bare (\texttt{ft4})  & 0.954 & 0.899 & 0.926 [0.919--0.933] \\
+        RGB test split & clf [robust8]        & 0.981 & 0.383 & 0.551 [0.532--0.570] \\
+        RGB test split & clf [robust8-nr]     & 0.954 & 0.899 & 0.926 [0.919--0.933] \\
         RGB test split & filt (mlp)           & 0.976 & 0.691 & 0.809 [0.797--0.823] \\
         RGB test split & filt (patch)         & 0.957 & 0.832 & 0.890 [0.881--0.898] \\
         SelCom val & bare (\texttt{ft4})      & 0.858 & 0.451 & 0.591 [0.532--0.639] \\
+        SelCom val & clf [robust8]            & 0.881 & 0.125 & 0.220 [0.161--0.276] \\
+        SelCom val & clf [robust8-nr]         & 0.858 & 0.451 & 0.591 [0.531--0.639] \\
         SelCom val & filt (mlp)               & 0.950 & 0.451 & 0.612 [0.551--0.659] \\
         SelCom val & filt (patch)             & 0.858 & 0.451 & 0.591 [0.532--0.639] \\
         \bottomrule
@@ -153,7 +213,7 @@ The in-distribution test splits and the CCTV val set are single-modality surface
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (ir_dset_final, rgb_dataset_test, selcom_val S4_verifier)]
 
-Three per-surface readings. On the IR test split the aligned filter costs $0.8$~pp recall for a precision nudge (recall-safe, as designed), while the patch CNN costs $5.0$~pp recall on the same frames. On the RGB test split the feature-reuse filter's known carve-out reproduces exactly at the canonical configuration: $-11.7$~pp F1, all of it recall ($0.899 \to 0.691$), the OOD coverage gap diagnosed in Section~\ref{sec:verifier_results}. On SelCom the filter cuts false positives $22 \to 7$ at \emph{zero} recall cost (precision $0.858 \to 0.950$), while the patch CNN, which has never seen CCTV-scale crops, is bit-for-bit the bare detector: the abstention behaviour that motivated the feature-reuse design in the first place. A regime note: applying the trust \emph{router} on these single-modality photo surfaces collapses recall (it routes against a dead second channel; e.g.\ $R=0.38$ on the RGB test split), which is the measured demonstration that routing is a \emph{paired-stream} component. Single-modality deployments run detector $+$ filter, as the GUI's single-camera modes do.
+Three per-surface readings. On the IR test split the aligned filter costs $0.8$~pp recall for a precision nudge (recall-safe, as designed), while the patch CNN costs $5.0$~pp recall on the same frames. On the RGB test split the feature-reuse filter's known carve-out reproduces exactly at the canonical configuration: $-11.7$~pp F1, all of it recall ($0.899 \to 0.691$), the OOD coverage gap diagnosed in Section~\ref{sec:verifier_results}. On SelCom the filter cuts false positives $22 \to 7$ at \emph{zero} recall cost (precision $0.858 \to 0.950$), while the patch CNN, which has never seen CCTV-scale crops, is bit-for-bit the bare detector: the abstention behaviour that motivated the feature-reuse design in the first place. A regime note: the reject-class \texttt{robust8} collapses recall on these single-modality surfaces (it routes against a dead second channel; clf-only $R=0.383$ on the RGB test split, $0.125$ on SelCom), but the shipped no-reject \texttt{robust8-nr} does not, instead degrading to the bare detector ($R=0.899$ and $0.451$, the \texttt{clf [robust8-nr]} rows above). The collapse was the reject class, not routing per se, so single-modality deployments can run the shipped router safely; detector $+$ filter remains the minimal configuration the GUI's single-camera modes use.
 % [source: thesis_eval/results/tier1_results.json (S4_verifier clf rows)]
 
 \subsection{Modality A/B: What a Single-Camera System Misses}
@@ -176,13 +236,15 @@ RQ3 asks whether routed dual-modality beats either modality alone. The headline 
         both (unrouted)     & 0.742 [0.730--0.754] & 0.973 [0.970--0.976] \\
         both $+$filt        & 0.907 [0.900--0.915] & 0.973 [0.970--0.976] \\
         routed [\texttt{robust8}]        & 0.915 [0.908--0.921] & 0.973 [0.970--0.976] \\
-        routed $+$filt (production)      & \textbf{0.921} [0.914--0.927] & \textbf{0.973} [0.970--0.976] \\
+        routed [\texttt{robust8}] $+$filt & 0.921 [0.914--0.927] & 0.973 [0.970--0.976] \\
+        routed [\texttt{robust8-nr}]     & 0.743 [0.731--0.755] & 0.974 [0.971--0.976] \\
+        \textbf{routed [\texttt{robust8-nr}] $+$filt (production)} & \textbf{0.909} [0.902--0.916] & \textbf{0.974} [0.971--0.976] \\
         \bottomrule
     \end{tabular}
 \end{table}
 % [source: thesis_eval/results/notes_round1_results.json (M_modality_ab); run=thesis_eval/notes_round1_replays.py]
 
-The answer is unambiguous on the discriminating surface. On Svanstr\"om, either camera alone misses roughly half of what the pair can see (RGB-only $0.458$, IR-only $0.632$); carrying both sensors unrouted recovers the coverage but imports both failure profiles ($0.742$); and the routing stage is worth $+1.4$~pp over filtering alone even under this harsher rule (routed$+$filt $0.921$ vs both$+$filt $0.907$), because it rejects frames the filter cannot. On the in-distribution Anti-UAV control every dual arm is statistically identical ($0.973$), the expected no-harm result; the single-modality arms sit near $0.65$ there only because each sensor sees just its own half of the paired ground truth. The asymmetric filter effect is also visible: the filter moves RGB-only by $+12.4$~pp (it removes the visible channel's confuser false positives) and IR-only by nothing (the thermal channel barely hallucinates on this surface, Section~\ref{sec:failure_profile}).
+The answer is unambiguous on the discriminating surface. On Svanstr\"om, either camera alone misses roughly half of what the pair can see (RGB-only $0.458$, IR-only $0.632$); carrying both sensors unrouted recovers the coverage but imports both failure profiles ($0.742$); and routing more than recovers it: the shipped no-reject \texttt{robust8-nr}$+$filt reaches $0.909$, more than $0.27$ above either single camera. Its margin over both$+$filt is small here ($+0.2$~pp, $0.909$ vs $0.907$), because without a reject class it rarely overrides the both-channel default on this surface; the reject-class \texttt{robust8} ablation widens that margin to $+1.4$~pp ($0.921$) by vetoing frames the filter cannot, the coverage cost it trades for the recall recovered elsewhere. On the in-distribution Anti-UAV control every dual arm is statistically identical ($0.973$), the expected no-harm result; the single-modality arms sit near $0.65$ there only because each sensor sees just its own half of the paired ground truth. The asymmetric filter effect is also visible: the filter moves RGB-only by $+12.4$~pp (it removes the visible channel's confuser false positives) and IR-only by nothing (the thermal channel barely hallucinates on this surface, Section~\ref{sec:failure_profile}).
 
 \subsection{Per-Size Attribution: Where the Resolvable Floor Bites}
 \label{sec:per_size}
@@ -280,7 +342,7 @@ The mode does \emph{not} generalise to a new global default, and the sweep maps 
         \toprule
         stage & predecessor & production & speedup \\
         \midrule
-        trust router    & \texttt{fusion\_no\_fn} 38.3 ms/frame & \texttt{robust8} 0.095 ms/frame & $\sim$404$\times$ \\
+        trust router    & \texttt{fusion\_no\_fn} 38.3 ms/frame & \texttt{robust8-nr} 0.095 ms/frame & $\sim$404$\times$ \\
         confuser filter & patch CNN 59--112 ms/det & \texttt{mlp\_v5} 1.3--2.1 ms/det & 37--72$\times$ \\
         \bottomrule
     \end{tabular}
@@ -306,9 +368,11 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
         bare (both channels)            & 0.957 & 0.753 & 0.843 & 0.350 (---) \\
         filt only (mlp)                 & 0.954 & 0.541 & 0.690 & 0.226 ($-35\%$) \\
         filt only (patch, per-frame)    & 0.957 & 0.689 & 0.801 & 0.182 ($-48\%$) \\
+        clf only [robust8-nr]           & 0.957 & 0.753 & 0.843 & 0.350 ($-0\%$) \\
         clf only [robust8]              & 0.967 & 0.520 & 0.676 & 0.101 ($-71\%$) \\
         clf only [robust6]              & 0.999 & 0.584 & 0.737 & 0.081 ($-77\%$) \\
         clf only [sa32]                 & 0.967 & 0.582 & 0.727 & 0.120 ($-66\%$) \\
+        clf$\to$filt [robust8-nr]       & 0.954 & 0.537 & 0.687 & 0.225 ($-36\%$) \\
         clf$\to$filt [robust8]          & 0.972 & 0.393 & 0.560 & 0.073 ($-79\%$) \\
         clf$\to$filt [robust6]          & 0.998 & 0.443 & 0.614 & 0.057 ($-84\%$) \\
         clf$\to$filt patch [sa32]       & 0.969 & 0.535 & 0.689 & 0.080 ($-77\%$) \\
@@ -316,8 +380,9 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
     \end{tabular}
 \end{table}
 % [source: thesis_eval/results/temporal_results.json; run=thesis_eval/temporal_replay.py (window 2-of-3, patch_thr=0.7, mlp rgb@0.25/gray@0.25)]
+% [nr rows: thesis_eval/results_noreject/temporal_results.json — clf[robust8-nr]=bare; clf->filt[robust8-nr]=filt-only (no-reject router passes every confuser frame to the filter)]
 
-This surface is fully OOD for every component, and it is where the pipeline's costs show. Three results. \emph{First, the trade is real on operational video:} the strongest router-only cell (\texttt{robust6}) trades $10.6$~pp window F1 for a $77\%$ confuser-fire cut at near-perfect precision ($0.999$); the full production composition pushes the cut to $79$--$84\%$, but the per-frame filters, whose thresholds were tuned on benchmark surfaces, veto OOD drones aggressively (window recall $0.39$--$0.44$), the video counterpart of the filter's known coverage gap (Section~\ref{sec:verifier_results}). \emph{Second, the gate position matters more than the gate:} the predecessor design consulted its filter only at the alert moment, and under that placement the same surface showed segment F1 \emph{gains} (below); a per-frame veto applies the same discrimination thousands of times more often, so every false veto compounds. The measured per-frame numbers therefore \emph{validate the GUI's alert-gate placement} for OOD video rather than contradicting the pipeline: routing per-frame (cheap, $-71$--$77\%$ fire at $10$--$17$~pp F1) plus verification at the alert gate is the operating point the deployment uses. \emph{Third, temporal voting is recall-neutral and precision-positive here} (window vs frame: $\Delta R \approx \pm 0.01$ on every cell, confuser fire consistently lower), confirming the smoother's role as a stabiliser rather than a recall recoverer when detections are already temporally consistent.
+This surface is fully OOD for every component, and it is where the pipeline's costs show. Three results. \emph{First, the trade is real on operational video, and the shipped no-reject router sits on the recall side of it:} \texttt{clf$\to$filt[robust8-nr]} keeps window recall $0.537$ (F1 $0.687$, the best composed F1 here) while cutting confuser fire $36\%$, whereas the reject-class compositions (\texttt{robust8}/\texttt{robust6}) push the cut to $79$--$84\%$ but veto OOD drones aggressively (window recall $0.39$--$0.44$), the video counterpart of the filter's known coverage gap (Section~\ref{sec:verifier_results}). The per-frame filter thresholds were tuned on benchmark surfaces, so on fully OOD video they over-veto, which is exactly where the deployment's alert-gate placement matters. \emph{Second, the gate position matters more than the gate:} the predecessor design consulted its filter only at the alert moment, and under that placement the same surface showed segment F1 \emph{gains} (below); a per-frame veto applies the same discrimination thousands of times more often, so every false veto compounds. The measured per-frame numbers therefore \emph{validate the GUI's alert-gate placement} for OOD video rather than contradicting the pipeline: routing per-frame (cheap, $-71$--$77\%$ fire at $10$--$17$~pp F1) plus verification at the alert gate is the operating point the deployment uses. \emph{Third, temporal voting is recall-neutral and precision-positive here} (window vs frame: $\Delta R \approx \pm 0.01$ on every cell, confuser fire consistently lower), confirming the smoother's role as a stabiliser rather than a recall recoverer when detections are already temporally consistent.
 
 A filter-threshold sweep over the cached probabilities settles whether the veto cost is an operating-point artifact: it is not. Lowering the shared filter threshold from $0.25$ to $0.01$ recovers most of the composed cells' recall \emph{relative to router-only} (robust8: $R$ $0.393 \to 0.507$ against the router's $0.520$; robust6: $0.443 \to 0.577$ against $0.584$): at a near-zero threshold the per-frame filter costs only $\sim$1~pp recall on top of the router while still trimming window fire by $7$--$9\%$ relative. But the true drones' filter probabilities on this surface are smeared across the $[0.01, 0.25)$ interval rather than concentrated near 1, so no threshold simultaneously keeps them and rejects confusers: the video-deployment choice is a near-zero per-frame threshold (cheap, marginal benefit) or the alert gate (the predecessor's measured-gain placement). The full sweep is \texttt{thesis\_eval/results/video\_thr\_sweep.md}.
 % [source: thesis_eval/results/video_thr_sweep.json; run=thesis_eval/video_thr_sweep.py]
@@ -359,7 +424,8 @@ The per-category breakdown of the predecessor runs carries one durable lesson: t
 \end{table}
 % [source: ledger=retrainedv2-recall-collapse; eval=rgb_svan_baseline,rgb_svan_hardneg,rgb_svan_retrainedv2; run=eval/diagnose_failures_all.py; cache=eval/results/_failure_diagnosis/svanstrom_1280_by_category.csv; config=svan_iop_1280 (full set)]
 
-The three stances trace the lever that motivated the whole architecture (Section~\ref{sec:rgb_three_variants}): hard-negative mining is class-specific (helicopters yield, birds do not), and the one stance that suppresses birds collapses drone recall. The same comparison at \texttt{imgsz=640} was run for \texttt{retrained\_v2} ($P=0.837, R=0.072$), confirming the \texttt{imgsz=640} regime is unusable on Svanstr\"om regardless of stance. The collapse does not show in-domain: on the composite corpus's \emph{own} test split the same weights score $F1=0.949$, above the baseline's $0.942$, and on SelCom they total-collapse to $F1=0.007$ (1~TP of 295~GT). In-domain evaluation alone would have selected the detector that fails deployed; this is the sharpest single argument for the OOD surfaces the protocol mandates.
+The three stances trace the lever that motivated the whole architecture (Section~\ref{sec:rgb_three_variants}): hard-negative mining is class-specific (helicopters yield, birds do not), and the one stance that suppresses birds collapses drone recall. The dedicated resolution sweep (Section~\ref{sec:resolution_arch}, Table~\ref{tab:resolution}) puts the \texttt{imgsz=640} regime in within-model terms: the baseline loses $28$~pp of recall at 640 and \texttt{retrained\_v2} drops further from its already-collapsed level. (That sweep reports \texttt{retrained\_v2} at $R=0.323$ at 1280 against the $0.306$ here: the same already-collapsed level measured on its stride-7 harness, $n=4{,}102$, rather than this full $28{,}710$-frame set, a sampling difference of $1.7$~pp, not an inconsistency.)
+% [source: eval/results/svan_resolution_sweep.json; run=eval/svan_resolution_sweep.py] The collapse does not show in-domain: on the composite corpus's \emph{own} test split the same weights score $F1=0.949$, above the baseline's $0.942$, and on SelCom they total-collapse to $F1=0.007$ (1~TP of 295~GT). In-domain evaluation alone would have selected the detector that fails deployed; this is the sharpest single argument for the OOD surfaces the protocol mandates.
 % [source: ledger=retrainedv2-recall-collapse,rgb-collapse-ood-specific; eval=rgb_rgbds_baseline,rgb_rgbds_retrainedv2,selcom_retrainedv2_1280; config=rgb_dataset_iou_640,selcom_iop_1280]
 
 \begin{table}[htbp]
@@ -427,7 +493,7 @@ The trajectory reads in four passes. \emph{V2 $\to$ V3}: a narrower curated subs
 \label{sec:classifier_results}
 \label{sec:classifier_compare}
 
-The production router is \texttt{robust8}; this section reports its validation and then the design evolution that produced it. The headline evidence is already in the pipeline ablation: \texttt{robust8} carries the production cells of Tables~\ref{tab:ablation_svanstrom}--\ref{tab:ablation_confusers} (Svanstr\"om $F1$ $0.941$ router-only at recall $0.990$; RGB-confuser fire $30.4\% \to 4.9\%$ before any filter), with \texttt{robust6} and \texttt{sa32} flanking it exactly as the feature statistics predicted: \texttt{sa32} marginally ahead in-domain, the statistical generation ahead out-of-domain and $404\times$ cheaper.
+The production router is the no-reject \texttt{robust8-nr}; this section reports the design path that produced it, from statistical feature selection through the reject-class variants to the shipped no-reject form. The lineage is one feature set with one decision rule changed. Feature selection (Section~\ref{sec:feature_selection}) produced the six-feature \texttt{robust6} and its eight-feature extension \texttt{robust8}, both \emph{four-class} routers that can label a frame \texttt{reject} (trust neither modality). The shipped router keeps those eight features but \emph{drops the reject class}, delegating all false-positive removal to the per-frame filter. The reject-class variants flank each other in the pipeline ablation (Tables~\ref{tab:ablation_svanstrom}--\ref{tab:ablation_confusers}) exactly as the feature statistics predicted (\texttt{sa32} marginally ahead in-domain, the statistical generation ahead out-of-domain and $404\times$ cheaper); the shipped \texttt{robust8-nr} then trades a little of \texttt{robust8}'s confuser suppression for the recall it recovers on clean, single-modality, and degraded-channel surfaces.
 
 \paragraph{The statistical generation, validated end-to-end.}
 \texttt{robust6} (six leakage-free features, Section~\ref{sec:feature_selection}) was validated against \texttt{sa32} in a 5{,}000-frame/surface alert ablation under the production cascade: in-domain Svanstr\"om F1 within $0.2$~pp of \texttt{sa32} ($0.9957$ vs $0.9974$, classifier$\to$filter cells), and materially better on the OOD confuser surface (classifier-only fire $0.143$ vs $0.203$, $\approx$30\% fewer false alerts; best-composed cascade $0.057$ vs $0.066$). The same run makes a structural point: on surveillance-style footage the classifier does the bulk of FP suppression (classifier-only fire $0.003$ vs $0.065$ for the filter alone), while on confuser-rich footage the two stages are complementary.
@@ -452,14 +518,17 @@ The production router is \texttt{robust8}; this section reports its validation a
     \end{tabular}
 \end{table}
 
-\paragraph{\texttt{robust8}: the shipped operating point.}
-\texttt{robust8} closes \texttt{robust6}'s grayscale recall hole (Section~\ref{sec:feature_selection}): at $\tau=0.20$ it lifts Svanstr\"om-grayscale drone recall $0.577 \to 0.681$ (to $0.738$ at $\tau=0.10$) at unchanged precision and ties thermal F1. The cost is structural and reported: real-video-confuser fire rises $7$--$10\times$ on the grayscale slice ($0.006 \to 0.046$ at $\tau=0.20$) because \texttt{rgb\_mean\_conf} reads as a drone on Svanstr\"om but as a confident bird on real-motion video. \texttt{robust8} at $\tau=0.20$ is the shipped balanced point; \texttt{robust6} remains preferable on real-video-confuser-dominated surfaces, visibly so in the temporal table (Table~\ref{tab:temporal_production}), where it is the best router cell on both axes.
+\paragraph{The shipped router: dropping the reject class.}
+The reject class is a liability on any surface that is not a confuser-rich paired stream. When a modality is absent (single-camera deployment), degraded (the grayscale-IR fallback), or the surface is simply clean (DUT), \texttt{reject} fires on recoverable drone frames and recall collapses: clf-only $R\,0.383$ on the RGB test split, $0.125$ on SelCom, and a $24\%$ reject rate on confuser-free DUT (Tables~\ref{tab:ablation_solo},~\ref{tab:ablation_dut}). \texttt{robust8-nr} removes the class at its source: it retrains the eight-feature \texttt{robust8} with the neither-correct rows dropped, so the router always routes to RGB, IR, or both (argmax, no threshold) and the per-frame filter owns all false-positive rejection. This recovers the lost recall in full (composed F1: DUT $0.701\to0.792$, RGB test split $0.551\to0.809$, SelCom $0.220\to0.612$; mean across drone surfaces $0.733\to0.834$) and dissolves two artefacts of the reject class at once: the grayscale recall \emph{hole} (below) and the per-class threshold $\tau$ that patched it. The cost is confuser fire the reject net no longer compounds away: RGB-confuser frame fire $0.0015\to0.011$ (still near $1\%$, and damped by temporal voting, Section~\ref{sec:temporal_results}), thermal $0.217\to0.237$, real-video-confuser $0.073\to0.225$. We ship the no-reject router and keep \texttt{robust8} as the ablation that quantifies the reject net; on confuser-rich \emph{paired} streams (the Svanstr\"om flagship), where both modalities are live and a \texttt{reject} is rarely wrong, \texttt{robust8} remains the stronger choice (at the shipped \texttt{filt$\to$clf} order, $0.963$ vs $0.944$) and is the recommended configuration there. (The composed-F1 recovery figures above compare \texttt{robust8} and \texttt{robust8-nr} at a fixed \texttt{clf$\to$filt} composition, isolating the reject variable; the shipped \texttt{filt$\to$clf} order, chosen in Section~\ref{sec:pipeline_paired}, lifts the no-reject numbers further still, e.g.\ Svanstr\"om $0.930\to0.944$ and DUT $0.792\to0.837$.)
+
+\paragraph{The grayscale hole, and why the reject class caused it.}
+\texttt{robust6} inherits one honest weakness from the four-class formulation: in the grayscale-IR fallback the thermal features go uninformative, so drone-only-in-RGB frames are routed to \texttt{reject} and grayscale recall collapses. \texttt{robust8} patched this \emph{within} the reject formulation by adding \texttt{rgb\_mean\_conf} and a per-class threshold $\tau$ on $P(\text{trust\_rgb})$: at $\tau=0.20$ it lifts Svanstr\"om-grayscale recall $0.577 \to 0.681$ (Figure~\ref{fig:robust8_operating}), at the structural cost of $7$--$10\times$ real-video-confuser fire on the grayscale slice ($0.006 \to 0.046$), because \texttt{rgb\_mean\_conf} reads as a drone on Svanstr\"om but as a confident bird on real-motion video. Dropping the reject class removes the hole at its source: a router that never rejects cannot route a grayscale drone to \texttt{reject}, so \texttt{robust8-nr} needs neither the $\tau$ dial nor the precision/recall trade the figure illustrates. The sweep is retained as the design-history record of why the reject formulation was awkward to operate.
 % [source: ledger=robust8-grayscale-router; eval=svan_gray_robust8_t20_clffilter,video_confuser_robust8_t20_clffilter; run=eval/compare_routing_pipeline.py; cache=eval/results/_routing_pipeline_cmp/comparison.md]
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.7\textwidth]{fig_robust8_operating_point}
-    \caption{The grayscale \texttt{trust\_rgb} hole is a decision-rule problem, not a feature-space limit. Sweeping the per-class \texttt{trust\_rgb} threshold $\tau$ trades precision for recall along a well-separated operating curve; the shipped \texttt{robust8} operating point is $\tau{=}0.20$. Source: \texttt{eval/compare\_routing\_pipeline.py}.}
+    \caption{Design-history: the grayscale \texttt{trust\_rgb} hole was a decision-rule problem inside the four-class router, not a feature-space limit. Sweeping the per-class \texttt{trust\_rgb} threshold $\tau$ trades precision for recall along a well-separated curve; the reject-class \texttt{robust8} operated at $\tau{=}0.20$. The shipped \texttt{robust8-nr} drops the reject class and removes this knob entirely (the hole cannot form without a \texttt{reject} label). Source: \texttt{eval/compare\_routing\_pipeline.py}.}
     \label{fig:robust8_operating}
 \end{figure}
 
@@ -489,13 +558,13 @@ The first quantitative router comparison ran the predecessor cascade (baseline R
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.7\textwidth]{fig8_classifier_reversal}
-    \caption{No trust classifier wins both surfaces. On the OOD confuser zoo \texttt{fusion\_no\_fn\_v1.1} is far the safest (S2 fire $0.016$) but on real video it collapses drone $F1$ to $0.219$; \texttt{sa32} inverts the ranking, dominating real-video drone $F1$ ($0.826$) at a higher zoo fire ($0.205$). This surface reversal motivated the \texttt{sa32} working pick, later superseded by the statistically-derived \texttt{robust6}/\texttt{robust8} (Section~\ref{sec:feature_selection}).}
+    \caption{No trust classifier wins both surfaces. On the OOD confuser zoo \texttt{fusion\_no\_fn\_v1.1} is far the safest (S2 fire $0.016$) but on real video it collapses drone $F1$ to $0.219$; \texttt{sa32} inverts the ranking, dominating real-video drone $F1$ ($0.826$) at a higher zoo fire ($0.205$). This surface reversal motivated the \texttt{sa32} working pick, later superseded by the statistically-derived \texttt{robust6}/\texttt{robust8} (Section~\ref{sec:feature_selection}) and the shipped no-reject \texttt{robust8-nr} (Section~\ref{sec:classifier_results}).}
     % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn,clfzoo_fnfn; config=pipe_video_drone_iop]
     \label{fig:classifier_reversal}
 \end{figure}
 
 \paragraph{The surface reversal.}
-On real video the ranking inverted: \texttt{sa32} dominated segment drone $F1$ ($0.826$ baseline RGB) while \texttt{fusion\_no\_fn\_v1.1} accepted only 15\% of correct RGB drone TPs (segment $R=0.128$; seven of eight drone events missed) and \texttt{control\_v3more\_40feat} trailed \texttt{sa32} by 18~pp with no compensating win anywhere. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where missed drones cost less than false alarms. This reversal is what discredited hand-ranking classifiers on single benchmarks and motivated the statistical selection that produced \texttt{robust6}/\texttt{robust8} above.
+On real video the ranking inverted: \texttt{sa32} dominated segment drone $F1$ ($0.826$ baseline RGB) while \texttt{fusion\_no\_fn\_v1.1} accepted only about one in eight of the correct RGB drone TPs (segment $R=0.128$; seven of eight drone events missed) and \texttt{control\_v3more\_40feat} trailed \texttt{sa32} by 18~pp with no compensating win anywhere. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where missed drones cost less than false alarms. This reversal is what discredited hand-ranking classifiers on single benchmarks and motivated the statistical selection that produced \texttt{robust6}/\texttt{robust8} above.
 % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn; config=pipe_video_drone_iop]
 
 \subsection{Confuser Filter}
@@ -603,8 +672,19 @@ The aligned filter (\texttt{mlp\_v5\_ir\_aligned}, Section~\ref{sec:ir_xmodal_ve
 \end{table}
 % [source: ledger=ir-grayscale-harvest-solves-thermal-filter; eval=ir_aligned_cbam_heldout,ir_aligned_irdset_final; run=mri_train_aligned,eval_run_aligned_full; config=cbam_ir_640,ir_final_640]
 
-Two properties make this deployable where the earlier IR filter was not: a drone-diversity re-mine ($\sim$30k corrective-set thermal drones) made it recall-safe on held-out thermal, and the grayscale-harvested confusers supply the rejection signal scarce labelled thermal data could not (Section~\ref{sec:ir_xmodal_verifier}). The same network's grayscale-scaler behaviour (a $96.8\%$ FP cut on grayscale confusers) is reported with the grayscale finding (Section~\ref{sec:grayscale}), where its drone-recall bound on that surface is also stated plainly. Across both modalities the feature-reuse generation beats the patch generation on every confuser-rich surface measured; the airplane category remains its weakest, inherited from training distribution rather than architecture.
+Two properties define this filter: a drone-diversity re-mine ($\sim$30k corrective-set thermal drones) keeps it recall-safe on held-out thermal, and the grayscale-harvested confusers, aligned into thermal feature space, provide its confuser-rejection signal (Section~\ref{sec:ir_xmodal_verifier}). The same network's grayscale-scaler behaviour (a $96.8\%$ FP cut on grayscale confusers) is reported with the grayscale finding (Section~\ref{sec:grayscale}), where its drone-recall bound on that surface is also stated plainly. Across both modalities the feature-reuse generation beats the patch generation on every confuser-rich surface measured; the airplane category remains its weakest, inherited from training distribution rather than architecture.
 % [source: ledger=ir-recall-fixed-by-drone-diversity,mlp-beats-patch-both-modalities]
+
+\paragraph{Operating points: the recall/false-positive dial.}
+Each filter's threshold is a tunable operating point, not a fixed property of the network. Figure~\ref{fig:filter_operating} sweeps the per-detection $P(\text{drone})$ threshold of all three filters, plotting drone-detection recall (the fraction of true-drone detections retained, pooled over that filter's drone surfaces) against the confuser fire-rate on the matching confuser surface. Three shapes emerge. The RGB \texttt{mlp\_v5} sits on a flat high-recall shoulder: at the shipped $0.25$ it keeps $95.6\%$ of true-drone detections at a $1.1\%$ confuser fire-rate, and stays recall-transparent ($\ge 98\%$) well below that, so its recall is essentially free to recover. The IR-thermal \texttt{aligned} filter is flat in fire at \emph{every} threshold (fire-rate $\approx 0.21$--$0.24$ throughout): the thermal airplanes it misses are a coverage limit (Section~\ref{sec:limits}), not a threshold one, so no setting suppresses them. The grayscale scaler has the steepest recall slope: at the shipped $0.25$ it retains only $46.7\%$ of grayscale-fallback drone detections, the documented cost of the cross-domain mode. The reading for a deployer is that the shipped points sit deliberately on the high-precision side. Where the limit is the threshold (RGB), recall is recoverable almost for free by lowering it; where the limit is coverage (the IR-thermal airplanes, the grayscale cross-domain drones), lowering helps only partially and at a steeper false-positive cost: the grayscale scaler at $0.05$ instead of $0.25$, for instance, lifts detection recall $0.47 \to 0.62$ while its confuser fire-rate rises $0.008 \to 0.036$. The shipped configuration chooses precision where confusers dominate; a recall-first deployment moves left along these curves.
+% [source: run=eval/filter_operating_sweep.py; cache=eval/results/filter_operating_sweep.json; surfaces per tab:ablation_confusers]
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{fig_filter_operating}
+    \caption{Filter operating points (detection level). For each confuser filter, drone detection recall (blue, left axis; fraction of GT-matched true-drone detections retained, pooled over the drone surfaces) and confuser fire-rate (red dashed, right axis; matching confuser surface) as the per-detection $P(\text{drone})$ threshold varies; the shipped point ($t=0.25$ RGB, $0.05$ IR-thermal, $0.25$ grayscale) is marked. RGB sits on a flat high-recall shoulder; the IR-thermal fire-rate is threshold-insensitive (the airplane coverage gap); the grayscale scaler trades recall steeply (the cross-domain fallback). Source: \texttt{eval/filter\_operating\_sweep.py}.}
+    \label{fig:filter_operating}
+\end{figure}
 
 % ======================================================================
 \section{Model MRI Findings}
@@ -635,7 +715,7 @@ On the RGB detector, a single Fisher axis separates drone from confuser at $\app
 \end{figure}
 
 \paragraph{Cross-modal alignment is an affine offset.}
-The grayscale$\leftrightarrow$thermal comparison (Section~\ref{sec:ir_xmodal_verifier}) is the MRI's most consequential measurement: per-modality z-scoring lifts grayscale$\to$thermal confuser-transfer AUROC from chance ($0.500$) to $0.919$ against a within-thermal ceiling of $0.974$, while full-covariance CORAL reaches only $0.707$: the modality gap in the detector's feature space is a diagonal mean/scale shift, not a representational change. This single measurement converted an abundant data source (grayscale confusers) into training signal for a data-starved domain (thermal confusers).
+The grayscale$\leftrightarrow$thermal comparison (Section~\ref{sec:ir_xmodal_verifier}) is the MRI's most consequential measurement: per-modality z-scoring lifts grayscale$\to$thermal confuser-transfer from chance to near the within-thermal ceiling, far above full-covariance CORAL (Table~\ref{tab:gray_thermal_auroc}): the modality gap in the detector's feature space is a diagonal mean/scale shift, not a representational change. This is what lets the abundant grayscale-confuser corpus train directly into thermal feature space.
 % [source: ledger=gray-thermal-alignable; run=mri/modality_align.py; cache=mri/results/ir_v3b_report; config=ir_v3b]
 
 \begin{figure}[htbp]
@@ -716,7 +796,7 @@ To our knowledge, no published study quantifies this specific transfer: a therma
 
 \subsection{The Harvesting Payoff and the Honest Bound}
 
-The finding's practical value is double. As a \emph{fallback}, grayscale mode gives a thermal-equipped system a usable second channel when the thermal camera is absent. As a \emph{harvesting surface}, it is the data source that unblocked the thermal filter: the IR detector hallucinates $\sim$20$\times$ more on grayscale confusers than on thermal ones ($37.2\%$ vs $1.8\%$ per image), so grayscale supplies the abundant confuser detections that scarce labelled thermal data could not, and the MRI's alignment result (Section~\ref{sec:mri_findings}) carries them into thermal feature space, yielding \texttt{mlp\_v5\_ir\_aligned} (Section~\ref{sec:verifier_results}).
+The finding's practical value is double. As a \emph{fallback}, grayscale mode gives a thermal-equipped system a usable second channel when the thermal camera is absent. As a \emph{harvesting surface}, it is where the thermal filter's confuser training comes from: the IR detector hallucinates $\sim$20$\times$ more on grayscale confusers than on thermal ones ($37.2\%$ vs $1.8\%$ per image), so grayscale yields abundant confuser detections, and the MRI's alignment result (Section~\ref{sec:mri_findings}) carries them into thermal feature space, yielding \texttt{mlp\_v5\_ir\_aligned} (Section~\ref{sec:verifier_results}).
 % [source: ledger=ir-grayscale-is-hallucination-mode; run=mri/modality_probe.py; cache=mri/results/ir_v3b_report]
 
 On the grayscale channel itself, the aligned filter (grayscale scaler) cuts confuser FPs by $96.8\%$ ($656 \to 21$ on the grayscale-converted confuser corpus), and over-vetoes drones on grayscale Svanstr\"om: a threshold sweep over the cached probabilities finds no operating point that preserves useful drone recall on that surface (recall $\leq 0.27$ even at threshold $0.02$), because the filter's grayscale drone training came from photo-style imagery, not Svanstr\"om-scale silhouettes. The deployment consequence is stated plainly: on the grayscale path the filter is a \emph{confuser-suppression} tool, gated rather than unconditional; grayscale \emph{detection} runs unfiltered ($F1=0.580$ bare). Grayscale is a fallback and a harvesting surface, not a primary detection surface.
@@ -733,7 +813,8 @@ Three threats. First, the RGB detector's training stances and the patch filter's
 IoP at 0.5 is more lenient than IoU at 0.5 for small-object detection; numbers here are not directly comparable to IoU-based literature without conversion (Section~\ref{sec:metrics}). Trust-aware scoring is the second construct choice, justified in Section~\ref{sec:scoring_audit}; both rules are declared per table.
 
 \paragraph{External validity.}
-The trust classifier's training frames overlap the Svanstr\"om evaluation sequences (Section~\ref{sec:svanstrom_audit}); Svanstr\"om classifier numbers are in-distribution upper bounds, and Anti-UAV, fully clean, is the mitigation. The IR detector trains on 21{,}637 Svanstr\"om thermal frames, so Svanstr\"om IR numbers are likewise in-distribution; the consistency between its Svanstr\"om and Anti-UAV F1 suggests limited inflation. The deployment evidence is one site (SelCom) and one camera class; generalisation to other CCTV installations is untested.
+The IR detector and the trust classifier train on frames and sequences that overlap both paired evaluation surfaces; the overlap is quantified per component, and bounded by the held-out clean split, in Section~\ref{sec:svanstrom_audit}: Anti-UAV conclusions are unchanged on $57{,}542$ held-out frames ($0.973 \to 0.977$ bare, $0.984 \to 0.986$ pipeline), the Svanstr\"om IR detector's solo numbers carry at most $7.3$~pp of in-distribution inflation (part of it sequence difficulty, per the leakage-free RGB control), and the production cascade moves only $-1.4$~pp ($0.949 \to 0.935$). The deployment evidence is one site (SelCom) and one camera class; generalisation to other CCTV installations is untested.
+% [source: runs/clean_split/clean_split_results.json]
 
 \paragraph{Sampling and uncertainty.}
 Large surfaces are evaluated on $\approx$4{,}000-frame even-spread samples (Section~\ref{sec:canonical_configs}); all tables print $n$ and the source size, and headline cells carry 95\% bootstrap CIs. Differences within overlapping CIs are treated as ties; this includes the grayscale three-way's $2.7$~pp gap, which is reported as ``slightly behind'', not as parity. Per-clip real-video numbers ($20$--$340$ frames per clip) are indicative; aggregates are the reliable quantities.

@@ -1,0 +1,97 @@
+Based on your numbers alone — IoP Svanström F1, IoU Anti-UAV F1, OOD YouTube IR        
+  suppression — the ranking is unambiguous:
+
+  Recommended architecture
+
+  RGB-YOLO + IR-YOLO → meta-classifier (modality routing) → filter as post-hoc gate      
+
+  Specifically classifier→filter, not filter→classifier.
+
+  Why this specifically
+
+  Walk the evidence:
+
+  Question: Single modality enough?
+  Evidence in your data: No. RGB collapses on Svanström (F1 .08 / .53), IR suspect on    
+    Svanström (training overlap), IR hallucinates on OOD helis (40% FP). Neither alone is
+    safe to deploy.
+  ────────────────────────────────────────
+  Question: Fusion helps?
+  Evidence in your data: Yes. Classifier F1 = 0.9916 Anti-UAV, 0.9937 Svanström IoP —    
+    beats either modality alone on both.
+  ────────────────────────────────────────
+  Question: Filter helps raw modalities?
+  Evidence in your data: Yes, but only where confusers exist. RGB FPs on Svanström: 10   
+  777
+    → 2 568 (−76%), helicopter OOD IR: 40.5% → 7.6% (−81%).
+  ────────────────────────────────────────
+  Question: Filter helps the classifier?
+  Evidence in your data: In-distribution no (redundant — classifier already routes around
+    confusers). OOD yes — when IR hallucinates, the filter is the only thing catching it 
+    because the classifier trusted IR.
+  ────────────────────────────────────────
+  Question: Order (filter→classifier vs classifier→filter)?
+  Evidence in your data: classifier→filter wins. Your own note: filtering before the     
+    classifier feeds it an OOD feature distribution it wasn't trained on. Post-hoc filter
+    preserves classifier routing and adds a safety net. Numbers agree: classifier→filter 
+    precision .9897 vs .9883.
+
+  The architecture, concretely
+
+            ┌──────────────┐         ┌──────────────┐
+    RGB ──▶ │  RGB YOLO    │ ──dets▶ │              │
+            └──────────────┘         │  meta-       │          ┌──────────┐
+                                     │  classifier  │ ──dets▶  │  filter  │ ──▶ alert    
+            ┌──────────────┐         │  (XGBoost)   │          │ (patch)  │
+     IR ──▶ │  IR YOLO     │ ──dets▶ │              │          └──────────┘
+            └──────────────┘         └──────────────┘              veto if
+                                                                P(confuser)≥0.7
+
+  Three stages, each with a distinct job:
+
+  1. Per-modality detectors → raw candidates. Keep both, independent, no modifications.  
+  2. Meta-classifier → picks which modality (or both) to trust given scene features + det   confidences. This is your in-distribution confuser defence (RGB airplanes don't       
+  survive when IR disagrees).
+  3. Filter → per-detection veto on surviving dets. This is your OOD defence — catches   
+  the cases where the trusted modality itself hallucinates (IR on OOD helis).
+
+  Why not simpler alternatives
+
+  - OR gate (any det → alert): eats all of RGB's confuser FPs. Useless on Svanström.     
+  - AND gate (both must fire): kills recall when one modality is blind (night, thermal   
+  occlusion).
+  - Classifier alone, no filter: F1 on Svanström is already 0.994, tempting. But your    
+  YouTube test is the reason to keep the filter — classifier can't save you when IR lies 
+  and RGB didn't see the confuser at all.
+  - Filter alone per modality, no classifier: raw rgb_filter F1 on Svanström = 0.6988.   
+  Not even close to classifier's 0.9937.
+  - End-to-end learned fusion (CNN on both frames): would need paired training data you  
+  don't have cleanly (Svanström isn't truly paired; Anti-UAV is your only real paired    
+  corpus). Your late-fusion XGBoost is the right call given the data reality.
+
+  Operating points (from your own results)
+
+  - RGB conf: 0.25 (Anti-UAV) / 0.40 (Svanström — higher to reduce confuser noise when   
+  filter isn't in play; with filter 0.25 is fine)
+  - IR conf: 0.40
+  - Filter veto threshold: 0.70 (current). If you want more OOD safety at the cost of a  
+  bit of drone recall, try 0.60. If drone recall is sacred, try 0.80 — but OOD heli      
+  suppression drops.
+  - Matching rule for evaluation: report both IoU and IoP; IoP is the honest metric for  
+  Svanström given the GT issue.
+
+  One thing the architecture is missing
+
+  Temporal consistency. Every number you have is per-frame. A single post-hoc check —    
+  "alert only if a detection survives the pipeline for K of the last N frames" — would   
+  eliminate most of the residual FPs on OOD IR (hallucinations are rarely temporally     
+  consistent) with negligible recall cost. Cheap to add, strongest single remaining      
+  lever. Worth mentioning in the thesis as future work if you don't have time to
+  implement and measure it.
+
+  Bottom line
+
+  You already built the right system. RGB-YOLO + IR-YOLO → XGBoost classifier →
+  patch-verifier filter, in that order. The data supports it end-to-end and your two     
+  failure-mode caveats (IR training overlap, Svanström GT looseness) are honestly        
+  disclosed. Don't change the architecture; sharpen the narrative.

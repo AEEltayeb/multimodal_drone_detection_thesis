@@ -17,8 +17,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-OLD = Path(r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection")
 NEW = Path(__file__).resolve().parent.parent
+OLD = NEW   # legacy alias: artifacts are now resident in ES_Drone_Thesis (was ES_Drone_Detection)
 V5_W = OLD / "models/ir/IR_dsetV5_269ep/best.pt"          # read-only from the archive tree
 ERA = Path(r"G:/drone/IR_dsetV5")
 FINAL = Path(r"G:/drone/IR_dset_final")

@@ -11,10 +11,9 @@ from pathlib import Path
 # Configuration
 # ---------------------------------------------------------------------------
 OUTPUT_ROOT = Path(r"G:\drone\youtube_videos")
-MODEL_PATH = (
-    r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace"
-    r"\ES_Drone_Detection\IR_FT_dsetV8_aug1_noclahe_200ep_s0"
-    r"\IR_FT_dsetV8_aug1_noclahe_200ep_s0\weights\best.pt"
+MODEL_PATH = str(
+    Path(__file__).resolve().parents[2]       # ES_Drone_Thesis/ (resident; was ES_Drone_Detection)
+    / "models" / "ir" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt"
 )
 FPS = 1  # frames per second to extract
 CONF_THRESH = 0.3  # auto-label confidence threshold

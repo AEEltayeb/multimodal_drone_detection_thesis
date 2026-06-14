@@ -1,0 +1,15 @@
+category,stage,n_frames,fp_boxes,fired_frames,fr_frame_pct,fired_segs,n_segs,fr_seg_pct,tn_seg_pct
+bird,S0_rgb,118,1,1,0.85,0,40,0.0,100.0
+bird,S0_ir,118,1,1,0.85,0,40,0.0,100.0
+bird,S2_rgb_patch,118,1,1,0.85,0,40,0.0,100.0
+bird,S2_ir_patch,118,1,1,0.85,0,40,0.0,100.0
+bird,S4_clf,118,1,1,0.85,0,40,0.0,100.0
+bird,S4_clf_patch,118,1,1,0.85,0,40,0.0,100.0
+bird,S4_clf_other_mode,118,1,1,0.85,0,40,0.0,100.0
+other_negative,S0_rgb,99,1,1,1.01,0,33,0.0,100.0
+other_negative,S0_ir,99,2,2,2.02,0,33,0.0,100.0
+other_negative,S2_rgb_patch,99,1,1,1.01,0,33,0.0,100.0
+other_negative,S2_ir_patch,99,2,2,2.02,0,33,0.0,100.0
+other_negative,S4_clf,99,1,1,1.01,0,33,0.0,100.0
+other_negative,S4_clf_patch,99,1,1,1.01,0,33,0.0,100.0
+other_negative,S4_clf_other_mode,99,1,1,1.01,0,33,0.0,100.0

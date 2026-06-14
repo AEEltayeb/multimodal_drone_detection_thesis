@@ -68,6 +68,49 @@ def iter_dir(images_dir):
 
 VIDEO_ROOT = REPO / "datasets" / "drone detection video tests" / "rgb"
 
+# ---- CLEAN-SPLIT surfaces (2026-06-12): the held-out test split with ZERO IR-training overlap ----
+# Sequence-level (frame exclusion is insufficient: training saw sibling frames 3 frames away).
+# Contaminated ids are derived LIVE from the IR_dset_final/train listing via the same function the
+# leakage audit uses; the kept sequence lists are dumped to results/clean_split_manifest.json so the
+# split is a fixed, citable artifact. Expected size: svanstrom_clean 54 seqs / 5,557 frames,
+# antiuav_clean 61 segments / 57,542 frames (full corpora, not the Tier-1 sample).
+import re as _re
+_SVAN_SEQ = _re.compile(r"(IR_[A-Z]+_\d+)")
+_AUV_SEG = _re.compile(r"(20\d{6}_\d{6}_\d+_\d+)")
+_CONTAM: dict = {}
+
+
+def _contaminated(which):
+    if not _CONTAM:
+        sys.path.insert(0, str(REPO / "thesis_eval"))
+        from leakage_controlled_replay import train_contaminated_ids
+        svan, auv, _n, _se, _ae, _c = train_contaminated_ids()
+        _CONTAM["svan"], _CONTAM["auv"] = svan, auv
+    return _CONTAM[which]
+
+
+def iter_clean(parent_iter, rex, which, manifest_name):
+    """Filter a paired iterator to sequences absent from IR training; record the kept split."""
+    import json
+    ids = _contaminated(which)
+    items, kept_seqs = [], set()
+    for it in parent_iter():
+        m = rex.search(it["key"])
+        seq = m.group(1) if m else it["key"]
+        if seq not in ids:
+            items.append(it)
+            kept_seqs.add(seq)
+    mpath = REPO / "thesis_eval" / "results" / "clean_split_manifest.json"
+    manifest = json.load(open(mpath)) if mpath.exists() else {}
+    manifest[manifest_name] = {"sequences": sorted(kept_seqs), "n_sequences": len(kept_seqs),
+                               "n_frames": len(items),
+                               "definition": "eval sequences with zero frames in IR_dset_final/train"}
+    mpath.parent.mkdir(parents=True, exist_ok=True)
+    json.dump(manifest, open(mpath, "w"), indent=2)
+    print(f"  [clean-split {manifest_name}] {len(kept_seqs)} sequences / {len(items)} frames "
+          f"(manifest -> {mpath.name})", flush=True)
+    return iter(items)
+
 
 def iter_video_clips(categories):
     """The 19-clip real-video set: frames are CONSECUTIVE (as extracted) within each clip,
@@ -137,10 +180,21 @@ SURFACES = [
     ("rgb_dataset_test","rgb",    lambda: iter_dir("G:/drone/dataset/dataset/images/test"),         640, 640, "iou", True,  0),
     ("antiuav",         "paired", iter_antiuav_pairs,                                              640, 640, "iou", True,  0),
     ("svanstrom",       "paired", iter_svanstrom_pairs,                                            1280, 640, "iop", True,  0),
+    # held-out clean split (zero IR-training overlap; build with --full --no-patch, see module docstring)
+    ("antiuav_clean",   "paired", lambda: iter_clean(iter_antiuav_pairs, _AUV_SEG, "auv", "antiuav_clean"),    640, 640, "iou", True, 0),
+    ("svanstrom_clean", "paired", lambda: iter_clean(iter_svanstrom_pairs, _SVAN_SEQ, "svan", "svanstrom_clean"), 1280, 640, "iop", True, 0),
     ("svanstrom_gray",  "gray",   iter_svanstrom_pairs,                                            1280, 640, "iop", True,  0),
     # rawrgb = v3b fed the UNCONVERTED 3-channel RGB frame: the control leg of the grayscale 3-way
     # (RGB bare vs IR-on-rawRGB vs IR-on-gray). Diagnostic only — not a production mode.
     ("svanstrom_rawrgb", "rawrgb", iter_svanstrom_pairs,                                           1280, 640, "iop", True,  0),
+    # ---- DUT Anti-UAV test split (2200 RGB-only frames; VOC->YOLO labels at .../test/labels) ----
+    # grayrgb_paired = the production RGB-video regime: ft4 (selcom_1280) on the RGB frame + v3b on
+    # gray(RGB) (is_grayscale=1 -> aligned_gray verifier scaler). Part B = full ablation: bare ft4 /
+    # bare gray-v3b -> +classifier -> +verifier (mlp_v5 RGB / mlp_v5_ir_aligned gray) -> clf->filt ->
+    # filt->clf. IoU scoring (DUT boxes are tight, Anti-UAV family). Resolution ablation: 960 vs 640
+    # (BOTH detectors at the same size per config); 2200<target so all frames, stride 1.
+    ("dut_antiuav_960", "grayrgb_paired", lambda: iter_dir("G:/drone/DUT_antiuav_test/test/img"),  960, 960, "iou", True, 0),
+    ("dut_antiuav_640", "grayrgb_paired", lambda: iter_dir("G:/drone/DUT_antiuav_test/test/img"),  640, 640, "iou", True, 0),
     # grayrgb_paired = the production RGB-VIDEO regime (and the GUI's no-thermal mode): ft4 on the
     # RGB frame + v3b on gray(RGB) as the second channel, is_grayscale=1. CONSECUTIVE frames ->
     # the temporal replay (thesis_eval/temporal_replay.py) votes 2-of-3 on these two surfaces.
@@ -260,6 +314,7 @@ def cache_surface(name, kind, items, rsz, isz, rule, has_drones, gt_class, targe
             print(f"    [frame-err {name} #{k}] {traceback.format_exc(limit=1)}")
     meta = {"name": name, "kind": kind, "rule": rule, "has_drones": has_drones,
             "is_grayscale": is_gray, "rgb_imgsz": rsz, "ir_imgsz": isz, "conf": conf,
+            "patch_scored": M["pr"] is not None,
             "detector_rgb": FT4 if kind in ("paired", "rgb", "grayrgb_paired") else None,
             "detector_ir": V3B if kind in ("paired", "ir", "gray", "rawrgb", "grayrgb_paired") else None,
             "n": len(frames), "n_source": n_all, "stride": st,

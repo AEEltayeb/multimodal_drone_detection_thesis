@@ -1,0 +1,332 @@
+{
+  "rgb": {
+    "rows": [
+      {
+        "video": "airplane_rgb.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1073,
+        "frames_processed": 215,
+        "frames_with_det": 112,
+        "veto_new": 112,
+        "veto_old": 89,
+        "fps_proc": 9.5
+      },
+      {
+        "video": "airplane_rgb_2.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1073,
+        "frames_processed": 215,
+        "frames_with_det": 112,
+        "veto_new": 112,
+        "veto_old": 89,
+        "fps_proc": 13.3
+      },
+      {
+        "video": "airplane_rgb_3.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 385,
+        "frames_processed": 77,
+        "frames_with_det": 15,
+        "veto_new": 14,
+        "veto_old": 9,
+        "fps_proc": 12.0
+      },
+      {
+        "video": "airplane_rgb_compilation.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 6248,
+        "frames_processed": 1250,
+        "frames_with_det": 237,
+        "veto_new": 161,
+        "veto_old": 141,
+        "fps_proc": 13.6
+      },
+      {
+        "video": "bird_rgb.mp4",
+        "category": "BIRD",
+        "frames_total": 3503,
+        "frames_processed": 701,
+        "frames_with_det": 366,
+        "veto_new": 283,
+        "veto_old": 203,
+        "fps_proc": 12.9
+      },
+      {
+        "video": "birds_flock_rgb.mp4",
+        "category": "BIRD",
+        "frames_total": 299,
+        "frames_processed": 60,
+        "frames_with_det": 2,
+        "veto_new": 1,
+        "veto_old": 1,
+        "fps_proc": 13.0
+      },
+      {
+        "video": "heli_rgb.mp4",
+        "category": "HELICOPTER",
+        "frames_total": 186,
+        "frames_processed": 38,
+        "frames_with_det": 0,
+        "veto_new": 0,
+        "veto_old": 0,
+        "fps_proc": 9.4
+      },
+      {
+        "video": "heli_rgb_2.mp4",
+        "category": "HELICOPTER",
+        "frames_total": 206,
+        "frames_processed": 42,
+        "frames_with_det": 0,
+        "veto_new": 0,
+        "veto_old": 0,
+        "fps_proc": 17.3
+      }
+    ],
+    "overall": {
+      "old": {
+        "frames": 2598,
+        "det_frames": 844,
+        "vetoed_frames": 532,
+        "by_cat": {
+          "AIRPLANE": {
+            "frames": 1757,
+            "det": 476,
+            "veto": 328
+          },
+          "BIRD": {
+            "frames": 761,
+            "det": 368,
+            "veto": 204
+          },
+          "HELICOPTER": {
+            "frames": 80,
+            "det": 0,
+            "veto": 0
+          }
+        }
+      },
+      "new": {
+        "frames": 2598,
+        "det_frames": 844,
+        "vetoed_frames": 683,
+        "by_cat": {
+          "AIRPLANE": {
+            "frames": 1757,
+            "det": 476,
+            "veto": 399
+          },
+          "BIRD": {
+            "frames": 761,
+            "det": 368,
+            "veto": 284
+          },
+          "HELICOPTER": {
+            "frames": 80,
+            "det": 0,
+            "veto": 0
+          }
+        }
+      }
+    }
+  },
+  "ir": {
+    "rows": [
+      {
+        "video": "yt_5BYnJQfMvrg.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1109,
+        "frames_processed": 222,
+        "frames_with_det": 8,
+        "veto_new": 6,
+        "veto_old": 1,
+        "fps_proc": 26.2
+      },
+      {
+        "video": "yt_LflkvbKEEr8.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1087,
+        "frames_processed": 218,
+        "frames_with_det": 0,
+        "veto_new": 0,
+        "veto_old": 0,
+        "fps_proc": 31.9
+      },
+      {
+        "video": "yt_UwOMwAGVwvs.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1719,
+        "frames_processed": 344,
+        "frames_with_det": 55,
+        "veto_new": 16,
+        "veto_old": 4,
+        "fps_proc": 27.0
+      },
+      {
+        "video": "yt_gg0Da0AtWJk.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 387,
+        "frames_processed": 78,
+        "frames_with_det": 71,
+        "veto_new": 71,
+        "veto_old": 52,
+        "fps_proc": 14.4
+      },
+      {
+        "video": "yt_oon2AjhmAE8.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 1411,
+        "frames_processed": 283,
+        "frames_with_det": 0,
+        "veto_new": 0,
+        "veto_old": 0,
+        "fps_proc": 32.2
+      },
+      {
+        "video": "yt_r5tBDvY7MrA.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 3664,
+        "frames_processed": 733,
+        "frames_with_det": 9,
+        "veto_new": 4,
+        "veto_old": 0,
+        "fps_proc": 25.5
+      },
+      {
+        "video": "yt_vfLc8n8mcKo.mp4",
+        "category": "AIRPLANE",
+        "frames_total": 2616,
+        "frames_processed": 524,
+        "frames_with_det": 39,
+        "veto_new": 17,
+        "veto_old": 23,
+        "fps_proc": 23.6
+      },
+      {
+        "video": "yt_NEANQ74oTew.mp4",
+        "category": "BIRD",
+        "frames_total": 1126,
+        "frames_processed": 226,
+        "frames_with_det": 11,
+        "veto_new": 11,
+        "veto_old": 0,
+        "fps_proc": 31.2
+      },
+      {
+        "video": "yt_omoX_2UYb0s.mp4",
+        "category": "BIRD",
+        "frames_total": 600,
+        "frames_processed": 120,
+        "frames_with_det": 7,
+        "veto_new": 2,
+        "veto_old": 6,
+        "fps_proc": 30.4
+      },
+      {
+        "video": "yt_Y0epqCI7muk.mp4",
+        "category": "DRONE",
+        "frames_total": 4743,
+        "frames_processed": 949,
+        "frames_with_det": 462,
+        "veto_new": 16,
+        "veto_old": 5,
+        "fps_proc": 14.2
+      },
+      {
+        "video": "yt_nqk0NsTBlFI.mp4",
+        "category": "DRONE",
+        "frames_total": 9067,
+        "frames_processed": 1814,
+        "frames_with_det": 664,
+        "veto_new": 92,
+        "veto_old": 329,
+        "fps_proc": 16.2
+      },
+      {
+        "video": "yt_oA8Bfc_bjFk.mp4",
+        "category": "DRONE",
+        "frames_total": 4234,
+        "frames_processed": 847,
+        "frames_with_det": 146,
+        "veto_new": 87,
+        "veto_old": 10,
+        "fps_proc": 23.2
+      },
+      {
+        "video": "yt_zFu7hAi5mIc.mp4",
+        "category": "DRONE",
+        "frames_total": 2484,
+        "frames_processed": 497,
+        "frames_with_det": 444,
+        "veto_new": 101,
+        "veto_old": 35,
+        "fps_proc": 16.5
+      },
+      {
+        "video": "yt_EdOX8tJZDzw.mp4",
+        "category": "HELICOPTER",
+        "frames_total": 1266,
+        "frames_processed": 254,
+        "frames_with_det": 100,
+        "veto_new": 100,
+        "veto_old": 77,
+        "fps_proc": 22.2
+      }
+    ],
+    "overall": {
+      "old": {
+        "frames": 7109,
+        "det_frames": 2016,
+        "vetoed_frames": 542,
+        "by_cat": {
+          "AIRPLANE": {
+            "frames": 2402,
+            "det": 182,
+            "veto": 80
+          },
+          "BIRD": {
+            "frames": 346,
+            "det": 18,
+            "veto": 6
+          },
+          "DRONE": {
+            "frames": 4107,
+            "det": 1716,
+            "veto": 379
+          },
+          "HELICOPTER": {
+            "frames": 254,
+            "det": 100,
+            "veto": 77
+          }
+        }
+      },
+      "new": {
+        "frames": 7109,
+        "det_frames": 2016,
+        "vetoed_frames": 523,
+        "by_cat": {
+          "AIRPLANE": {
+            "frames": 2402,
+            "det": 182,
+            "veto": 114
+          },
+          "BIRD": {
+            "frames": 346,
+            "det": 18,
+            "veto": 13
+          },
+          "DRONE": {
+            "frames": 4107,
+            "det": 1716,
+            "veto": 296
+          },
+          "HELICOPTER": {
+            "frames": 254,
+            "det": 100,
+            "veto": 100
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,9 +2,12 @@
 
 Dual-modality (RGB + thermal IR) drone detection system with a trust-routing classifier,
 feature-space verifiers, an operator GUI, and a human-in-the-loop data engine — plus the
-MSc thesis built on it. This repo is the curated thesis workspace (full git history; the
-original heavyweight workspace lives in the sibling `ES_Drone_Detection/` folder as a
-frozen archive).
+MSc thesis built on it. This repo is the curated, **self-contained** thesis workspace —
+all model weights, the thesis source + figures, and the full pipeline code, runnable from a
+fresh clone. Raw image/video datasets and regenerable caches are **excluded** (they live on
+`G:/drone`); everything needed to run the GUI, build the thesis, and regenerate figures is
+committed. (The original heavyweight workspace `ES_Drone_Detection/` is a local archive, not
+required by this repo.)
 
 ## Where everything is
 
@@ -39,6 +42,23 @@ frozen archive).
 | Comparison RGB detectors | `models/rgb/Yolo26n_*/weights/best.pt` | baseline, retrained_v2, selcom variants… |
 | IR lineage | `models/ir/IR_dsetV4/5/6…` | historical versions |
 | Pretrained | `models/pretrained/yolo11n.pt`, `yolo26n.pt` | training init |
+
+## Run on a fresh clone
+
+```powershell
+git clone https://github.com/AEEltayeb/dorne_thesis.git
+cd dorne_thesis
+py -m venv .venv ; .venv\Scripts\Activate.ps1        # Windows PowerShell
+# install PyTorch first (GPU or CPU — see the requirements.txt header), then:
+pip install -r requirements.txt
+```
+
+Model weights, the thesis, and all figures are committed, so the **GUI** and **thesis build**
+work immediately. The GUI reads model paths **repo-relative** (resolved in
+`flet_app/settings_dialog.load_settings`), so it finds the weights wherever you cloned. Raw
+datasets and detection caches are not shipped: the zero-GPU eval replay
+(`thesis_eval/pipeline_eval_unified.py`) needs `thesis_eval/cache/`, which you regenerate by
+running detection over the `G:/drone` corpora (or copy the cache across).
 
 ## Quickstart
 

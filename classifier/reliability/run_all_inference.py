@@ -22,10 +22,10 @@ import time
 from pathlib import Path
 
 # ── PATHS ───────────────────────────────────────────────────────────
-WORKSPACE = Path(r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection")
+WORKSPACE = Path(__file__).resolve().parents[2]   # ES_Drone_Thesis/ (resident; was ES_Drone_Detection)
 
-RGB_WEIGHTS_DEFAULT = WORKSPACE / "RGB model" / "Yolo26n_trained" / "weights" / "best.pt"
-IR_WEIGHTS_DEFAULT  = WORKSPACE / "runs" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt"
+RGB_WEIGHTS_DEFAULT = WORKSPACE / "models" / "rgb" / "Yolo26n_selcom_confuser_ft4_1280" / "weights" / "best.pt"
+IR_WEIGHTS_DEFAULT  = WORKSPACE / "models" / "ir" / "corrective_finetune" / "finetune_v3b" / "weights" / "best.pt"
 
 OUTPUT_DIR_BASE = WORKSPACE / "classifier" / "runs" / "reliability"
 

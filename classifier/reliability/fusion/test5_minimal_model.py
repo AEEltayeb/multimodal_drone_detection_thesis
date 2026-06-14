@@ -8,7 +8,7 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import accuracy_score, f1_score
 from xgboost import XGBClassifier
 
-FUSION_DIR = Path(r"c:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection\classifier\runs\reliability\fusion")
+FUSION_DIR = Path(__file__).resolve().parents[2] / "runs" / "reliability" / "fusion"   # resident classifier/ (was ES_Drone_Detection); legacy run data not shipped
 
 # ── Load ──
 bundle = joblib.load(FUSION_DIR / "fusion_no_fn_model.joblib")

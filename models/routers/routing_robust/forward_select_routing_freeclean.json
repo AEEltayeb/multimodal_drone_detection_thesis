@@ -1,0 +1,153 @@
+{
+  "steps": [
+    {
+      "feature": "robust6",
+      "n": 6,
+      "overall": 0.8609318705595638,
+      "thermal": 0.8810111805125348,
+      "grayscale": 0.36117711117711115,
+      "gray_trust_rgb_R": 0.08333333333333333,
+      "leakage": null
+    },
+    {
+      "feature": "rgb_mean_conf",
+      "n": 7,
+      "overall": 0.8811087502350685,
+      "thermal": 0.8990983102309268,
+      "grayscale": 0.4228019734652012,
+      "gray_trust_rgb_R": 0.14583333333333334,
+      "leakage": 0.003424146665183
+    },
+    {
+      "feature": "rgb_best_pos_x",
+      "n": 8,
+      "overall": 0.8900488727398428,
+      "thermal": 0.908420778177747,
+      "grayscale": 0.42465230363227807,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0068042213154571
+    },
+    {
+      "feature": "pos_euclidean_diff",
+      "n": 9,
+      "overall": 0.8989671725926611,
+      "thermal": 0.9157500714210232,
+      "grayscale": 0.44722006716236185,
+      "gray_trust_rgb_R": 0.1875,
+      "leakage": 0.0698401954808837
+    },
+    {
+      "feature": "xmodal_centroid_dist",
+      "n": 10,
+      "overall": 0.8998219037557946,
+      "thermal": 0.9176793831499026,
+      "grayscale": 0.44015202865576103,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.5712319953184386
+    },
+    {
+      "feature": "xmodal_scale_ratio",
+      "n": 11,
+      "overall": 0.9027172316692749,
+      "thermal": 0.9204352244518348,
+      "grayscale": 0.4388427364217344,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0015106676372142
+    },
+    {
+      "feature": "ir_best_dist_to_center",
+      "n": 12,
+      "overall": 0.8991846638148988,
+      "thermal": 0.9168350268532235,
+      "grayscale": 0.6060178756289487,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0145539983266296,
+      "gray_gain_ci": [
+        0.050514673751158985,
+        0.35632754194307625
+      ]
+    },
+    {
+      "feature": "ir_mean_conf",
+      "n": 13,
+      "overall": 0.8955479375931479,
+      "thermal": 0.9128653992363636,
+      "grayscale": 0.5631047315257842,
+      "gray_trust_rgb_R": 0.16666666666666666,
+      "leakage": 0.0024825814917307
+    },
+    {
+      "feature": "rgb_best_dist_to_center",
+      "n": 14,
+      "overall": 0.896690152018573,
+      "thermal": 0.9137765245260301,
+      "grayscale": 0.5712701612903226,
+      "gray_trust_rgb_R": 0.20833333333333334,
+      "leakage": 0.730339327979488
+    }
+  ],
+  "winner": {
+    "feature": "ir_best_dist_to_center",
+    "n": 12,
+    "overall": 0.8991846638148988,
+    "thermal": 0.9168350268532235,
+    "grayscale": 0.6060178756289487,
+    "gray_trust_rgb_R": 0.16666666666666666,
+    "leakage": 0.0145539983266296,
+    "gray_gain_ci": [
+      0.050514673751158985,
+      0.35632754194307625
+    ]
+  },
+  "artifact_dropped": [
+    "area_diff",
+    "aspect_ratio_diff",
+    "brightness_ratio",
+    "ir_edge_density",
+    "ir_img_mean",
+    "ir_img_std",
+    "ir_sky_ground_ratio",
+    "rgb_best_local_contrast",
+    "rgb_best_target_bg_delta",
+    "rgb_blurriness",
+    "rgb_img_mean",
+    "scene_entropy_diff"
+  ],
+  "excluded_from_pool": [
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std",
+    "rgb_best_target_bg_delta",
+    "ir_best_target_bg_delta",
+    "rgb_n_dets",
+    "ir_n_dets",
+    "rgb_detected",
+    "ir_detected",
+    "both_detect",
+    "neither_detect",
+    "rgb_only_detect",
+    "ir_only_detect",
+    "ir_img_std",
+    "rgb_img_dynamic_range",
+    "ir_img_dynamic_range",
+    "rgb_img_entropy",
+    "ir_img_entropy",
+    "rgb_sky_ground_ratio",
+    "ir_sky_ground_ratio",
+    "rgb_edge_density",
+    "ir_edge_density",
+    "rgb_blurriness",
+    "ir_blurriness",
+    "det_count_diff",
+    "total_dets",
+    "area_diff",
+    "aspect_ratio_diff",
+    "contrast_diff",
+    "bg_delta_diff",
+    "scene_entropy_mean",
+    "scene_entropy_diff",
+    "brightness_ratio"
+  ]
+}

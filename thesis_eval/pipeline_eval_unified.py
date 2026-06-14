@@ -47,6 +47,8 @@ from compare_routing_pipeline import f8_vec, F8 as F8_ORDER, CONF               
 ROBUST8_JBL  = REPO / "models/routers/robust8.joblib"        # trust router (8 feat, tau=0.20)
 ROBUST6_JBL  = REPO / "models/routers/lean_ft4/trust_ft4_robust6.joblib"  # 6-feat base (argmax)
 SA32_JBL     = REPO / "models/routers/scene_aware_v3more_32feat/model.joblib"  # sad 32-feat router
+NR_DROP_JBL  = REPO / "models/routers/robust8_noreject_drop/model.joblib"   # no-reject 3-class (reject rows dropped)
+NR_BOTH_JBL  = REPO / "models/routers/robust8_noreject_both/model.joblib"   # no-reject 3-class (reject -> both)
 MLP_V5       = REPO / "models/verifiers/rgb_v5/mlp_v5.pt"   # RGB verifier
 ALIGNED      = REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"        # IR verifier (thermal scaler)
 ALIGNED_GRAY = REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt"   # same net, GRAYSCALE scaler
@@ -54,6 +56,7 @@ CACHE_DIR    = REPO / "thesis_eval" / "cache"
 OUT_DIR      = REPO / "thesis_eval" / "results"
 
 RGB_THR_MLP, IR_THR_MLP, GRAY_THR_MLP, TAU = 0.25, 0.05, 0.25, 0.20              # shipped thresholds
+REJECT_FLOOR = 0.80   # round-8 reject-probability-floor ablation: ONE global x* applied to every surface
 DUMMY_G, DUMMY_WH = np.zeros((64, 64), np.uint8), (64, 64)                       # f8 recompute ignores pixels
 BOOT_ITERS, BOOT_SEED = 1000, 0
 
@@ -94,6 +97,10 @@ def load_classifiers():
         raw = joblib.load(SA32_JBL)
         clfs["sa32"] = ({"model": raw["model"], "features": raw.get("features"), "feat_key": "f32", "tau": None}
                         if isinstance(raw, dict) else {"model": raw, "features": None, "feat_key": "f32", "tau": None})
+    # no-reject 3-class routers (dicts already carry model/features=F8/feat_key=f8/tau=None/label_map)
+    for nm, pth in (("robust8_nr_drop", NR_DROP_JBL), ("robust8_nr_both", NR_BOTH_JBL)):
+        if pth.exists():
+            clfs[nm] = joblib.load(pth)
     r6 = clfs.get("robust6")
     if r6 and (not r6.get("features") or not set(r6["features"]) <= set(F8_ORDER)):
         print("  [robust6 dropped: features missing or not a subset of F8]"); clfs.pop("robust6")
@@ -119,8 +126,34 @@ def batch_labels(clf, F8mat, F32mat, F8, F32):
     X = mat if feats is None else mat[:, [order.index(f) for f in feats]]
     if clf.get("tau") is not None:
         p = clf["model"].predict_proba(X)
-        return np.where(p[:, 1] >= clf["tau"], 1, p.argmax(1)).astype(int)
-    return np.asarray(clf["model"].predict(X), int)
+        out = np.where(p[:, 1] >= clf["tau"], 1, p.argmax(1)).astype(int)
+    else:
+        out = np.asarray(clf["model"].predict(X), int)
+    lm = clf.get("label_map")          # 3-class no-reject routers store {0:1,1:2,2:3} -> harness trust labels
+    if lm:
+        out = np.array([lm.get(int(v), int(v)) for v in out], int)
+    return out
+
+
+def reject_floor_labels(clf, F8mat, F8, x):
+    """robust8 with a reject-probability FLOOR (round-8 ablation): the production rule, except a
+    `reject` (0) is honoured only when P(reject) >= x; otherwise the frame is routed to the
+    more-confident single modality (trust_rgb vs trust_ir), leaving false-positive removal to the
+    per-frame filter. One global x for every surface."""
+    feats = clf.get("features")
+    X = F8mat if feats is None else F8mat[:, [F8.index(f) for f in feats]]
+    P = clf["model"].predict_proba(X)
+    classes = list(clf["model"].classes_); col = {c: i for i, c in enumerate(classes)}
+    tau = clf.get("tau")
+    out = np.empty(len(P), int)
+    for i, row in enumerate(P):
+        l = 1 if (tau is not None and 1 in col and row[col[1]] >= tau) else classes[int(np.argmax(row))]
+        if l == 0 and (0 not in col or row[col[0]] < x):
+            p1 = row[col[1]] if 1 in col else -1.0
+            p2 = row[col[2]] if 2 in col else -1.0
+            l = 1 if p1 >= p2 else 2
+        out[i] = int(l)
+    return out
 
 
 def batch_probs(frames, slot_key, verifier):
@@ -242,6 +275,12 @@ def part_b(meta, frames, clfs, verifs, patch_thr):
     F8mat = np.stack([fr["f8_all"] for fr in frames])
     F32mat = np.stack([fr["f32_all"] for fr in frames])
     labels = {c: batch_labels(clf, F8mat, F32mat, F8, F32) for c, clf in clfs.items()}
+    rf_labels = reject_floor_labels(clfs["robust8"], F8mat, F8, REJECT_FLOOR) if "robust8" in clfs else None
+    rf_cell = f"clf->filt[robust8,rej>={REJECT_FLOOR}]"
+    # f8-feature routers (robust8, robust6) are cascade-capable: their features are recomputable
+    # from the filtered detections, so they get the filter->classifier ordering. sa32 (f32 scene
+    # features) is excluded — those aren't recomputed post-filter here.
+    f8_clfs = [c for c, cl in clfs.items() if cl.get("feat_key") == "f8"]
     # the IR slot's verifier follows what the channel was FED: thermal -> aligned, gray -> aligned_gray
     ir_vkey, ir_thr = ("aligned_gray", GRAY_THR_MLP) if is_gray else ("aligned", IR_THR_MLP)
     rgb_probs = batch_probs(frames, "rgb", verifs["mlp_v5"]) if "mlp_v5" in verifs else None
@@ -262,13 +301,17 @@ def part_b(meta, frames, clfs, verifs, patch_thr):
                                      is_paired=True, rule=rule)
         cells.add("bare",       *_sum_ta(TA(3, rgb_all, ir_all)))
         cells.add("filt_mlp",   *_sum_ta(TA(3, rgb_flt, ir_flt)))
+        cells.add("filt_mlp_rgb", *_sum_ta(TA(3, rgb_flt, ir_all)))   # RGB filtered, IR raw (isolate RGB filter)
+        cells.add("filt_mlp_ir",  *_sum_ta(TA(3, rgb_all, ir_flt)))   # IR filtered, RGB raw (isolate IR filter)
         rp, ip = patch_mask(rgb, patch_thr), patch_mask(ir, patch_thr)
         cells.add("filt_patch", *_sum_ta(TA(3, dets2(rgb, rp), dets2(ir, ip))))
         for cname in clfs:
             L = int(labels[cname][i])
             cells.add(f"clf[{cname}]",       *_sum_ta(TA(L, rgb_all, ir_all)))
             cells.add(f"clf->filt[{cname}]", *_sum_ta(TA(L, rgb_flt, ir_flt)))
-        if "robust8" in clfs:
+        if rf_labels is not None:
+            cells.add(rf_cell, *_sum_ta(TA(int(rf_labels[i]), rgb_flt, ir_flt)))
+        if f8_clfs:
             f8f = recompute_f8(dets5(rgb, rm), dets5(ir, im), is_gray)
             if not parity_done:
                 f8a = recompute_f8(dets5(rgb), dets5(ir), is_gray)
@@ -276,14 +319,16 @@ def part_b(meta, frames, clfs, verifs, patch_thr):
                 parity_done = True
             surv.append((f8f, rgb_flt, ir_flt, rgb_g, ir_g))
 
-    # pass 2: filter->clf[robust8] with ONE batched predict over the recomputed f8 rows
+    # pass 2: filter->clf[<router>] for each f8 router (robust8, robust6) with ONE batched predict
+    # per router over the recomputed f8 rows
     if surv:
         F8f = np.stack([s[0] for s in surv])
-        L2 = batch_labels(clfs["robust8"], F8f, F32mat, F8, F32)
-        for (f8f, rgb_flt, ir_flt, rgb_g, ir_g), L in zip(surv, L2):
-            s = score_trust_aware(int(L), rgb_flt, ir_flt, rgb_g, ir_g, 1920, 1080, 1920, 1080,
-                                  is_paired=True, rule=meta["rule"])
-            cells.add("filt->clf[robust8]", *_sum_ta(s))
+        for cname in f8_clfs:
+            L2 = batch_labels(clfs[cname], F8f, F32mat, F8, F32)
+            for (f8f, rgb_flt, ir_flt, rgb_g, ir_g), L in zip(surv, L2):
+                s = score_trust_aware(int(L), rgb_flt, ir_flt, rgb_g, ir_g, 1920, 1080, 1920, 1080,
+                                      is_paired=True, rule=meta["rule"])
+                cells.add(f"filt->clf[{cname}]", *_sum_ta(s))
     return cells.report()
 
 
@@ -347,22 +392,30 @@ def part_gray_sweep(meta, frames, verifs):
 def part_c(meta, frames, clfs, verifs, patch_thr):
     slot_key, vkey, thr = KIND_VERIFIER[meta["kind"]]
     probs = batch_probs(frames, slot_key, verifs[vkey]) if vkey in verifs else None
-    labels = {}
+    labels = {}; rf_labels = None
+    rf_cell = f"clf->filt[robust8,rej>={REJECT_FLOOR}]"
     if clfs and meta["kind"] != "gray":  # router-on-confusers (gray excluded: wrong regime, see part_s4)
         F8, F32 = meta["F8"], meta["F32"]
         F8mat = np.stack([fr["f8_all"] for fr in frames])
         F32mat = np.stack([fr["f32_all"] for fr in frames])
         labels = {c: batch_labels(clf, F8mat, F32mat, F8, F32) for c, clf in clfs.items()}
+        if "robust8" in clfs:
+            rf_labels = reject_floor_labels(clfs["robust8"], F8mat, F8, REJECT_FLOOR)
+    is_gray = meta["is_grayscale"]
+    f8_clfs = [c for c in labels if clfs[c].get("feat_key") == "f8"]
     names = (["bare", "filt_mlp", "filt_patch"] + [f"clf[{c}]" for c in labels]
-             + [f"clf->filt[{c}]" for c in labels])
+             + [f"clf->filt[{c}]" for c in labels] + [f"filt->clf[{c}]" for c in f8_clfs]
+             + ([rf_cell] if rf_labels is not None else []))
     rows = {k: {"fp": 0, "flags": []} for k in names}
 
     def tally(cell, k):
         rows[cell]["fp"] += k; rows[cell]["flags"].append(int(k > 0))
 
+    k_mlp_list, f8f_list = [], []
     for i, fr in enumerate(frames):
         slot = fr[slot_key]; n = len(slot["confs"])
         k_mlp = int((probs[i] >= thr).sum()) if probs is not None else n
+        k_mlp_list.append(k_mlp)
         tally("bare", n)
         tally("filt_mlp", k_mlp)
         tally("filt_patch", int(patch_mask(slot, patch_thr).sum()))
@@ -370,6 +423,23 @@ def part_c(meta, frames, clfs, verifs, patch_thr):
             keep = gate(int(lab[i]), slot_key)
             tally(f"clf[{cname}]", n if keep else 0)
             tally(f"clf->filt[{cname}]", k_mlp if keep else 0)
+        if rf_labels is not None:
+            tally(rf_cell, k_mlp if gate(int(rf_labels[i]), slot_key) else 0)
+        if f8_clfs and probs is not None:
+            m = probs[i] >= thr
+            rgb5f = dets5(fr["rgb"], m) if slot_key == "rgb" else dets5(fr["rgb"])
+            ir5f = dets5(fr["ir"], m) if slot_key == "ir" else dets5(fr["ir"])
+            f8f_list.append(recompute_f8(rgb5f, ir5f, is_gray))
+
+    # filt->clf for f8 routers on confusers: filter first, then route on the recomputed f8 (one
+    # batched predict per router). For a no-reject router this is the order's confuser fire.
+    if f8_clfs and f8f_list:
+        F8f = np.stack(f8f_list)
+        F32dummy = np.zeros((len(F8f), len(meta["F32"])), np.float32)
+        for cname in f8_clfs:
+            fl = batch_labels(clfs[cname], F8f, F32dummy, meta["F8"], meta["F32"])
+            for i in range(len(frames)):
+                tally(f"filt->clf[{cname}]", k_mlp_list[i] if gate(int(fl[i]), slot_key) else 0)
     n = max(meta["n"], 1)
     out = {}
     for c, v in rows.items():

@@ -15,7 +15,7 @@ import pandas as pd
 from pathlib import Path
 
 # ── PATHS ──
-CLASSIFIER_DIR = Path(r"c:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection\classifier")
+CLASSIFIER_DIR = Path(__file__).resolve().parents[2]   # resident classifier/ (was ES_Drone_Detection); legacy run data not shipped
 FUSION_DIR = CLASSIFIER_DIR / "runs" / "reliability" / "fusion"
 
 # ── LOAD ──

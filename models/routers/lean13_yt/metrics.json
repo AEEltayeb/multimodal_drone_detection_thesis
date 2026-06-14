@@ -1,0 +1,63 @@
+{
+  "tag": "lean13_yt",
+  "n_features": 13,
+  "features": [
+    "rgb_max_conf",
+    "ir_max_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_log_bbox_area",
+    "rgb_best_aspect_ratio",
+    "ir_best_aspect_ratio",
+    "rgb_best_pos_y",
+    "ir_best_pos_y",
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std"
+  ],
+  "accuracy": 0.9692368037655497,
+  "f1_macro": 0.9121459552376548,
+  "per_dataset": {
+    "antiuav": {
+      "n": 14088,
+      "acc": 0.9783503691084611,
+      "f1_macro": 0.8794905332921624
+    },
+    "svanstrom": {
+      "n": 3354,
+      "acc": 0.9844961240310077,
+      "f1_macro": 0.7375612011446387
+    },
+    "video_airplanes_distant_airplane_over_head_flying_away": {
+      "n": 55,
+      "acc": 0.7272727272727273,
+      "f1_macro": 0.42105263157894735
+    },
+    "video_drone_drone_and_bird_sky_and_trees_short": {
+      "n": 114,
+      "acc": 0.5877192982456141,
+      "f1_macro": 0.38034465534465534
+    },
+    "video_drone_drone_seagull_attack": {
+      "n": 235,
+      "acc": 0.44680851063829785,
+      "f1_macro": 0.3213283333798013
+    }
+  },
+  "feature_importance": {
+    "rgb_max_conf": 0.07016966491937637,
+    "ir_max_conf": 0.28150492906570435,
+    "rgb_best_log_bbox_area": 0.028733808547258377,
+    "ir_best_log_bbox_area": 0.0402599573135376,
+    "rgb_best_aspect_ratio": 0.03669301047921181,
+    "ir_best_aspect_ratio": 0.3804723620414734,
+    "rgb_best_pos_y": 0.032094068825244904,
+    "ir_best_pos_y": 0.03613249957561493,
+    "rgb_best_local_contrast": 0.012485872022807598,
+    "ir_best_local_contrast": 0.013257238082587719,
+    "rgb_img_mean": 0.018064485862851143,
+    "ir_img_mean": 0.027509253472089767,
+    "rgb_img_std": 0.022622741758823395
+  }
+}

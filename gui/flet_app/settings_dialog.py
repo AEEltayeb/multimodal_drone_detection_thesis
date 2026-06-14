@@ -4,6 +4,7 @@ from pathlib import Path
 import flet as ft
 
 SETTINGS_PATH = Path(__file__).resolve().parents[1] / "fusion_settings.json"
+REPO_ROOT = Path(__file__).resolve().parents[2]  # ES_Drone_Thesis/ root — resolve repo-relative model paths
 
 DEFAULTS = {
     "rgb_model": "", "ir_model": "", "fusion_model": "",
@@ -156,6 +157,14 @@ def load_settings():
             s.update(json.loads(SETTINGS_PATH.read_text()))
         except Exception:
             pass
+    # Resolve repo-relative weight/output paths against the repo root so the GUI
+    # runs from any clone location. Absolute paths are left untouched.
+    for k in (PATH_FILE_KEYS | PATH_DIR_KEYS):
+        v = s.get(k, "")
+        if v and not Path(v).is_absolute():
+            cand = REPO_ROOT / v
+            if cand.exists():
+                s[k] = str(cand)
     return s
 
 

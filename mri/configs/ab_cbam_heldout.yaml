@@ -1,0 +1,11 @@
+# A/B held-out gate: CBAM valid (180 frames) — drones = main_class 1, confuser detections = FP.
+# Purpose: isolate the grayscale-harvested-confuser contribution to the THERMAL filter.
+#   Compare the pre-harvest thermal filter (mlp_v5_ir_dronediv: thermal drones + THERMAL-ONLY
+#   confusers, no grayscale) vs the production aligned filter (mlp_v5_ir_aligned: + grayscale-
+#   harvested confusers, z-aligned). CBAM valid is held out of BOTH nets' training
+#   (dronediv used CBAM /train/ in its positives; this is /valid/), so the FP delta is the
+#   clean measure of what the grayscale data bought. Scored IoP@0.5, conf 0.40, thr 0.05 — the
+#   identical config that produced ir_aligned_cbam_heldout (bare FP 48 -> aligned 15).
+pos:
+  - path: G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net.v1i.yolo26-maha-daxhh-cbam_tf-net/valid/images
+    main_class: 1

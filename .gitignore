@@ -1,97 +1,44 @@
+# ===========================================================================
+# ES_Drone_Thesis — publish-for-clone .gitignore
+# Goal: ship a RUNNABLE workspace (model weights + thesis + figures + code).
+# Exclude only junk and heavy/raw/regenerable artifacts.
+# (Replaces the old ES_Drone_Detection-inherited ignore that blocked
+#  models/, *.pt, *.joblib, *.csv, *.pdf — those are now intentionally tracked.)
+# ===========================================================================
 
-
-# --- IDE / Editor ---
-.idea/
-.vscode/
-*.iml
-*.iws
-out/
-/shelf/
-/workspace.xml
-/httpRequests/
-/dataSources/
-/dataSources.local.xml
-.claude/
-CLAUDE.md
-
-# --- Python ---
+# --- Python / env / build ---
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .env
 .venv/
-env/
 venv/
+env/
 ENV/
 build/
 dist/
 *.egg-info/
 *.egg
 
-# --- Node ---
-node_modules/
-
-# --- Logs and Cache ---
+# --- IDE / OS / logs ---
+.idea/
+.vscode/
+*.iml
 *.log
 .pytest_cache/
 .mypy_cache/
 .ipynb_checkpoints/
+node_modules/
+bash.exe.stackdump
 
-# --- Model weights (large binaries) ---
-*.pt
-*.pth
-*.onnx
-*.engine
-*.pb
-*.tflite
-*.joblib
-*.npz
-*.pkl
-*.pickle
-*.h5
-*.hdf5
+# --- Claude / local session state (CLAUDE.md stays tracked) ---
+.claude/
 
-# --- Data files ---
-*.csv
-*.parquet
-*.json
-*.jsonl
-*.txt
-!requirements.txt
-!requirements.json
-!package.json
-!package-lock.json
-!tsconfig.json
-!gui/ui/public/manifest.json
-!gui/settings.json
-!gui/fusion_settings.json
-!classifier/config.yaml
-!configs/*.yaml
-!configs/**/*.yaml
+# --- Raw datasets (live on G:/drone; not needed to run the GUI/thesis) ---
+datasets/
 
-# --- Images / Plots ---
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.bmp
-*.tiff
-*.ico
-*.webp
-*.pdf
-*.eps
-# Model MRI ships its curated report figures as committed assets (results/ stays
-# ignored by its directory rule, so per-run figures are unaffected).
-!mri/docs/**/*.png
-!mri/docs/**/*.jpg
-
-# SVGs are blocked globally EXCEPT the icon assets needed by PySide
-*.svg
-!gui/assets/icons/*.svg
-!gui/ui/public/vite.svg
-
-# --- Videos ---
+# --- Videos (test/demo media; large, not needed to run) ---
 *.mp4
 *.avi
 *.mov
@@ -101,84 +48,44 @@ node_modules/
 *.webm
 *.part
 
-# --- Archives ---
-*.zip
-*.tar
-*.tar.gz
-*.gz
-*.rar
-*.7z
-
-# --- Markdown docs (thesis-only, not needed to run) ---
-*.md
-!README.md
-!docs/**/*.md
-!docs/*.md
-# Model MRI ships its curated reports + plan as committed docs. (results/ stays
-# ignored by the directory rule below, so per-run report.md is unaffected.)
-!mri/**/*.md
-
-# --- Training runs / outputs ---
-runs/
-datasets/
-models/
-archive/
-backup/
-benchmarks/
-
-# --- YOLO / training results ---
-training/*.yaml
-
-# --- Classifier artifacts ---
-classifier/runs/
-
-# --- Model MRI run outputs (npz/pt/figures are reproducible) ---
-mri/results/
-
-# --- Demo outputs (downloaded YT videos, benchmark renders) ---
-gui/demo_outputs/
+# --- Regenerable run outputs / caches (rebuilt from models + G:/drone data) ---
+**/demo_outputs/
 gui/saved_alert_windows/
-
-# --- Flet legacy test scripts ---
-gui/flet_app/_test_image*.py
-
-# --- Scratch / debug scripts (underscore prefix) ---
-_check_*.py
-_debug_*.py
-_verify.py
-classifier/_check_*.py
-classifier/_debug_*.py
-check.txt
-
-# --- Config backups ---
-*.bak
-*.bak_*
-*.pre_finetune.bak
-
-# --- Notebook outputs ---
+eval/results/
+eval/cache/
+thesis_eval/cache/
+thesis_eval/cache_conf005/
+mri/results/
+classifier/runs/
 notebooks/cache/
 notebooks/figures/
-notebooks/*.ipynb
 
-# --- Misc ---
-bash.exe.stackdump
-youtube_cookies.txt
-video_benchmark_outputs/
-**/pred_labels/
-**/error_stems.txt
-**/error_summary.json
-.review_progress.json
-report/images/
-temp_labels/
-scripts/dataset/
-scripts/export/
-# label_reviewer/ is the (tracked) HITL tool; only its session outputs are ignored
+# --- HITL label-reviewer session outputs (the tool itself IS tracked) ---
 label_reviewer/.cache/
 label_reviewer/.last_session.json
 label_reviewer/review_*/
 label_reviewer/compare_labels_*/
 label_reviewer/roboflow_*/
-generate_professor_plots.py
 
-# knowledge-system session snapshot (local hook state)
-.claude/.kb_session_snapshot
+# --- Backups / scratch local state ---
+*.bak
+*.bak_*
+youtube_cookies.txt
+.review_progress.json
+
+# --- Patch-verifier TRAINING CROPS (raw/regenerable; ~128k tiny files, long paths).
+#     The deployable patch WEIGHTS (models/patches/*.pt) and OOD calibration ARE kept. ---
+models/patches/ir/
+models/patches/ir_synth_review/
+models/patches/rgb/
+models/patches/rgb_synth_review/
+
+# --- Granular ablation dumps (regenerable; deep paths hit Windows MAX_PATH 260).
+#     Dashboard CSVs in docs/analysis/full_pipeline_ablations/csv/ stay tracked. ---
+docs/analysis/full_pipeline_ablations/csvs/
+docs/analysis/full_pipeline_ablations/raw_results/
+*.stackdump
+
+# NOTE: model weights (*.pt / *.joblib), KB/data CSVs, JSON configs, thesis
+# PDFs + figures (docs/**), and Markdown are INTENTIONALLY tracked.
+# Do NOT add blanket *.pt / *.csv / *.pdf ignores here.

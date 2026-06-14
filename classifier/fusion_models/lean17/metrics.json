@@ -1,0 +1,74 @@
+{
+  "tag": "fusion_lean17",
+  "n_features": 17,
+  "features": [
+    "rgb_max_conf",
+    "ir_max_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_log_bbox_area",
+    "rgb_best_aspect_ratio",
+    "ir_best_aspect_ratio",
+    "rgb_best_pos_y",
+    "ir_best_pos_y",
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std",
+    "rgb_best_pos_x",
+    "ir_best_pos_x",
+    "rgb_best_dist_to_center",
+    "ir_best_dist_to_center"
+  ],
+  "n_train": 41607,
+  "n_test": 17715,
+  "accuracy": 0.9681625740897545,
+  "f1_macro": 0.9077412630337492,
+  "f1_weighted": 0.96629043707644,
+  "per_dataset": {
+    "antiuav": {
+      "n": 14088,
+      "acc": 0.9783503691084611,
+      "f1_macro": 0.8810475577230302
+    },
+    "svanstrom": {
+      "n": 3343,
+      "acc": 0.9832485791205504,
+      "f1_macro": 0.7377269519511139
+    },
+    "video_drone_drone_and_bird_sky_and_trees_short": {
+      "n": 114,
+      "acc": 0.42105263157894735,
+      "f1_macro": 0.27702811893988366
+    },
+    "video_drone_two_birds_drone": {
+      "n": 150,
+      "acc": 0.12,
+      "f1_macro": 0.09358162397202004
+    },
+    "video_helicopters_helicopter_overhead_short": {
+      "n": 20,
+      "acc": 0.75,
+      "f1_macro": 0.2857142857142857
+    }
+  },
+  "feature_importance": {
+    "rgb_max_conf": 0.05426470562815666,
+    "ir_max_conf": 0.10300123691558838,
+    "rgb_best_log_bbox_area": 0.04875446483492851,
+    "ir_best_log_bbox_area": 0.11222296953201294,
+    "rgb_best_aspect_ratio": 0.06907607614994049,
+    "ir_best_aspect_ratio": 0.1486717015504837,
+    "rgb_best_pos_y": 0.043400317430496216,
+    "ir_best_pos_y": 0.011891046538949013,
+    "rgb_best_local_contrast": 0.013191064819693565,
+    "ir_best_local_contrast": 0.011661037802696228,
+    "rgb_img_mean": 0.019315805286169052,
+    "ir_img_mean": 0.020845115184783936,
+    "rgb_img_std": 0.02523655630648136,
+    "rgb_best_pos_x": 0.01566351391375065,
+    "ir_best_pos_x": 0.25543075799942017,
+    "rgb_best_dist_to_center": 0.012188458815217018,
+    "ir_best_dist_to_center": 0.035185184329748154
+  }
+}

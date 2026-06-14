@@ -1,0 +1,3 @@
+config,TP,FP,FN,TN,precision,recall,f1
+best_iou,1,3,294,0,0.25,0.0034,0.0067
+best_iop,1,3,294,0,0.25,0.0034,0.0067

@@ -84,8 +84,9 @@ def part_modality_ab(meta, frames, clfs, verifs):
     rule, is_gray = meta["rule"], meta["is_grayscale"]
     F8, F32 = meta["F8"], meta["F32"]
     cells = Cells()
-    labels = batch_labels(clfs["robust8"], np.stack([f["f8_all"] for f in frames]),
-                          np.stack([f["f32_all"] for f in frames]), F8, F32) if "robust8" in clfs else None
+    F8mat = np.stack([f["f8_all"] for f in frames]); F32mat = np.stack([f["f32_all"] for f in frames])
+    routers = [r for r in ("robust8", "robust8_nr_drop") if r in clfs]
+    labels = {r: batch_labels(clfs[r], F8mat, F32mat, F8, F32) for r in routers}
     ir_vkey, ir_thr = ("aligned_gray", GRAY_THR_MLP) if is_gray else ("aligned", IR_THR_MLP)
     rgb_probs = batch_probs(frames, "rgb", verifs["mlp_v5"])
     ir_probs = batch_probs(frames, "ir", verifs[ir_vkey])
@@ -109,14 +110,15 @@ def part_modality_ab(meta, frames, clfs, verifs):
         add("ir_only +filt",  fn_r, side(i_flt, ir_g))
         add("both bare",      side(r_all, rgb_g), side(i_all, ir_g))
         add("both +filt",     side(r_flt, rgb_g), side(i_flt, ir_g))
-        if labels is not None:
-            L = int(labels[i])
+        for r in routers:
+            disp = "robust8-nr" if r == "robust8_nr_drop" else r
+            L = int(labels[r][i])
             rs = side(r_all, rgb_g) if L in (1, 3) else fn_r
             is_ = side(i_all, ir_g) if L in (2, 3) else fn_i
-            add("routed[robust8] bare", rs, is_)
+            add(f"routed[{disp}] bare", rs, is_)
             rs = side(r_flt, rgb_g) if L in (1, 3) else fn_r
             is_ = side(i_flt, ir_g) if L in (2, 3) else fn_i
-            add("routed[robust8] +filt", rs, is_)
+            add(f"routed[{disp}] +filt", rs, is_)
     return cells.report()
 
 

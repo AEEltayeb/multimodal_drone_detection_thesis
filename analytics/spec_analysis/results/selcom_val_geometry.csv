@@ -1,0 +1,3 @@
+dataset,source,n_images,n_with_label,n_boxes,sqrt_px_p25,sqrt_px_p50,sqrt_px_p75,sqrt_px_p90,rel_w_p50,rel_h_p50,cx_p50,cy_p50
+selcom_val,selcom,311,294,295,33.8,39.6,67.4,88.8,3.07,2.78,0.499,0.531
+selcom_val,_ALL,311,294,295,33.8,39.6,67.4,88.8,3.07,2.78,0.499,0.531

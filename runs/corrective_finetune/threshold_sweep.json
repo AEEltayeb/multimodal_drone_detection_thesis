@@ -1,0 +1,233 @@
+{
+  "config": {
+    "old_weights": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\models\\IR_final_cleaned\\weights\\best.pt",
+    "new_weights": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\runs\\corrective_finetune\\finetune_v2\\weights\\best.pt",
+    "data": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\runs\\corrective_finetune\\dataset\\dataset.yaml",
+    "fp_frames": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\runs\\corrective_finetune\\fp_mining\\frames",
+    "extra_fp_frames": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\runs\\corrective_finetune\\fp_mining_v1\\frames",
+    "conf_low": 0.3,
+    "conf_high": 0.7,
+    "conf_step": 0.02,
+    "imgsz": 640,
+    "device": "0",
+    "out": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\runs\\corrective_finetune\\threshold_sweep.json",
+    "pr_tolerance_pp": 1.0,
+    "fppi_reduction": 0.5
+  },
+  "test": {
+    "old": {
+      "precision": 0.9548877952028394,
+      "recall": 0.9794977749523204,
+      "map50": 0.9770310491907761,
+      "map50_95": 0.6019659722749336
+    },
+    "new": {
+      "precision": 0.9528627428939506,
+      "recall": 0.9574003662358537,
+      "map50": 0.9709914064094604,
+      "map50_95": 0.5873916245760049
+    },
+    "delta_pp": {
+      "precision": -0.20250523088888306,
+      "recall": -2.2097408716466704,
+      "map50": -0.6039642781315746
+    },
+    "pr_within_tolerance": false
+  },
+  "sweep": [
+    {
+      "conf": 0.3,
+      "old_fppi": 1.0558375634517767,
+      "old_fp": 208,
+      "new_fppi": 0.19796954314720813,
+      "new_fp": 39,
+      "reduction_pct": 81.25,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.32,
+      "old_fppi": 0.9949238578680203,
+      "old_fp": 196,
+      "new_fppi": 0.18274111675126903,
+      "new_fp": 36,
+      "reduction_pct": 81.63265306122449,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.34,
+      "old_fppi": 0.9390862944162437,
+      "old_fp": 185,
+      "new_fppi": 0.17766497461928935,
+      "new_fp": 35,
+      "reduction_pct": 81.08108108108108,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.36,
+      "old_fppi": 0.9187817258883249,
+      "old_fp": 181,
+      "new_fppi": 0.16243654822335024,
+      "new_fp": 32,
+      "reduction_pct": 82.32044198895028,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.38,
+      "old_fppi": 0.8984771573604061,
+      "old_fp": 177,
+      "new_fppi": 0.14213197969543148,
+      "new_fp": 28,
+      "reduction_pct": 84.18079096045197,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.4,
+      "old_fppi": 0.8629441624365483,
+      "old_fp": 170,
+      "new_fppi": 0.12690355329949238,
+      "new_fp": 25,
+      "reduction_pct": 85.29411764705883,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.42,
+      "old_fppi": 0.7969543147208121,
+      "old_fp": 157,
+      "new_fppi": 0.1116751269035533,
+      "new_fp": 22,
+      "reduction_pct": 85.98726114649682,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.44,
+      "old_fppi": 0.7614213197969543,
+      "old_fp": 150,
+      "new_fppi": 0.09137055837563451,
+      "new_fp": 18,
+      "reduction_pct": 88.0,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.46,
+      "old_fppi": 0.7258883248730964,
+      "old_fp": 143,
+      "new_fppi": 0.09137055837563451,
+      "new_fp": 18,
+      "reduction_pct": 87.41258741258741,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.48,
+      "old_fppi": 0.6852791878172588,
+      "old_fp": 135,
+      "new_fppi": 0.09137055837563451,
+      "new_fp": 18,
+      "reduction_pct": 86.66666666666667,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.5,
+      "old_fppi": 0.6548223350253807,
+      "old_fp": 129,
+      "new_fppi": 0.07106598984771574,
+      "new_fp": 14,
+      "reduction_pct": 89.14728682170544,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.52,
+      "old_fppi": 0.6395939086294417,
+      "old_fp": 126,
+      "new_fppi": 0.06091370558375635,
+      "new_fp": 12,
+      "reduction_pct": 90.47619047619048,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.54,
+      "old_fppi": 0.5989847715736041,
+      "old_fp": 118,
+      "new_fppi": 0.030456852791878174,
+      "new_fp": 6,
+      "reduction_pct": 94.91525423728814,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.56,
+      "old_fppi": 0.5380710659898477,
+      "old_fp": 106,
+      "new_fppi": 0.025380710659898477,
+      "new_fp": 5,
+      "reduction_pct": 95.28301886792453,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.58,
+      "old_fppi": 0.48223350253807107,
+      "old_fp": 95,
+      "new_fppi": 0.02030456852791878,
+      "new_fp": 4,
+      "reduction_pct": 95.78947368421052,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.6,
+      "old_fppi": 0.48223350253807107,
+      "old_fp": 95,
+      "new_fppi": 0.02030456852791878,
+      "new_fp": 4,
+      "reduction_pct": 95.78947368421052,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.62,
+      "old_fppi": 0.4365482233502538,
+      "old_fp": 86,
+      "new_fppi": 0.015228426395939087,
+      "new_fp": 3,
+      "reduction_pct": 96.51162790697674,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.64,
+      "old_fppi": 0.39086294416243655,
+      "old_fp": 77,
+      "new_fppi": 0.015228426395939087,
+      "new_fp": 3,
+      "reduction_pct": 96.1038961038961,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.66,
+      "old_fppi": 0.3248730964467005,
+      "old_fp": 64,
+      "new_fppi": 0.015228426395939087,
+      "new_fp": 3,
+      "reduction_pct": 95.3125,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.68,
+      "old_fppi": 0.2893401015228426,
+      "old_fp": 57,
+      "new_fppi": 0.005076142131979695,
+      "new_fp": 1,
+      "reduction_pct": 98.24561403508771,
+      "fppi_pass": true
+    },
+    {
+      "conf": 0.7,
+      "old_fppi": 0.20812182741116753,
+      "old_fp": 41,
+      "new_fppi": 0.005076142131979695,
+      "new_fp": 1,
+      "reduction_pct": 97.5609756097561,
+      "fppi_pass": true
+    }
+  ],
+  "recommendation": {
+    "best_conf": null,
+    "best_reduction_pct": null,
+    "pr_ok": false
+  }
+}

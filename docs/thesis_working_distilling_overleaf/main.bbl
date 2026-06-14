@@ -569,6 +569,32 @@
     \field{year}{2022}
   \endentry
 
+  \entry{aker2017using}{article}{}{}
+    \name{author}{2}{}{%
+      {{hash=AC}{%
+         family={Aker},
+         familyi={A\bibinitperiod},
+         given={Cemal},
+         giveni={C\bibinitperiod},
+      }}%
+      {{hash=KS}{%
+         family={Kalkan},
+         familyi={K\bibinitperiod},
+         given={Sinan},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ACKS1}
+    \strng{fullhash}{ACKS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{pages}{1\bibrangedash 6}
+    \field{title}{Using Deep Networks for Drone Detection}
+    \field{journaltitle}{IEEE International Conference on Advanced Video and
+  Signal Based Surveillance (AVSS)}
+    \field{year}{2017}
+  \endentry
+
   \entry{rozantsev2017detecting}{inproceedings}{}{}
     \name{author}{3}{}{%
       {{hash=RA}{%
@@ -600,32 +626,6 @@
     \field{pages}{879\bibrangedash 892}
     \field{title}{Detecting Flying Objects Using a Single Moving Camera}
     \field{volume}{39}
-    \field{year}{2017}
-  \endentry
-
-  \entry{aker2017using}{article}{}{}
-    \name{author}{2}{}{%
-      {{hash=AC}{%
-         family={Aker},
-         familyi={A\bibinitperiod},
-         given={Cemal},
-         giveni={C\bibinitperiod},
-      }}%
-      {{hash=KS}{%
-         family={Kalkan},
-         familyi={K\bibinitperiod},
-         given={Sinan},
-         giveni={S\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{ACKS1}
-    \strng{fullhash}{ACKS1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{pages}{1\bibrangedash 6}
-    \field{title}{Using Deep Networks for Drone Detection}
-    \field{journaltitle}{IEEE International Conference on Advanced Video and
-  Signal Based Surveillance (AVSS)}
     \field{year}{2017}
   \endentry
 
@@ -1503,6 +1503,50 @@
     \field{booktitle}{International Conference on Machine Learning}
     \field{title}{Similarity of neural network representations revisited}
     \field{year}{2019}
+  \endentry
+
+  \entry{zhao2022dutantiuav}{article}{}{}
+    \name{author}{4}{}{%
+      {{hash=ZJ}{%
+         family={Zhao},
+         familyi={Z\bibinitperiod},
+         given={Jie},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ZJ}{%
+         family={Zhang},
+         familyi={Z\bibinitperiod},
+         given={Jingshu},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=LD}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Dongdong},
+         giveni={D\bibinitperiod},
+      }}%
+      {{hash=WD}{%
+         family={Wang},
+         familyi={W\bibinitperiod},
+         given={Dong},
+         giveni={D\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ZJ+1}
+    \strng{fullhash}{ZJZJLDWD1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \verb{doi}
+    \verb 10.1109/TITS.2022.3177627
+    \endverb
+    \field{note}{DUT Anti-UAV detection (10{,}000 images) and tracking dataset}
+    \field{number}{12}
+    \field{pages}{25323\bibrangedash 25334}
+    \field{title}{Vision-Based Anti-UAV Detection and Tracking}
+    \field{volume}{23}
+    \field{journaltitle}{IEEE Transactions on Intelligent Transportation
+  Systems}
+    \field{year}{2022}
   \endentry
 
   \entry{howard2019mobilenetv3}{inproceedings}{}{}

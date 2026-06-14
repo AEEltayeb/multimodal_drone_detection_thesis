@@ -49,8 +49,8 @@ def main():
         a = sqrt_areas(d, W, H)
         if a.size == 0:
             print("  no boxes:", label); continue
-        ax.hist(a, bins=bins, density=True, alpha=0.55, color=c,
-                label=f"{label}  (median {np.median(a):.0f} px, n={a.size})")
+        ax.hist(a, bins=bins, weights=np.full(a.size, 1.0 / a.size), alpha=0.55, color=c,
+                label=f"{label}  (median {np.median(a):.0f} px, n={a.size:,} boxes)")
         ax.axvline(np.median(a), color=c, ls=":", lw=1)
     # imgsz resolvable floors for Svanstrom-native (p3 stride 8 at model input)
     for px, txt in [(8, "imgsz=640 floor"), (4, "imgsz=1280 floor")]:
@@ -59,7 +59,7 @@ def main():
                 va="top", ha="left", fontsize=8)
     ax.set_xscale("log")
     ax.set_xlabel(r"drone $\sqrt{\mathrm{area}}$ in native pixels (log scale)")
-    ax.set_ylabel("density")
+    ax.set_ylabel("fraction of GT boxes")
     ax.set_title("Drone size by dataset: why Svanström needs imgsz=1280")
     ax.legend(fontsize=8, loc="upper right")
     ax.grid(True, which="both", alpha=0.25)

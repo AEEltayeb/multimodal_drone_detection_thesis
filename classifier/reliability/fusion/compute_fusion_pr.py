@@ -1,7 +1,7 @@
 import json, numpy as np
 from pathlib import Path
 
-p = Path(r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection\classifier\runs\reliability\fusion\comparison\fusion_comparison.json")
+p = Path(__file__).resolve().parents[2] / "runs" / "reliability" / "fusion" / "comparison" / "fusion_comparison.json"   # resident classifier/ (was ES_Drone_Detection); legacy run data not shipped
 results = json.load(open(p))
 
 print(f"  {'#':<3s} {'Approach':<28s} {'Det_P':>7s} {'Det_R':>7s} {'Det_F1':>7s} {'TP':>8s} {'FP':>6s} {'Missed':>7s}")

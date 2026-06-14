@@ -1,0 +1,656 @@
+{
+  "antiuav": {
+    "M_modality_ab": {
+      "rgb_only bare": {
+        "TP": 3657,
+        "FP": 41,
+        "FN": 4016,
+        "TN": 0,
+        "precision": 0.9889,
+        "recall": 0.4766,
+        "f1": 0.6432,
+        "f1_ci": [
+          0.6402,
+          0.646
+        ]
+      },
+      "rgb_only +filt": {
+        "TP": 3655,
+        "FP": 39,
+        "FN": 4018,
+        "TN": 0,
+        "precision": 0.9894,
+        "recall": 0.4763,
+        "f1": 0.6431,
+        "f1_ci": [
+          0.64,
+          0.6458
+        ]
+      },
+      "ir_only bare": {
+        "TP": 3775,
+        "FP": 133,
+        "FN": 3898,
+        "TN": 0,
+        "precision": 0.966,
+        "recall": 0.492,
+        "f1": 0.6519,
+        "f1_ci": [
+          0.648,
+          0.6556
+        ]
+      },
+      "ir_only +filt": {
+        "TP": 3775,
+        "FP": 132,
+        "FN": 3898,
+        "TN": 0,
+        "precision": 0.9662,
+        "recall": 0.492,
+        "f1": 0.652,
+        "f1_ci": [
+          0.6481,
+          0.6557
+        ]
+      },
+      "both bare": {
+        "TP": 7432,
+        "FP": 174,
+        "FN": 241,
+        "TN": 0,
+        "precision": 0.9771,
+        "recall": 0.9686,
+        "f1": 0.9728,
+        "f1_ci": [
+          0.9697,
+          0.9757
+        ]
+      },
+      "both +filt": {
+        "TP": 7430,
+        "FP": 171,
+        "FN": 243,
+        "TN": 0,
+        "precision": 0.9775,
+        "recall": 0.9683,
+        "f1": 0.9729,
+        "f1_ci": [
+          0.9697,
+          0.9758
+        ]
+      },
+      "routed[robust8] bare": {
+        "TP": 7408,
+        "FP": 141,
+        "FN": 265,
+        "TN": 0,
+        "precision": 0.9813,
+        "recall": 0.9655,
+        "f1": 0.9733,
+        "f1_ci": [
+          0.9702,
+          0.9762
+        ]
+      },
+      "routed[robust8] +filt": {
+        "TP": 7406,
+        "FP": 139,
+        "FN": 267,
+        "TN": 0,
+        "precision": 0.9816,
+        "recall": 0.9652,
+        "f1": 0.9733,
+        "f1_ci": [
+          0.9703,
+          0.9762
+        ]
+      },
+      "routed[robust8-nr] bare": {
+        "TP": 7430,
+        "FP": 160,
+        "FN": 243,
+        "TN": 0,
+        "precision": 0.9789,
+        "recall": 0.9683,
+        "f1": 0.9736,
+        "f1_ci": [
+          0.9705,
+          0.9764
+        ]
+      },
+      "routed[robust8-nr] +filt": {
+        "TP": 7428,
+        "FP": 157,
+        "FN": 245,
+        "TN": 0,
+        "precision": 0.9793,
+        "recall": 0.9681,
+        "f1": 0.9737,
+        "f1_ci": [
+          0.9706,
+          0.9765
+        ]
+      }
+    },
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 93.1,
+        "n_gt_total": 3725,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 38,
+              "FP": 3,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.9268,
+              "recall": 1.0,
+              "f1": 0.962,
+              "n_gt": 38
+            },
+            "32-64px": {
+              "TP": 733,
+              "FP": 10,
+              "FN": 14,
+              "TN": 0,
+              "precision": 0.9865,
+              "recall": 0.9813,
+              "f1": 0.9839,
+              "n_gt": 747
+            },
+            ">=64px": {
+              "TP": 2886,
+              "FP": 28,
+              "FN": 54,
+              "TN": 0,
+              "precision": 0.9904,
+              "recall": 0.9816,
+              "f1": 0.986,
+              "n_gt": 2940
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 38,
+              "FP": 3,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.9268,
+              "recall": 1.0,
+              "f1": 0.962,
+              "n_gt": 38
+            },
+            "32-64px": {
+              "TP": 731,
+              "FP": 8,
+              "FN": 16,
+              "TN": 0,
+              "precision": 0.9892,
+              "recall": 0.9786,
+              "f1": 0.9838,
+              "n_gt": 747
+            },
+            ">=64px": {
+              "TP": 2886,
+              "FP": 28,
+              "FN": 54,
+              "TN": 0,
+              "precision": 0.9904,
+              "recall": 0.9816,
+              "f1": 0.986,
+              "n_gt": 2940
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 37.0,
+        "n_gt_total": 3948,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 18,
+              "FP": 8,
+              "FN": 5,
+              "TN": 0,
+              "precision": 0.6923,
+              "recall": 0.7826,
+              "f1": 0.7347,
+              "n_gt": 23
+            },
+            "16-32px": {
+              "TP": 860,
+              "FP": 41,
+              "FN": 78,
+              "TN": 0,
+              "precision": 0.9545,
+              "recall": 0.9168,
+              "f1": 0.9353,
+              "n_gt": 938
+            },
+            "32-64px": {
+              "TP": 2821,
+              "FP": 83,
+              "FN": 90,
+              "TN": 0,
+              "precision": 0.9714,
+              "recall": 0.9691,
+              "f1": 0.9702,
+              "n_gt": 2911
+            },
+            ">=64px": {
+              "TP": 76,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.987,
+              "recall": 1.0,
+              "f1": 0.9935,
+              "n_gt": 76
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 18,
+              "FP": 8,
+              "FN": 5,
+              "TN": 0,
+              "precision": 0.6923,
+              "recall": 0.7826,
+              "f1": 0.7347,
+              "n_gt": 23
+            },
+            "16-32px": {
+              "TP": 860,
+              "FP": 41,
+              "FN": 78,
+              "TN": 0,
+              "precision": 0.9545,
+              "recall": 0.9168,
+              "f1": 0.9353,
+              "n_gt": 938
+            },
+            "32-64px": {
+              "TP": 2821,
+              "FP": 82,
+              "FN": 90,
+              "TN": 0,
+              "precision": 0.9718,
+              "recall": 0.9691,
+              "f1": 0.9704,
+              "n_gt": 2911
+            },
+            ">=64px": {
+              "TP": 76,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.987,
+              "recall": 1.0,
+              "f1": 0.9935,
+              "n_gt": 76
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "antiuav",
+      "kind": "paired",
+      "rule": "iou",
+      "n": 4000,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 4000
+    }
+  },
+  "svanstrom": {
+    "M_modality_ab": {
+      "rgb_only bare": {
+        "TP": 1532,
+        "FP": 1845,
+        "FN": 1782,
+        "TN": 0,
+        "precision": 0.4537,
+        "recall": 0.4623,
+        "f1": 0.4579,
+        "f1_ci": [
+          0.4477,
+          0.4678
+        ]
+      },
+      "rgb_only +filt": {
+        "TP": 1433,
+        "FP": 179,
+        "FN": 1881,
+        "TN": 0,
+        "precision": 0.889,
+        "recall": 0.4324,
+        "f1": 0.5818,
+        "f1_ci": [
+          0.5731,
+          0.5902
+        ]
+      },
+      "ir_only bare": {
+        "TP": 1610,
+        "FP": 174,
+        "FN": 1704,
+        "TN": 0,
+        "precision": 0.9025,
+        "recall": 0.4858,
+        "f1": 0.6316,
+        "f1_ci": [
+          0.6261,
+          0.6368
+        ]
+      },
+      "ir_only +filt": {
+        "TP": 1610,
+        "FP": 173,
+        "FN": 1704,
+        "TN": 0,
+        "precision": 0.903,
+        "recall": 0.4858,
+        "f1": 0.6317,
+        "f1_ci": [
+          0.6263,
+          0.6369
+        ]
+      },
+      "both bare": {
+        "TP": 3142,
+        "FP": 2019,
+        "FN": 172,
+        "TN": 0,
+        "precision": 0.6088,
+        "recall": 0.9481,
+        "f1": 0.7415,
+        "f1_ci": [
+          0.7295,
+          0.7536
+        ]
+      },
+      "both +filt": {
+        "TP": 3043,
+        "FP": 352,
+        "FN": 271,
+        "TN": 0,
+        "precision": 0.8963,
+        "recall": 0.9182,
+        "f1": 0.9071,
+        "f1_ci": [
+          0.8996,
+          0.9146
+        ]
+      },
+      "routed[robust8] bare": {
+        "TP": 3092,
+        "FP": 354,
+        "FN": 222,
+        "TN": 0,
+        "precision": 0.8973,
+        "recall": 0.933,
+        "f1": 0.9148,
+        "f1_ci": [
+          0.9075,
+          0.9213
+        ]
+      },
+      "routed[robust8] +filt": {
+        "TP": 2993,
+        "FP": 195,
+        "FN": 321,
+        "TN": 0,
+        "precision": 0.9388,
+        "recall": 0.9031,
+        "f1": 0.9206,
+        "f1_ci": [
+          0.9139,
+          0.9268
+        ]
+      },
+      "routed[robust8-nr] bare": {
+        "TP": 3136,
+        "FP": 1997,
+        "FN": 178,
+        "TN": 0,
+        "precision": 0.6109,
+        "recall": 0.9463,
+        "f1": 0.7425,
+        "f1_ci": [
+          0.7307,
+          0.7547
+        ]
+      },
+      "routed[robust8-nr] +filt": {
+        "TP": 3037,
+        "FP": 330,
+        "FN": 277,
+        "TN": 0,
+        "precision": 0.902,
+        "recall": 0.9164,
+        "f1": 0.9091,
+        "f1_ci": [
+          0.9016,
+          0.9163
+        ]
+      }
+    },
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 29.8,
+        "n_gt_total": 1673,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 17,
+              "FP": 1040,
+              "FN": 10,
+              "TN": 0,
+              "precision": 0.0161,
+              "recall": 0.6296,
+              "f1": 0.0314,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 892,
+              "FP": 390,
+              "FN": 102,
+              "TN": 0,
+              "precision": 0.6958,
+              "recall": 0.8974,
+              "f1": 0.7838,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 605,
+              "FP": 283,
+              "FN": 28,
+              "TN": 0,
+              "precision": 0.6813,
+              "recall": 0.9558,
+              "f1": 0.7955,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 18,
+              "FP": 132,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.12,
+              "recall": 0.9474,
+              "f1": 0.213,
+              "n_gt": 19
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 16,
+              "FP": 69,
+              "FN": 11,
+              "TN": 0,
+              "precision": 0.1882,
+              "recall": 0.5926,
+              "f1": 0.2857,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 818,
+              "FP": 60,
+              "FN": 176,
+              "TN": 0,
+              "precision": 0.9317,
+              "recall": 0.8229,
+              "f1": 0.8739,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 581,
+              "FP": 37,
+              "FN": 52,
+              "TN": 0,
+              "precision": 0.9401,
+              "recall": 0.9179,
+              "f1": 0.9289,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 18,
+              "FP": 13,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.5806,
+              "recall": 0.9474,
+              "f1": 0.72,
+              "n_gt": 19
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 14.8,
+        "n_gt_total": 1641,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 963,
+              "FP": 74,
+              "FN": 30,
+              "TN": 0,
+              "precision": 0.9286,
+              "recall": 0.9698,
+              "f1": 0.9488,
+              "n_gt": 993
+            },
+            "16-32px": {
+              "TP": 642,
+              "FP": 97,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.8687,
+              "recall": 0.9984,
+              "f1": 0.9291,
+              "n_gt": 643
+            },
+            "32-64px": {
+              "TP": 5,
+              "FP": 2,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7143,
+              "recall": 1.0,
+              "f1": 0.8333,
+              "n_gt": 5
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 963,
+              "FP": 74,
+              "FN": 30,
+              "TN": 0,
+              "precision": 0.9286,
+              "recall": 0.9698,
+              "f1": 0.9488,
+              "n_gt": 993
+            },
+            "16-32px": {
+              "TP": 642,
+              "FP": 97,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.8687,
+              "recall": 0.9984,
+              "f1": 0.9291,
+              "n_gt": 643
+            },
+            "32-64px": {
+              "TP": 5,
+              "FP": 2,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7143,
+              "recall": 1.0,
+              "f1": 0.8333,
+              "n_gt": 5
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "svanstrom",
+      "kind": "paired",
+      "rule": "iop",
+      "n": 4000,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 4000
+    }
+  }
+}

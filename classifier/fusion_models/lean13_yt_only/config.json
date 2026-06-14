@@ -1,0 +1,31 @@
+{
+  "rgb_weights": "RGB model/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt",
+  "ir_weights": "runs/corrective_finetune/finetune_v3b/weights/best.pt",
+  "auv_stride": 2,
+  "svan_stride": 2,
+  "neg_keep": 0.2,
+  "conf": 0.25,
+  "trust_distribution": {
+    "reject_both": 5870
+  },
+  "source_counts": {
+    "confuser_AIRPLANE": 1437,
+    "confuser_BIRD": 4433
+  },
+  "total_rows": 5870,
+  "feature_cols": [
+    "rgb_max_conf",
+    "ir_max_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_log_bbox_area",
+    "rgb_best_aspect_ratio",
+    "ir_best_aspect_ratio",
+    "rgb_best_pos_y",
+    "ir_best_pos_y",
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std"
+  ]
+}

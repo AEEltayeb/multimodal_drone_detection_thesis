@@ -30,7 +30,8 @@ Per-source composition is in Table~\ref{tab:ds_confusers}. Split policy:
 
 \section{IR Detector Corpus}
 
-The per-prefix distribution is in Table~\ref{tab:ds_ir_components}. The Svanstr\"om IR partition (\texttt{svan}, 21{,}637 frames) is the largest single Svanstr\"om appearance in any training corpus in this thesis and is the reason Svanstr\"om IR evaluation is in-distribution for the IR detector (Table~\ref{tab:svanstrom_audit}). The corpus state documented here is the state at the \texttt{Final} checkpoint; the V2--V6 revision history (Section~\ref{sec:ir_evolution}) operated on smaller predecessor variants of the same source families.
+The per-prefix distribution is in Table~\ref{tab:ds_ir_components}. The Svanstr\"om IR partition (\texttt{svan}, 21{,}637 frames across the corpus' train/val/test splits: 17{,}314 train, 2{,}050 val, 2{,}273 test, plus 1{,}325 zoom-augmented copies under \texttt{czoom}) is the largest single Svanstr\"om appearance in any training corpus in this thesis and is the reason Svanstr\"om IR evaluation is in-distribution for the IR detector (Table~\ref{tab:svanstrom_audit}).
+% [source: ls G:/drone/IR_dset_final/{train,val,test}/images svan_* counts 17314/2050/2273; czoom_svan_* 1325; thesis_eval/results/leakage_controlled.json derived] The corpus state documented here is the state at the \texttt{Final} checkpoint; the V2--V6 revision history (Section~\ref{sec:ir_evolution}) operated on smaller predecessor variants of the same source families.
 
 \section{Thermal Confuser Corpus (\texttt{IR\_confusers})}
 
@@ -44,6 +45,11 @@ The per-prefix distribution is in Table~\ref{tab:ds_ir_components}. The Svanstr\
 \section{Anti-UAV RGBT}
 
 The converted YOLO test + val splits used for evaluation comprise 85{,}374 paired frames at $1920{\times}1080$ (RGB) and $640{\times}512$ (IR). Anti-UAV is a tracking benchmark in its native form; the per-frame detection evaluation reported in this thesis is computed by re-scoring the tracking benchmark's frame-level GT boxes with the IoU@0.5 matching rule.
+
+\section{DUT Anti-UAV}
+
+The DUT Anti-UAV detection dataset~\cite{zhao2022dutantiuav} ships $10{,}000$ aerial RGB images with author-provided train / validation / test partitions. It enters this thesis twice. As a \emph{training} source, $5{,}200$ of its images contribute to the composite RGB corpus (the \texttt{dut} prefix in Table~\ref{tab:ds_rgb_components}), so the production RGB detector \texttt{ft4} is in-distribution on it. As an \emph{evaluation} surface, the official test split (the $2{,}200$ frames / $2{,}245$ ground-truth drones used in Table~\ref{tab:ablation_dut}) is the confuser-free, all-drone RGB check of Section~\ref{sec:pipeline_paired}, evaluated at \texttt{imgsz=960} with the thermal detector in its grayscale-fallback mode. No DUT frame used at evaluation time was a training image for the trust router or the per-frame filters.
+% [source: github.com/wangdongdut/DUT-Anti-UAV; cite=zhao2022dutantiuav; eval split = thesis_eval/results_dut/tier1_results.json]
 
 \section{SelCom CCTV}
 
@@ -144,9 +150,10 @@ Model & Role & Note \\
 \midrule
 \multicolumn{3}{l}{\textbf{Trust classifiers (XGBoost fusion / routing)}} \\
 \midrule
-\texttt{robust8} & \textbf{production} & Production trust router: the six \texttt{robust6} features plus \texttt{rgb\_mean\_conf}, an \texttt{is\_grayscale} flag, and a per-class \texttt{trust\_rgb} threshold. \\
-\texttt{robust6} & comparison & Six statistically-selected, leakage-free features; the base extended into the shipped \texttt{robust8}. \\
-\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, superseded in production by \texttt{robust8}. \\
+\texttt{robust8-nr} & \textbf{production} & Shipped trust router: the eight \texttt{robust8} features with the \texttt{reject} class dropped (always routes RGB/IR/both; the filter owns false-positive rejection). \\
+\texttt{robust8} & ablation & Four-class router (\texttt{robust6} $+$ two free features $+$ a tuned per-class threshold); recommended on confuser-rich paired streams, retained as the reject-class ablation. \\
+\texttt{robust6} & comparison & Six statistically-selected, leakage-free features; the base extended into \texttt{robust8}/\texttt{robust8-nr}. \\
+\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, superseded in production by \texttt{robust8-nr}. \\
 \texttt{control40} & comparison & 40-feature control: best raw drone metrics but the worst confuser rejection. \\
 \texttt{fusion\_no\_fn\_v1.1} & comparison & Open-world fallback; the most conservative variant on the OOD confuser zoo. \\
 \midrule
@@ -214,8 +221,8 @@ Every headline number in this thesis is the value of a named cell in a canonical
         \toprule
         Thesis number & File (cell) & Reproduce \\
         \midrule
-        Svanstr\"om composed F1 $0.742 \to 0.949$ & \texttt{tier1\_results.json} (\texttt{svanstrom.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only svanstrom} \\
-        Confuser fire $30.4\% \to 0.15\%$ & \texttt{tier1\_results.json} (\texttt{rgb\_confuser.C\_confuser}) & \texttt{pipeline\_eval\_unified.py --only rgb\_confuser} \\
+        Svanstr\"om composed F1 $0.742 \to 0.944$ (shipped \texttt{robust8-nr}, \texttt{filt$\to$clf}) & \texttt{results\_noreject/tier1\_results.json} (\texttt{svanstrom.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only svanstrom} \\
+        Confuser fire $30.4\% \to 1.1\%$ (shipped \texttt{robust8-nr}; $0.15\%$ \texttt{robust8} ablation) & \texttt{results\_noreject/tier1\_results.json} (\texttt{rgb\_confuser.C\_confuser}) & \texttt{pipeline\_eval\_unified.py --only rgb\_confuser} \\
         Anti-UAV no-harm $0.973 \to 0.984$ & \texttt{tier1\_results.json} (\texttt{antiuav.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only antiuav} \\
         Grayscale 3-way $0.607/0.187/0.580$ & \texttt{tier1\_results.json} (D table) & \texttt{pipeline\_eval\_unified.py} \\
         Temporal 2-of-3 windows (Table~\ref{tab:temporal_production}) & \texttt{temporal\_results.json} & \texttt{temporal\_replay.py} \\
@@ -225,6 +232,9 @@ Every headline number in this thesis is the value of a named cell in a canonical
         Low-conf mode (Table~\ref{tab:lowconf_selcom}) & \texttt{conf\_sweep/conf\_sweep\_results.json} & \texttt{conf\_sweep\_replay.py} \\
         IR HITL trajectory $0.503 \to 0.967$ & \texttt{knowledge/evals.csv} (\texttt{ir\_final\_*}, one fixed split) & \texttt{eval/ir\_version\_comparison.py} (GPU) \\
         Stage latencies (Table~\ref{tab:speed}) & \texttt{knowledge/ledger.csv} (speed rows) & \texttt{eval/bench\_speed.py} (GPU) \\
+        Scoring swing $2.8$~pp (Section~\ref{sec:scoring_audit}) & \texttt{notes\_round1\_results.json} vs \texttt{tier1\_results.json} (routed \texttt{+filt} / \texttt{clf->filt}) & \texttt{notes\_round1\_replays.py} \\
+        Overlap audit counts (Table~\ref{tab:svanstrom_audit}) & \texttt{clean\_split/README.md} $+$ \texttt{leakage\_controlled.json} & \texttt{leakage\_controlled\_replay.py} \\
+        Clean-split results (Table~\ref{tab:clean_split}) & \texttt{clean\_split/clean\_split\_results.json} (sequence lists alongside) & cache \texttt{--only svanstrom\_clean,antiuav\_clean --full}, then \texttt{pipeline\_eval\_unified.py} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -248,11 +258,12 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[IoP] Intersection over Prediction. The matching rule used for Svanstr\"om RGB scoring (Section~\ref{sec:metrics}); $\text{IoP} = |B_\text{pred} \cap B_\text{gt}| / |B_\text{pred}|$.
     \item[S1 / S2 / S3] Cascade stages: S1 = RGB detector alone; S2 = + trust classifier; S3 = + patch filter alert gate.
     \item[ft4] \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280}. The production RGB detector (SelCom$+$confuser fine-tune); the only confuser-injection config that passed every drone-recall regression gate (Section~\ref{sec:training_recipes}).
-    \item[robust6] The leakage-aware six-feature trust classifier (per-modality detection confidence $+$ box geometry) selected statistically (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
-    \item[robust8] The production trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features (\texttt{rgb\_mean\_conf} and an \texttt{is\_grayscale} regime flag) and a tuned per-class \texttt{trust\_rgb} decision threshold; closes \texttt{robust6}'s grayscale recall hole at a documented real-video-confuser-fire cost.
-    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost), superseded in production by \texttt{robust8} (Section~\ref{sec:feature_selection}).
-    \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature, failure-model scores dropped).
-    \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate trust classifier (40-feature with failure-model scores retained); deprecated.
+    \item[robust6] The six-feature trust classifier (per-modality detection confidence $+$ box geometry), its features screened by the scene-fingerprint ratio (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
+    \item[robust8] The four-class trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features and a tuned per-class decision threshold; retained as the reject-class ablation and recommended on confuser-rich paired streams.
+    \item[robust8-nr] The shipped production trust router (Section~\ref{sec:classifier_results}): the eight \texttt{robust8} features with the \texttt{reject} class dropped, so it always routes RGB/IR/both and the per-frame filter owns false-positive rejection.
+    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost), superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
+    \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
+    \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate 40-feature trust classifier; deprecated.
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
     \item[v2 (patch filter)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
     \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame.

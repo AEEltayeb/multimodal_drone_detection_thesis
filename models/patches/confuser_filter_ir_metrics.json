@@ -1,0 +1,431 @@
+{
+  "mode": "confuser_filter",
+  "best_val_auc": 0.999395916394829,
+  "final": {
+    "auc": 0.999395916394829,
+    "acc": 0.9941961694718514,
+    "cm": [
+      [
+        974,
+        5
+      ],
+      [
+        5,
+        739
+      ]
+    ],
+    "per_cat": {
+      "airplane": {
+        "n": 213,
+        "mean_confuser_prob": 0.9999,
+        "frac_flagged_confuser": 1.0
+      },
+      "bird": {
+        "n": 256,
+        "mean_confuser_prob": 0.9774,
+        "frac_flagged_confuser": 0.9844
+      },
+      "drone": {
+        "n": 979,
+        "mean_confuser_prob": 0.0069,
+        "frac_flagged_confuser": 0.0051
+      },
+      "helicopter": {
+        "n": 275,
+        "mean_confuser_prob": 0.9939,
+        "frac_flagged_confuser": 0.9964
+      }
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.16122335841913427,
+      "auc": 0.9749415137236811,
+      "acc": 0.881601857225769,
+      "cm": [
+        [
+          791,
+          188
+        ],
+        [
+          16,
+          728
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.936,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9175,
+          "frac_flagged_confuser": 0.9805
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.2533,
+          "frac_flagged_confuser": 0.192
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.8967,
+          "frac_flagged_confuser": 0.96
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.05429134035585534,
+      "auc": 0.9775857524135886,
+      "acc": 0.9158444573418456,
+      "cm": [
+        [
+          964,
+          15
+        ],
+        [
+          130,
+          614
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.6598,
+          "frac_flagged_confuser": 0.7183
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.889,
+          "frac_flagged_confuser": 0.9102
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0278,
+          "frac_flagged_confuser": 0.0153
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.7982,
+          "frac_flagged_confuser": 0.8291
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.039615396982691155,
+      "auc": 0.9963658879479829,
+      "acc": 0.9396401625072548,
+      "cm": [
+        [
+          978,
+          1
+        ],
+        [
+          103,
+          641
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.7174,
+          "frac_flagged_confuser": 0.7653
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.8775,
+          "frac_flagged_confuser": 0.9219
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0058,
+          "frac_flagged_confuser": 0.001
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.8457,
+          "frac_flagged_confuser": 0.88
+        }
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.025806707415490522,
+      "auc": 0.9980298636967719,
+      "acc": 0.987811955890888,
+      "cm": [
+        [
+          968,
+          11
+        ],
+        [
+          10,
+          734
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9858,
+          "frac_flagged_confuser": 0.9953
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9539,
+          "frac_flagged_confuser": 0.9648
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0166,
+          "frac_flagged_confuser": 0.0112
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9829,
+          "frac_flagged_confuser": 1.0
+        }
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.019717236072969956,
+      "auc": 0.9987025931661669,
+      "acc": 0.9889727219965178,
+      "cm": [
+        [
+          969,
+          10
+        ],
+        [
+          9,
+          735
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9832,
+          "frac_flagged_confuser": 0.9906
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9732,
+          "frac_flagged_confuser": 0.9766
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0105,
+          "frac_flagged_confuser": 0.0102
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9934,
+          "frac_flagged_confuser": 0.9964
+        }
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.014606586389255351,
+      "auc": 0.998897547420563,
+      "acc": 0.9901334881021474,
+      "cm": [
+        [
+          969,
+          10
+        ],
+        [
+          7,
+          737
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9997,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9804,
+          "frac_flagged_confuser": 0.9844
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0125,
+          "frac_flagged_confuser": 0.0102
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9884,
+          "frac_flagged_confuser": 0.9891
+        }
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.010457596089717625,
+      "auc": 0.9992881423879975,
+      "acc": 0.9924550203134068,
+      "cm": [
+        [
+          972,
+          7
+        ],
+        [
+          6,
+          738
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9999,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9789,
+          "frac_flagged_confuser": 0.9844
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0079,
+          "frac_flagged_confuser": 0.0072
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9933,
+          "frac_flagged_confuser": 0.9927
+        }
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.010210929575913966,
+      "auc": 0.9991851735916614,
+      "acc": 0.9924550203134068,
+      "cm": [
+        [
+          972,
+          7
+        ],
+        [
+          6,
+          738
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9999,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9756,
+          "frac_flagged_confuser": 0.9805
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0082,
+          "frac_flagged_confuser": 0.0072
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9955,
+          "frac_flagged_confuser": 0.9964
+        }
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.009455240761138682,
+      "auc": 0.999395916394829,
+      "acc": 0.9941961694718514,
+      "cm": [
+        [
+          974,
+          5
+        ],
+        [
+          5,
+          739
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 0.9999,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.9774,
+          "frac_flagged_confuser": 0.9844
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0069,
+          "frac_flagged_confuser": 0.0051
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9939,
+          "frac_flagged_confuser": 0.9964
+        }
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.007079435613886411,
+      "auc": 0.9993547288762947,
+      "acc": 0.9924550203134068,
+      "cm": [
+        [
+          972,
+          7
+        ],
+        [
+          6,
+          738
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 213,
+          "mean_confuser_prob": 1.0,
+          "frac_flagged_confuser": 1.0
+        },
+        "bird": {
+          "n": 256,
+          "mean_confuser_prob": 0.979,
+          "frac_flagged_confuser": 0.9805
+        },
+        "drone": {
+          "n": 979,
+          "mean_confuser_prob": 0.0082,
+          "frac_flagged_confuser": 0.0072
+        },
+        "helicopter": {
+          "n": 275,
+          "mean_confuser_prob": 0.9957,
+          "frac_flagged_confuser": 0.9964
+        }
+      }
+    }
+  ],
+  "n_train": 7013,
+  "n_val": 1723,
+  "n_confuser": 3409,
+  "n_pass": 5327,
+  "confuser_categories": [
+    "airplane",
+    "bird",
+    "helicopter"
+  ]
+}

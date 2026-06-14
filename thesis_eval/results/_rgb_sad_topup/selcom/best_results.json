@@ -1,0 +1,77 @@
+{
+  "model": "best",
+  "weights": "RGB model/Yolo26n_retrained_v2/weights/best.pt",
+  "detection_metrics": [
+    {
+      "TP": 1,
+      "FP": 3,
+      "FN": 294,
+      "TN": 0,
+      "precision": 0.25,
+      "recall": 0.0034,
+      "f1": 0.0067,
+      "config": "best_iou"
+    },
+    {
+      "TP": 1,
+      "FP": 3,
+      "FN": 294,
+      "TN": 0,
+      "precision": 0.25,
+      "recall": 0.0034,
+      "f1": 0.0067,
+      "config": "best_iop"
+    }
+  ],
+  "frame_metrics": {
+    "tp": 4,
+    "fp": 0,
+    "fn": 290,
+    "tn": 17,
+    "fp_rate": 0.0,
+    "fn_rate": 0.9864,
+    "total_frames": 311
+  },
+  "size_distribution": {
+    "small": 1,
+    "medium": 3,
+    "large": 0
+  },
+  "per_size_metrics": {
+    "iou": {
+      "small": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 166
+      },
+      "medium": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 124
+      },
+      "large": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 4
+      }
+    },
+    "iop": {
+      "small": {
+        "tp": 0,
+        "fp": 1,
+        "fn": 166
+      },
+      "medium": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 124
+      },
+      "large": {
+        "tp": 0,
+        "fp": 0,
+        "fn": 4
+      }
+    }
+  },
+  "per_source": {}
+}

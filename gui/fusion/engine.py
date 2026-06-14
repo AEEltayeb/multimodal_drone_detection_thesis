@@ -153,8 +153,13 @@ class FusionEngine:
         # label=1 iff P(trust_rgb)>=tau else argmax (argmax alone suppresses the
         # rare trust_rgb class — the known grayscale hole). Older bundles have no tau.
         self.fusion_tau = bundle.get("tau")
+        # no-reject 3-class routers (robust8_noreject) carry a label_map: their model classes are
+        # 0-indexed {0,1,2}; map back to the trust-label space {1,2,3}. argmax (no tau), never rejects.
+        self.fusion_label_map = ({int(k): int(v) for k, v in bundle["label_map"].items()}
+                                 if bundle.get("label_map") else None)
         print(f"[Fusion] Ready. {len(self.feature_names)} features"
-              + (f", tau={self.fusion_tau}" if self.fusion_tau is not None else "") + ".")
+              + (f", tau={self.fusion_tau}" if self.fusion_tau is not None else "")
+              + (" [no-reject 3-class]" if self.fusion_label_map else "") + ".")
 
         # MLP V5 feature-distillation verifier (optional). When enabled it
         # REPLACES the RGB patch verifier — it reads YOLO's internal P3/P5
@@ -377,7 +382,16 @@ class FusionEngine:
                            f"feature dict: {missing} — check extract_features()")
         X = np.array([[feats[f] for f in self.feature_names]])
         probs = self.fusion_clf.predict_proba(X)[0]
-        if self.fusion_tau is not None and len(probs) > 1:
+        if self.fusion_label_map is not None:
+            # 3-class no-reject router: model classes are 0-indexed {0,1,2}. Map argmax back to the
+            # trust label {1,2,3} and expose a 4-vector indexed BY trust label (reject=0 gets prob 0),
+            # so callers that do probs[trust] stay correct. This router never rejects.
+            probs4 = np.zeros(4, dtype=float)
+            for col, trust in self.fusion_label_map.items():
+                probs4[trust] = float(probs[col])
+            label = int(self.fusion_label_map.get(int(np.argmax(probs)), int(np.argmax(probs))))
+            probs = probs4
+        elif self.fusion_tau is not None and len(probs) > 1:
             label = 1 if float(probs[1]) >= float(self.fusion_tau) else int(np.argmax(probs))
         else:
             label = int(self.fusion_clf.predict(X)[0])

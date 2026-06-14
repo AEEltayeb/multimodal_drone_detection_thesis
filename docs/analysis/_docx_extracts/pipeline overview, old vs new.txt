@@ -1,0 +1,198 @@
+Pipeline Ablation: OLD vs NEW
+Generated: 2026-05-02 — all numbers freshly computed from classifier/runs/ablation_old_vs_new/
+
+Component Summary
+
+1. Anti-UAV RGBT — IoU @ 0.5
+NOTE
+Source: ablation_old_vs_new/{old,new}/antiuav/metrics_scoped_iou.csv Computed from eval_six_configs{,_v3more_32feat}/antiuav/per_det.jsonl
+Summary: On Anti-UAV, the NEW pipeline improves across every config. The NEW rgb_only has 768 fewer FPs (2,538→1,770). The end-to-end classifier improves +0.40pt (0.9868→0.9908).
+
+2. Svanström — IoP @ 0.5
+NOTE
+Source: ablation_old_vs_new/{old,new}/svanstrom/metrics_scoped_iop.csv
+Summary: On confuser-heavy Svanström, the NEW pipeline improves across every config:
+rgb_only F1 +2.02pt — v3_more YOLO fires more but higher-confidence drone detections
+rgb_filter F1 +5.58pt — new filter + new YOLO combination is much stronger
+classifier F1 tied (0.9934→0.9937) — 32-feat classifier matches the old 40-feat
+classifier→filter F1 +0.97pt — the shipped pipeline config improves meaningfully
+
+3. YouTube OOD IR — Confuser Filter
+IMPORTANT
+Both OLD and NEW filters evaluated on the same 14 videos at the same stride=3 — fully comparable.
+NOTE
+Source: ablation_old_vs_new/{old,new}/youtube_ir/category_summary.csv
+NOTE
+The ir_only detection rates are identical for OLD and NEW (same IR YOLO, same videos, same stride). Only the filter behavior differs.
+Confuser suppression improvement
+Drone preservation trade-off
+WARNING
+DRONE_CLEAN regression: NEW filter suppresses 23.8% of clean drone detections (vs OLD 7.5%). The failure mode is drone-as-helicopter misclassification. However, with temporal smoothing (5-of-6 alert window), this is operationally negligible.
+TIP
+DRONE_LABELS improvement: NEW filter actually preserves MORE labeled drone detections (21.3%→13.3%). The OLD filter was over-rejecting UI overlay detections.
+
+4. YouTube OOD RGB — Confuser YOLO + Filter
+NOTE
+Source: eval_youtube_rgb/summary.json — both YOLO models ran on same frames in the same script.
+
+5. Overall Verdict
+What improved
+What regressed (and why it's acceptable)
+What stayed the same
+
+6. Plots
+Plots are in classifier/runs/ablation_old_vs_new/{old,new}/{antiuav,svanstrom}/:
+pr_curves_iou.png / pr_curves_iop.png — Precision-Recall curves
+metrics_bars_iou.png / metrics_bars_iop.png — Bar charts (P, R, F1)
+confusion_matrices_iou.png / confusion_matrices_iop.png — Per-config confusion matrices
+
+7. File Provenance
+
+
+--- TABLE 1 ---
+Component | OLD | NEW
+RGB YOLO | Yolo26n_trained/best.pt | Yolo26n_hardneg_v3_more/best.pt
+IR YOLO | finetune_v3b/best.pt | unchanged
+Patch verifier (IR) | confuser_filter4_ir_v1_backup.pt | confuser_filter4_ir.pt
+Patch verifier (RGB) | confuser_filter4_rgb_v1_backup.pt | confuser_filter4_rgb.pt
+Fusion classifier | fusion_no_fn_model.joblib (40 feat) | scene_aware_v3more_32feat/model.joblib (32 feat)
+
+
+--- TABLE 2 ---
+Parameter | Value
+Split | test (official Anti-UAV-RGBT test set)
+Stride | 1 (every frame)
+Frames | 85,374 truly paired RGB-IR frames
+Matching | IoU ≥ 0.5
+
+
+--- TABLE 3 ---
+Config |  | TP | FP | FN | TN | Precision | Recall | F1 | Δ F1
+ir_only | OLD | 79,360 | 1,461 | 4,818 | 1,079 | 0.9819 | 0.9428 | 0.9619 | 
+ | NEW | 79,360 | 1,461 | 4,818 | 1,079 | 0.9819 | 0.9428 | 0.9619 | tied
+rgb_only | OLD | 78,931 | 2,538 | 768 | 5,073 | 0.9688 | 0.9904 | 0.9795 | 
+ | NEW | 78,990 | 1,770 | 709 | 5,187 | 0.9781 | 0.9911 | 0.9846 | +0.51pt ✓
+classifier | OLD | 157,931 | 3,267 | 956 | 1,331 | 0.9797 | 0.9940 | 0.9868 | 
+ | NEW | 158,314 | 2,259 | 687 | 1,361 | 0.9859 | 0.9957 | 0.9908 | +0.40pt ✓
+ir_filter | OLD | 79,158 | 1,457 | 5,020 | 1,080 | 0.9819 | 0.9404 | 0.9607 | 
+ | NEW | 79,346 | 1,461 | 4,832 | 1,079 | 0.9819 | 0.9426 | 0.9619 | +0.12pt
+rgb_filter | OLD | 78,909 | 2,537 | 790 | 5,073 | 0.9689 | 0.9901 | 0.9794 | 
+ | NEW | 78,988 | 1,770 | 711 | 5,187 | 0.9781 | 0.9911 | 0.9845 | +0.51pt ✓
+filter→classifier | OLD | 157,707 | 3,273 | 955 | 1,408 | 0.9797 | 0.9940 | 0.9868 | 
+ | NEW | 158,298 | 2,259 | 687 | 1,366 | 0.9859 | 0.9957 | 0.9908 | +0.40pt ✓
+classifier→filter | OLD | 157,707 | 3,263 | 1,180 | 1,331 | 0.9797 | 0.9926 | 0.9861 | 
+ | NEW | 158,298 | 2,259 | 703 | 1,361 | 0.9859 | 0.9956 | 0.9907 | +0.46pt ✓
+
+
+--- TABLE 4 ---
+Parameter | Value
+Split | Full dataset (all 4 categories: AIRPLANE, BIRD, DRONE, HELICOPTER)
+Stride | 1 (every frame)
+Frames | 28,710 pseudo-paired RGB-IR frames
+Matching | IoP ≥ 0.5 (intersection-over-prediction)
+Note | IoP used because Svanström's oversized GT boxes make IoU unreliable
+
+
+--- TABLE 5 ---
+Config |  | TP | FP | FN | TN | Precision | Recall | F1 | Δ F1
+ir_only | OLD | 11,156 | 622 | 329 | 16,902 | 0.9472 | 0.9714 | 0.9591 | 
+ | NEW | 11,156 | 622 | 329 | 16,902 | 0.9472 | 0.9714 | 0.9591 | tied
+rgb_only | OLD | 6,724 | 6,270 | 4,990 | 11,188 | 0.5175 | 0.5740 | 0.5443 | 
+ | NEW | 7,713 | 7,899 | 4,001 | 9,588 | 0.4940 | 0.6584 | 0.5645 | +2.02pt ✓
+classifier | OLD | 16,858 | 180 | 45 | 17,304 | 0.9894 | 0.9973 | 0.9934 | 
+ | NEW | 18,837 | 187 | 50 | 17,231 | 0.9902 | 0.9974 | 0.9937 | +0.03pt
+ir_filter | OLD | 10,814 | 570 | 671 | 16,945 | 0.9499 | 0.9416 | 0.9457 | 
+ | NEW | 10,862 | 584 | 623 | 16,934 | 0.9490 | 0.9458 | 0.9474 | +0.17pt
+rgb_filter | OLD | 6,323 | 2,334 | 5,391 | 14,929 | 0.7304 | 0.5398 | 0.6208 | 
+ | NEW | 7,566 | 3,084 | 4,148 | 14,135 | 0.7104 | 0.6459 | 0.6766 | +5.58pt ✓
+filter→classifier | OLD | 16,155 | 193 | 46 | 17,484 | 0.9882 | 0.9972 | 0.9927 | 
+ | NEW | 18,376 | 179 | 49 | 17,366 | 0.9904 | 0.9973 | 0.9938 | +0.11pt ✓
+classifier→filter | OLD | 16,162 | 169 | 741 | 17,304 | 0.9897 | 0.9562 | 0.9726 | 
+ | NEW | 18,399 | 176 | 488 | 17,232 | 0.9905 | 0.9742 | 0.9823 | +0.97pt ✓
+
+
+--- TABLE 6 ---
+Parameter | Value
+Split | OOD (out-of-distribution YouTube thermal videos, not in training set)
+Stride | 3 (every 3rd frame)
+Videos | 14 total: 7 AIRPLANE, 2 BIRD, 1 HELICOPTER, 4 DRONE
+Confuser frames | 4,998 (any detection = false positive)
+Drone frames | 828 clean + 6,016 with UI overlays
+Note | Same IR YOLO for both OLD and NEW — only the patch verifier differs
+
+
+--- TABLE 7 ---
+Group | Frames | OLD ir% | OLD filt% | OLD Suppress | NEW ir% | NEW filt% | NEW Suppress | Δ Suppress
+ALL CONFUSERS | 4,998 | 9.8% | 4.6% | 53.0% | 9.8% | 2.4% | 75.2% | +22.2pt ✓
+AIRPLANE | 4,000 | 7.3% | 4.5% | 39.1% | 7.3% | 2.8% | 61.6% | +22.5pt ✓
+BIRD | 576 | 5.9% | 3.6% | 38.2% | 5.9% | 1.6% | 73.5% | +35.3pt ✓
+HELICOPTER | 422 | 38.6% | 7.3% | 81.0% | 38.6% | 0.0% | 100.0% | +19.0pt ✓
+DRONE_CLEAN | 828 | 90.5% | 83.7% | 7.5% | 90.5% | 69.0% | 23.8% | +16.3pt ⚠
+DRONE_LABELS | 6,016 | 35.6% | 28.0% | 21.3% | 35.6% | 30.8% | 13.3% | −8.0pt ✓
+
+
+--- TABLE 8 ---
+Group | OLD | NEW | Δ
+ALL CONFUSERS | 53.0% | 75.2% | +22.2pt ✓
+AIRPLANE | 39.1% | 61.6% | +22.5pt ✓
+BIRD | 38.2% | 73.5% | +35.3pt ✓
+HELICOPTER | 81.0% | 100.0% | +19.0pt ✓
+
+
+--- TABLE 9 ---
+Group | OLD Suppress | NEW Suppress | Δ
+DRONE_CLEAN | 7.5% | 23.8% | +16.3pt ⚠
+DRONE_LABELS | 21.3% | 13.3% | −8.0pt ✓
+
+
+--- TABLE 10 ---
+Parameter | Value
+Split | OOD (confuser-only YouTube RGB videos, not in training set)
+Stride | 3 (every 3rd frame)
+Videos | Confuser-only: AIRPLANE, BIRD, HELICOPTER
+Frames | 4,265 total
+Note | Any detection = false positive → lower det rate = better
+
+
+--- TABLE 11 ---
+Category | Frames | OLD RGB YOLO | NEW v3_more YOLO | NEW YOLO + filter | Total Δ vs OLD
+ALL | 4,265 | 56.5% | 30.3% | 12.9% | −43.5pt ✓
+AIRPLANE | 2,928 | 49.1% | 27.1% | 9.8% | −39.3pt ✓
+BIRD | 1,268 | 77.8% | 39.3% | 20.8% | −56.9pt ✓
+HELICOPTER | 69 | 13.7% | 1.4% | 1.4% | −12.3pt ✓
+
+
+--- TABLE 12 ---
+Metric | OLD | NEW | Δ | Source
+Anti-UAV classifier F1 (IoU) | 0.9868 | 0.9908 | +0.40pt | Better RGB YOLO + 32-feat classifier
+Anti-UAV rgb_only F1 (IoU) | 0.9795 | 0.9846 | +0.51pt | v3_more YOLO fewer FPs
+Svanström rgb_filter F1 (IoP) | 0.6208 | 0.6766 | +5.58pt | New YOLO + new filter
+Svanström classifier→filter F1 (IoP) | 0.9726 | 0.9823 | +0.97pt | Better end-to-end pipeline
+YouTube IR confuser suppression | 53.0% | 75.2% | +22.2pt | Retrained patch verifier
+YouTube IR helicopter suppression | 81.0% | 100.0% | +19.0pt | Perfect helicopter rejection
+YouTube RGB confuser any-det rate | 56.5% | 12.9% | −43.5pt | v3_more YOLO + new filter stacked
+
+
+--- TABLE 13 ---
+Metric | OLD | NEW | Δ | Why acceptable
+YouTube DRONE_CLEAN suppression | 7.5% | 23.8% | +16.3pt | Temporal smoothing reduces to ~4 events operationally
+
+
+--- TABLE 14 ---
+Metric | OLD | NEW
+Svanström classifier F1 (IoP) | 0.9934 | 0.9937 (+0.03pt)
+IR YOLO (all metrics) | unchanged | unchanged
+
+
+--- TABLE 15 ---
+Data | File Path
+OLD Anti-UAV | ablation_old_vs_new/old/antiuav/metrics_scoped_{iou,iop}.csv
+OLD Svanström | ablation_old_vs_new/old/svanstrom/metrics_scoped_{iou,iop}.csv
+OLD YouTube IR | ablation_old_vs_new/old/youtube_ir/{category_summary,youtube_per_video}.csv
+NEW Anti-UAV | ablation_old_vs_new/new/antiuav/metrics_scoped_{iou,iop}.csv
+NEW Svanström | ablation_old_vs_new/new/svanstrom/metrics_scoped_{iou,iop}.csv
+NEW YouTube IR | ablation_old_vs_new/new/youtube_ir/{category_summary,youtube_per_video}.csv
+YouTube RGB | eval_youtube_rgb/summary.json (stride=3, same frames for both YOLO models)
+Source caches | eval_six_configs{,_v3more_32feat}/{antiuav,svanstrom}/per_det.jsonl
+Ablation script | classifier/run_ablation.py
+Plot script | classifier/gen_ablation_plots.py

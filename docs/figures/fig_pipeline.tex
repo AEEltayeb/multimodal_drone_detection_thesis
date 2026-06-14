@@ -13,14 +13,14 @@
       \node[io]  (ir)   at (0,-1.0)  {IR stream};
       \node[det] (ry)   at (2.8,1.0) {RGB YOLO};
       \node[det] (iy)   at (2.8,-1.0){IR YOLO};
-      \node[ver] (ver)  at (5.9,0)   {\texttt{mlp\_v5} verifier\\(\textbf{per-frame};\\ROI-feature reuse)};
-      \node[box] (clf)  at (9.3,0)   {XGBoost trust\\classifier\\(4-way, \texttt{robust8})};
+      \node[box] (clf)  at (5.9,0)   {XGBoost trust\\classifier\\(4-way, \texttt{robust8})};
+      \node[ver] (ver)  at (9.3,0)   {confuser filter\\(MLP; \textbf{per-frame};\\ROI-feature reuse)};
       \node[box] (temp) at (12.6,0)  {Temporal\\smoother\\($N$-of-$M$)};
       \node[box, fill=red!10] (alert) at (15.6,0) {ALERT};
-      \node[old] (patch) at (5.9,-2.5) {patch verifier\\(predecessor; alert-gated)};
+      \node[old] (patch) at (9.3,-2.5) {patch filter\\(predecessor; alert-gated)};
       \draw[->] (rgb)--(ry);   \draw[->] (ir)--(iy);
-      \draw[->] (ry)--(ver);   \draw[->] (iy)--(ver);
-      \draw[->] (ver)--(clf);  \draw[->] (clf)--(temp); \draw[->] (temp)--(alert);
+      \draw[->] (ry)--(clf);   \draw[->] (iy)--(clf);
+      \draw[->] (clf)--(ver);  \draw[->] (ver)--(temp); \draw[->] (temp)--(alert);
       \draw[->, dashed, gray] (patch) -- node[right, font=\scriptsize, text=gray]{superseded} (ver);
       \draw[->, dashed, gray] (rgb.south) -- ($(rgb.south)+(0,-0.6)$) -| (iy.north)
             node[midway, below, font=\scriptsize, text=gray]{grayscale fallback (no IR sensor)};

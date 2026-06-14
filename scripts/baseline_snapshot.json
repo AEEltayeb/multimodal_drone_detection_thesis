@@ -1,0 +1,116 @@
+{
+  "model": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\RGB model\\Yolo26n_selcom_mixed_ft3_1280\\weights\\best.pt",
+  "imgsz": 1280,
+  "conf": 0.25,
+  "timestamp": "2026-05-25T16:20:36",
+  "surfaces": {
+    "selcom_val": {
+      "n_images": 311,
+      "tp": 144,
+      "fp": 26,
+      "fn": 151,
+      "precision": 0.8471,
+      "recall": 0.4881,
+      "f1": 0.6194,
+      "total_dets": 170,
+      "frames_with_det": 156,
+      "halluc_rate": 0.5016,
+      "elapsed_s": 72.5
+    },
+    "dataset_rgb_test": {
+      "n_images": 507,
+      "tp": 401,
+      "fp": 40,
+      "fn": 30,
+      "precision": 0.9093,
+      "recall": 0.9304,
+      "f1": 0.9197,
+      "total_dets": 441,
+      "frames_with_det": 376,
+      "halluc_rate": 0.7416,
+      "elapsed_s": 85.0
+    },
+    "confuser_test": {
+      "n_images": 2633,
+      "tp": 0,
+      "fp": 2027,
+      "fn": 0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "total_dets": 2027,
+      "frames_with_det": 1606,
+      "halluc_rate": 0.61,
+      "elapsed_s": 391.1,
+      "by_category": {
+        "AIRPLANE": {
+          "n": 99,
+          "halluc_rate": 0.5657,
+          "total_dets": 94,
+          "fp_frames": 56
+        },
+        "OTHER": {
+          "n": 2534,
+          "halluc_rate": 0.6117,
+          "total_dets": 1933,
+          "fp_frames": 1550
+        }
+      }
+    },
+    "svanstrom": {
+      "n_images": 3190,
+      "tp": 1207,
+      "fp": 1754,
+      "fn": 95,
+      "precision": 0.4076,
+      "recall": 0.927,
+      "f1": 0.5663,
+      "total_dets": 2961,
+      "frames_with_det": 2694,
+      "halluc_rate": 0.8445,
+      "elapsed_s": 444.4,
+      "by_category": {
+        "AIRPLANE": {
+          "n": 677,
+          "halluc_rate": 0.7666,
+          "total_dets": 546,
+          "fp_frames": 519
+        },
+        "BIRD": {
+          "n": 589,
+          "halluc_rate": 0.7334,
+          "total_dets": 568,
+          "fp_frames": 432
+        },
+        "DRONE": {
+          "n": 1299,
+          "tp": 1207,
+          "fp": 50,
+          "fn": 95,
+          "precision": 0.9602,
+          "recall": 0.927,
+          "f1": 0.9433
+        },
+        "HELICOPTER": {
+          "n": 625,
+          "halluc_rate": 0.8624,
+          "total_dets": 590,
+          "fp_frames": 539
+        }
+      }
+    },
+    "antiuav": {
+      "n_images": 17075,
+      "tp": 15631,
+      "fp": 1573,
+      "fn": 313,
+      "precision": 0.9086,
+      "recall": 0.9804,
+      "f1": 0.9431,
+      "total_dets": 17204,
+      "frames_with_det": 15749,
+      "halluc_rate": 0.9223,
+      "elapsed_s": 2859.3
+    }
+  }
+}

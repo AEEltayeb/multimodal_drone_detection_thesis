@@ -84,7 +84,10 @@ def prf(alert, pos):
 
 
 def main():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default=str(OUT_DIR), help="output dir (default canonical results/)")
+    out_dir = Path(ap.parse_args().out); out_dir.mkdir(parents=True, exist_ok=True)
     clfs, verifs = load_classifiers(), load_verifiers()
     results = {}
     L = ["# Temporal / segment-level replay — real-video clips, production stack",
@@ -124,9 +127,9 @@ def main():
         results[name] = res
         print(f"  [{name}] n={meta['n']} clips={n_clips}")
 
-    (OUT_DIR / "temporal_segment_results.md").write_text("\n".join(L), encoding="utf-8")
-    json.dump(results, open(OUT_DIR / "temporal_results.json", "w"), indent=2, default=float)
-    print(f"\nDONE -> {OUT_DIR/'temporal_segment_results.md'}  +  temporal_results.json")
+    (out_dir / "temporal_segment_results.md").write_text("\n".join(L), encoding="utf-8")
+    json.dump(results, open(out_dir / "temporal_results.json", "w"), indent=2, default=float)
+    print(f"\nDONE -> {out_dir/'temporal_segment_results.md'}  +  temporal_results.json")
 
 
 if __name__ == "__main__":

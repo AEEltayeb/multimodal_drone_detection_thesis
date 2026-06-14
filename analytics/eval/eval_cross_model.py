@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 
 # ── Configure models and datasets here ──
-PROJ = Path(r"C:\Users\User\Desktop\UNISA projects\Drone detection\es proj 3 thesis workspace\ES_Drone_Detection")
+PROJ = Path(__file__).resolve().parents[2]   # ES_Drone_Thesis/ (resident; was ES_Drone_Detection). Older IR-lineage models may not all be resident.
 
 MODELS = {
     "dsetV4": PROJ / "models" / "IR_dsetV4_300ep" / "best.pt",

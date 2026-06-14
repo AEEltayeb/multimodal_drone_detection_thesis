@@ -1,0 +1,67 @@
+{
+  "tag": "fusion_lean13",
+  "n_features": 13,
+  "features": [
+    "rgb_max_conf",
+    "ir_max_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_log_bbox_area",
+    "rgb_best_aspect_ratio",
+    "ir_best_aspect_ratio",
+    "rgb_best_pos_y",
+    "ir_best_pos_y",
+    "rgb_best_local_contrast",
+    "ir_best_local_contrast",
+    "rgb_img_mean",
+    "ir_img_mean",
+    "rgb_img_std"
+  ],
+  "n_train": 41607,
+  "n_test": 17715,
+  "accuracy": 0.9685012701100763,
+  "f1_macro": 0.9093466556566964,
+  "f1_weighted": 0.9666217897180421,
+  "per_dataset": {
+    "antiuav": {
+      "n": 14088,
+      "acc": 0.9789892106757524,
+      "f1_macro": 0.8897363498449505
+    },
+    "svanstrom": {
+      "n": 3343,
+      "acc": 0.9832485791205504,
+      "f1_macro": 0.7377269519511139
+    },
+    "video_drone_drone_and_bird_sky_and_trees_short": {
+      "n": 114,
+      "acc": 0.37719298245614036,
+      "f1_macro": 0.24348725208532843
+    },
+    "video_drone_two_birds_drone": {
+      "n": 150,
+      "acc": 0.12666666666666668,
+      "f1_macro": 0.09832997408580478
+    },
+    "video_helicopters_helicopter_overhead_short": {
+      "n": 20,
+      "acc": 0.8,
+      "f1_macro": 0.2962962962962963
+    }
+  },
+  "feature_importance": {
+    "rgb_max_conf": 0.07525379210710526,
+    "ir_max_conf": 0.15886548161506653,
+    "rgb_best_log_bbox_area": 0.061206791549921036,
+    "ir_best_log_bbox_area": 0.21205253899097443,
+    "rgb_best_aspect_ratio": 0.06716936081647873,
+    "ir_best_aspect_ratio": 0.21840757131576538,
+    "rgb_best_pos_y": 0.04088742658495903,
+    "ir_best_pos_y": 0.0627409815788269,
+    "rgb_best_local_contrast": 0.01746378466486931,
+    "ir_best_local_contrast": 0.013170242309570312,
+    "rgb_img_mean": 0.021263154223561287,
+    "ir_img_mean": 0.02447626367211342,
+    "rgb_img_std": 0.027042657136917114
+  },
+  "detection_only": false
+}

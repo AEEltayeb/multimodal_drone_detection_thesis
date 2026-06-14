@@ -1,0 +1,336 @@
+{
+  "rgb": {
+    "old_acc": 0.9835064141722664,
+    "new_acc": 0.9780085522296884,
+    "old_per_class": {
+      "airplane": {
+        "n": 322,
+        "TP": 320,
+        "FP": 29,
+        "FN": 2,
+        "P": 0.9169,
+        "R": 0.9938
+      },
+      "helicopter": {
+        "n": 256,
+        "TP": 255,
+        "FP": 7,
+        "FN": 1,
+        "P": 0.9733,
+        "R": 0.9961
+      },
+      "bird": {
+        "n": 130,
+        "TP": 110,
+        "FP": 12,
+        "FN": 20,
+        "P": 0.9016,
+        "R": 0.8462
+      },
+      "other": {
+        "n": 2566,
+        "TP": 2535,
+        "FP": 6,
+        "FN": 31,
+        "P": 0.9976,
+        "R": 0.9879
+      }
+    },
+    "new_per_class": {
+      "airplane": {
+        "n": 322,
+        "TP": 308,
+        "FP": 27,
+        "FN": 14,
+        "P": 0.9194,
+        "R": 0.9565
+      },
+      "helicopter": {
+        "n": 256,
+        "TP": 255,
+        "FP": 3,
+        "FN": 1,
+        "P": 0.9884,
+        "R": 0.9961
+      },
+      "bird": {
+        "n": 130,
+        "TP": 109,
+        "FP": 31,
+        "FN": 21,
+        "P": 0.7786,
+        "R": 0.8385
+      },
+      "other": {
+        "n": 2566,
+        "TP": 2530,
+        "FP": 11,
+        "FN": 36,
+        "P": 0.9957,
+        "R": 0.986
+      }
+    },
+    "old_reject_sweep": {
+      "thr=0.5": {
+        "TP": 700,
+        "FP": 29,
+        "FN": 8,
+        "TN": 2537,
+        "precision_veto": 0.9602,
+        "recall_veto": 0.9887,
+        "pass_acc_on_drones": 0.9887
+      },
+      "thr=0.6": {
+        "TP": 699,
+        "FP": 23,
+        "FN": 9,
+        "TN": 2543,
+        "precision_veto": 0.9681,
+        "recall_veto": 0.9873,
+        "pass_acc_on_drones": 0.991
+      },
+      "thr=0.7": {
+        "TP": 698,
+        "FP": 17,
+        "FN": 10,
+        "TN": 2549,
+        "precision_veto": 0.9762,
+        "recall_veto": 0.9859,
+        "pass_acc_on_drones": 0.9934
+      },
+      "thr=0.8": {
+        "TP": 690,
+        "FP": 14,
+        "FN": 18,
+        "TN": 2552,
+        "precision_veto": 0.9801,
+        "recall_veto": 0.9746,
+        "pass_acc_on_drones": 0.9945
+      },
+      "thr=0.9": {
+        "TP": 670,
+        "FP": 9,
+        "FN": 38,
+        "TN": 2557,
+        "precision_veto": 0.9867,
+        "recall_veto": 0.9463,
+        "pass_acc_on_drones": 0.9965
+      }
+    },
+    "new_reject_sweep": {
+      "thr=0.5": {
+        "TP": 696,
+        "FP": 35,
+        "FN": 12,
+        "TN": 2531,
+        "precision_veto": 0.9521,
+        "recall_veto": 0.9831,
+        "pass_acc_on_drones": 0.9864
+      },
+      "thr=0.6": {
+        "TP": 692,
+        "FP": 32,
+        "FN": 16,
+        "TN": 2534,
+        "precision_veto": 0.9558,
+        "recall_veto": 0.9774,
+        "pass_acc_on_drones": 0.9875
+      },
+      "thr=0.7": {
+        "TP": 679,
+        "FP": 28,
+        "FN": 29,
+        "TN": 2538,
+        "precision_veto": 0.9604,
+        "recall_veto": 0.959,
+        "pass_acc_on_drones": 0.9891
+      },
+      "thr=0.8": {
+        "TP": 670,
+        "FP": 26,
+        "FN": 38,
+        "TN": 2540,
+        "precision_veto": 0.9626,
+        "recall_veto": 0.9463,
+        "pass_acc_on_drones": 0.9899
+      },
+      "thr=0.9": {
+        "TP": 649,
+        "FP": 21,
+        "FN": 59,
+        "TN": 2545,
+        "precision_veto": 0.9687,
+        "recall_veto": 0.9167,
+        "pass_acc_on_drones": 0.9918
+      }
+    },
+    "n_val": 3274
+  },
+  "ir": {
+    "old_acc": 0.9448844884488449,
+    "new_acc": 0.9379537953795379,
+    "old_per_class": {
+      "airplane": {
+        "n": 368,
+        "TP": 283,
+        "FP": 32,
+        "FN": 85,
+        "P": 0.8984,
+        "R": 0.769
+      },
+      "helicopter": {
+        "n": 232,
+        "TP": 231,
+        "FP": 27,
+        "FN": 1,
+        "P": 0.8953,
+        "R": 0.9957
+      },
+      "bird": {
+        "n": 231,
+        "TP": 169,
+        "FP": 22,
+        "FN": 62,
+        "P": 0.8848,
+        "R": 0.7316
+      },
+      "other": {
+        "n": 2199,
+        "TP": 2180,
+        "FP": 86,
+        "FN": 19,
+        "P": 0.962,
+        "R": 0.9914
+      }
+    },
+    "new_per_class": {
+      "airplane": {
+        "n": 368,
+        "TP": 260,
+        "FP": 34,
+        "FN": 108,
+        "P": 0.8844,
+        "R": 0.7065
+      },
+      "helicopter": {
+        "n": 232,
+        "TP": 229,
+        "FP": 29,
+        "FN": 3,
+        "P": 0.8876,
+        "R": 0.9871
+      },
+      "bird": {
+        "n": 231,
+        "TP": 177,
+        "FP": 38,
+        "FN": 54,
+        "P": 0.8233,
+        "R": 0.7662
+      },
+      "other": {
+        "n": 2199,
+        "TP": 2176,
+        "FP": 87,
+        "FN": 23,
+        "P": 0.9616,
+        "R": 0.9895
+      }
+    },
+    "old_reject_sweep": {
+      "thr=0.5": {
+        "TP": 738,
+        "FP": 18,
+        "FN": 93,
+        "TN": 2181,
+        "precision_veto": 0.9762,
+        "recall_veto": 0.8881,
+        "pass_acc_on_drones": 0.9918
+      },
+      "thr=0.6": {
+        "TP": 719,
+        "FP": 12,
+        "FN": 112,
+        "TN": 2187,
+        "precision_veto": 0.9836,
+        "recall_veto": 0.8652,
+        "pass_acc_on_drones": 0.9945
+      },
+      "thr=0.7": {
+        "TP": 707,
+        "FP": 9,
+        "FN": 124,
+        "TN": 2190,
+        "precision_veto": 0.9874,
+        "recall_veto": 0.8508,
+        "pass_acc_on_drones": 0.9959
+      },
+      "thr=0.8": {
+        "TP": 687,
+        "FP": 8,
+        "FN": 144,
+        "TN": 2191,
+        "precision_veto": 0.9885,
+        "recall_veto": 0.8267,
+        "pass_acc_on_drones": 0.9964
+      },
+      "thr=0.9": {
+        "TP": 665,
+        "FP": 5,
+        "FN": 166,
+        "TN": 2194,
+        "precision_veto": 0.9925,
+        "recall_veto": 0.8002,
+        "pass_acc_on_drones": 0.9977
+      }
+    },
+    "new_reject_sweep": {
+      "thr=0.5": {
+        "TP": 742,
+        "FP": 22,
+        "FN": 89,
+        "TN": 2177,
+        "precision_veto": 0.9712,
+        "recall_veto": 0.8929,
+        "pass_acc_on_drones": 0.99
+      },
+      "thr=0.6": {
+        "TP": 721,
+        "FP": 18,
+        "FN": 110,
+        "TN": 2181,
+        "precision_veto": 0.9756,
+        "recall_veto": 0.8676,
+        "pass_acc_on_drones": 0.9918
+      },
+      "thr=0.7": {
+        "TP": 704,
+        "FP": 15,
+        "FN": 127,
+        "TN": 2184,
+        "precision_veto": 0.9791,
+        "recall_veto": 0.8472,
+        "pass_acc_on_drones": 0.9932
+      },
+      "thr=0.8": {
+        "TP": 688,
+        "FP": 10,
+        "FN": 143,
+        "TN": 2189,
+        "precision_veto": 0.9857,
+        "recall_veto": 0.8279,
+        "pass_acc_on_drones": 0.9955
+      },
+      "thr=0.9": {
+        "TP": 658,
+        "FP": 6,
+        "FN": 173,
+        "TN": 2193,
+        "precision_veto": 0.991,
+        "recall_veto": 0.7918,
+        "pass_acc_on_drones": 0.9973
+      }
+    },
+    "n_val": 3030
+  }
+}

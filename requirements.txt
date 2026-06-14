@@ -1,21 +1,35 @@
-# Drone Detection System - Requirements
-# Note: PyTorch is installed separately by setup.py (CUDA or CPU version)
+# ES Drone Detection — Python requirements
+# ---------------------------------------------------------------------------
+# PyTorch is installed SEPARATELY (CUDA or CPU build). Pick ONE first, then
+# run  pip install -r requirements.txt
+#
+#   GPU (CUDA 12.1):  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+#   CPU only:         pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# ---------------------------------------------------------------------------
 
-# YOLO object detection
+# --- Core: detectors + trust router + verifiers (GUI + eval replay) ---
 ultralytics
-
-# Video processing
 opencv-python
+numpy
+pandas
+scikit-learn
+xgboost
+joblib
 
-# Backend API
-fastapi>=0.100.0
-# uvicorn[standard]>=0.23.0
-# websockets>=11.0
-pydantic>=2.0.0
+# --- Operator GUI (PySide "TALOS") ---
+PySide6
+flet            # flet_app/settings_dialog.py is imported by the PySide app
 
-# YouTube support
-# yt-dlp>=2023.0.0
+# --- Figures / Model MRI / statistics ---
+matplotlib
+scipy
+seaborn
+Pillow
 
-# Utilities
-# numpy>=1.24.0
-# requests>=2.31.0
+# --- Web API + dataset-prep helpers (optional; gui/api.py + scripts/) ---
+fastapi
+pydantic
+uvicorn
+requests
+yt-dlp
+tqdm

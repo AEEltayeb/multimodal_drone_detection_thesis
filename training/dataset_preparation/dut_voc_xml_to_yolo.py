@@ -65,36 +65,50 @@ def voc_to_yolo(xml_path: Path) -> tuple[str, int, int, list[tuple[int, float, f
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="DUT Anti-UAV VOC XML -> YOLO labels (class 0 = drone).")
+    ap.add_argument("--xml-dir", default=str(IN_XML_DIR), help="dir of VOC .xml files")
+    ap.add_argument("--img-dir", default=str(IN_IMG_DIR), help="dir of source images (for stem matching / optional copy)")
+    ap.add_argument("--out-lbl-dir", default=str(OUT_LBL_DIR), help="dir to write YOLO .txt labels")
+    ap.add_argument("--out-img-dir", default=str(OUT_IMG_DIR), help="dir to copy images into (only if --copy-images)")
+    ap.add_argument("--labels-only", action="store_true",
+                    help="write labels only; do NOT copy images (use when images are already in place)")
     args = ap.parse_args()
 
-    ensure_dir(OUT_IMG_DIR)
-    ensure_dir(OUT_LBL_DIR)
+    in_xml = Path(args.xml_dir); in_img = Path(args.img_dir)
+    out_lbl = Path(args.out_lbl_dir); out_img = Path(args.out_img_dir)
+    ensure_dir(out_lbl)
+    if not args.labels_only:
+        ensure_dir(out_img)
 
-    xml_files = sorted(IN_XML_DIR.glob("*.xml"))
+    xml_files = sorted(in_xml.glob("*.xml"))
+    n_lbl = n_box = n_empty = 0
     for xml_path in tqdm(xml_files, desc="DUT VOC->YOLO", unit="file"):
         filename, w, h, objs = voc_to_yolo(xml_path)
 
-        src_img = IN_IMG_DIR / filename
+        # resolve the matching image (by <filename>, else by stem)
+        src_img = in_img / filename
         if not src_img.exists():
-            # try stem match
-            jpg = IN_IMG_DIR / (xml_path.stem + ".jpg")
-            if jpg.exists():
-                src_img = jpg
-            else:
+            jpg = in_img / (xml_path.stem + ".jpg")
+            src_img = jpg if jpg.exists() else None
+
+        if not args.labels_only:
+            if src_img is None:
                 continue
+            shutil.copy2(src_img, out_img / src_img.name)
 
-        dst_img = OUT_IMG_DIR / src_img.name
-        shutil.copy2(src_img, dst_img)
-
-        dst_lbl = OUT_LBL_DIR / (src_img.stem + ".txt")
+        # label stem follows the image stem when known, else the xml stem
+        stem = (src_img.stem if src_img is not None else xml_path.stem)
+        dst_lbl = out_lbl / (stem + ".txt")
         if objs:
             lines = [f"{cls} {cx:.6f} {cy:.6f} {nw:.6f} {nh:.6f}" for cls, cx, cy, nw, nh in objs]
             dst_lbl.write_text("\n".join(lines), encoding="utf-8")
+            n_box += len(objs)
         else:
             dst_lbl.write_text("", encoding="utf-8")
+            n_empty += 1
+        n_lbl += 1
 
-    print(f"\nDONE. Output: {OUT_ROOT}")
+    print(f"\nDONE. {n_lbl} labels ({n_box} boxes, {n_empty} empty) -> {out_lbl}")
 
 
 if __name__ == "__main__":

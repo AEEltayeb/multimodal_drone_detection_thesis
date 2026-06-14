@@ -1,0 +1,425 @@
+{
+  "best_val_auc": 0.9991452251003494,
+  "final": {
+    "auc": 0.9991452251003494,
+    "acc": 0.9817987152034261,
+    "cm": [
+      [
+        677,
+        2
+      ],
+      [
+        15,
+        240
+      ]
+    ],
+    "per_cat": {
+      "airplane": {
+        "n": 342,
+        "mean_drone_prob": 0.005984564311802387,
+        "frac_as_drone": 0.0
+      },
+      "bird": {
+        "n": 126,
+        "mean_drone_prob": 0.03164079785346985,
+        "frac_as_drone": 0.015873015873015872
+      },
+      "drone": {
+        "n": 255,
+        "mean_drone_prob": 0.9236453175544739,
+        "frac_as_drone": 0.9411764705882353
+      },
+      "helicopter": {
+        "n": 211,
+        "mean_drone_prob": 0.0008402200764976442,
+        "frac_as_drone": 0.0
+      }
+    }
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.3469324126068888,
+      "auc": 0.974015998151838,
+      "acc": 0.9036402569593148,
+      "cm": [
+        [
+          659,
+          20
+        ],
+        [
+          70,
+          185
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.12932904064655304,
+          "frac_as_drone": 0.0029239766081871343
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.16461242735385895,
+          "frac_as_drone": 0.0
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.6108354926109314,
+          "frac_as_drone": 0.7254901960784313
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.17705662548542023,
+          "frac_as_drone": 0.09004739336492891
+        }
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.14897886201225477,
+      "auc": 0.9786537295330503,
+      "acc": 0.9164882226980728,
+      "cm": [
+        [
+          675,
+          4
+        ],
+        [
+          74,
+          181
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.022571343928575516,
+          "frac_as_drone": 0.0029239766081871343
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.09752646088600159,
+          "frac_as_drone": 0.023809523809523808
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.6244973540306091,
+          "frac_as_drone": 0.7098039215686275
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.026526018977165222,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.11464288650915541,
+      "auc": 0.9845158682029513,
+      "acc": 0.9282655246252677,
+      "cm": [
+        [
+          675,
+          4
+        ],
+        [
+          63,
+          192
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.016942156478762627,
+          "frac_as_drone": 0.008771929824561403
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.021736718714237213,
+          "frac_as_drone": 0.007936507936507936
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.7090520858764648,
+          "frac_as_drone": 0.7529411764705882
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.0030479016713798046,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.09833042525911126,
+      "auc": 0.9895521095035953,
+      "acc": 0.9132762312633833,
+      "cm": [
+        [
+          679,
+          0
+        ],
+        [
+          81,
+          174
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.006097028031945229,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.03022042289376259,
+          "frac_as_drone": 0.0
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.634838879108429,
+          "frac_as_drone": 0.6823529411764706
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.008227971382439137,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0762671604270822,
+      "auc": 0.9941436368361778,
+      "acc": 0.8897216274089935,
+      "cm": [
+        [
+          679,
+          0
+        ],
+        [
+          103,
+          152
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.006094001233577728,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.006652622018009424,
+          "frac_as_drone": 0.0
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.5902658700942993,
+          "frac_as_drone": 0.596078431372549
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.0034669581800699234,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.05335417445267326,
+      "auc": 0.9955124317768345,
+      "acc": 0.9561027837259101,
+      "cm": [
+        [
+          679,
+          0
+        ],
+        [
+          41,
+          214
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.005413816776126623,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.024481777101755142,
+          "frac_as_drone": 0.0
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.8148254156112671,
+          "frac_as_drone": 0.8392156862745098
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.0010918002808466554,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.05180499746849568,
+      "auc": 0.9979208178116608,
+      "acc": 0.9732334047109208,
+      "cm": [
+        [
+          678,
+          1
+        ],
+        [
+          24,
+          231
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.0038826761301606894,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.03006095625460148,
+          "frac_as_drone": 0.007936507936507936
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.8697165250778198,
+          "frac_as_drone": 0.9058823529411765
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.0011978022521361709,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.03745934848095579,
+      "auc": 0.9988795518207283,
+      "acc": 0.9700214132762313,
+      "cm": [
+        [
+          678,
+          1
+        ],
+        [
+          27,
+          228
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.003912642132490873,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.024471282958984375,
+          "frac_as_drone": 0.007936507936507936
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.8681745529174805,
+          "frac_as_drone": 0.8941176470588236
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.001474967459216714,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.043743982750537064,
+      "auc": 0.999133674088192,
+      "acc": 0.9785867237687366,
+      "cm": [
+        [
+          678,
+          1
+        ],
+        [
+          19,
+          236
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.004705134779214859,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.02462494932115078,
+          "frac_as_drone": 0.007936507936507936
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.8998150825500488,
+          "frac_as_drone": 0.9254901960784314
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.001230685506016016,
+          "frac_as_drone": 0.0
+        }
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.04658975184830869,
+      "auc": 0.9991452251003494,
+      "acc": 0.9817987152034261,
+      "cm": [
+        [
+          677,
+          2
+        ],
+        [
+          15,
+          240
+        ]
+      ],
+      "per_cat": {
+        "airplane": {
+          "n": 342,
+          "mean_drone_prob": 0.005984564311802387,
+          "frac_as_drone": 0.0
+        },
+        "bird": {
+          "n": 126,
+          "mean_drone_prob": 0.03164079785346985,
+          "frac_as_drone": 0.015873015873015872
+        },
+        "drone": {
+          "n": 255,
+          "mean_drone_prob": 0.9236453175544739,
+          "frac_as_drone": 0.9411764705882353
+        },
+        "helicopter": {
+          "n": 211,
+          "mean_drone_prob": 0.0008402200764976442,
+          "frac_as_drone": 0.0
+        }
+      }
+    }
+  ],
+  "n_train": 3755,
+  "n_val": 934,
+  "train_videos": 177,
+  "val_videos": 44
+}

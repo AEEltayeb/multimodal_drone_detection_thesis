@@ -1,0 +1,121 @@
+{
+  "steps": [
+    {
+      "feature": "robust6",
+      "n": 6,
+      "overall": 0.8609318705595638,
+      "thermal": 0.8810111805125348,
+      "grayscale": 0.36117711117711115,
+      "gray_trust_rgb_R": 0.08333333333333333,
+      "leakage": null
+    },
+    {
+      "feature": "rgb_blurriness",
+      "n": 7,
+      "overall": 0.9211604917858083,
+      "thermal": 0.9350115686028567,
+      "grayscale": 0.508158508158508,
+      "gray_trust_rgb_R": 0.4375,
+      "leakage": 0.0584516513760905
+    },
+    {
+      "feature": "xmodal_centroid_dist",
+      "n": 8,
+      "overall": 0.9275633635809921,
+      "thermal": 0.9408784317286156,
+      "grayscale": 0.5247287195563057,
+      "gray_trust_rgb_R": 0.5,
+      "leakage": 0.5712319953184386
+    },
+    {
+      "feature": "ir_img_std",
+      "n": 9,
+      "overall": 0.9344908154653666,
+      "thermal": 0.9493139924237639,
+      "grayscale": 0.5141397953897954,
+      "gray_trust_rgb_R": 0.5,
+      "leakage": 0.1112712720500787
+    },
+    {
+      "feature": "xmodal_scale_ratio",
+      "n": 10,
+      "overall": 0.9371497572973357,
+      "thermal": 0.9499743916975367,
+      "grayscale": 0.5369082875523408,
+      "gray_trust_rgb_R": 0.5208333333333334,
+      "leakage": 0.0015106676372142
+    },
+    {
+      "feature": "conf_product",
+      "n": 11,
+      "overall": 0.9358643936171511,
+      "thermal": 0.9491882283861534,
+      "grayscale": 0.5264829998407334,
+      "gray_trust_rgb_R": 0.5,
+      "leakage": 0.0030459575249624
+    },
+    {
+      "feature": "xmodal_conf_ratio",
+      "n": 12,
+      "overall": 0.936656327740479,
+      "thermal": 0.9493386176244151,
+      "grayscale": 0.5394919545862942,
+      "gray_trust_rgb_R": 0.5,
+      "leakage": 0.0023610419816634
+    },
+    {
+      "feature": "aspect_ratio_diff",
+      "n": 13,
+      "overall": 0.93756009113237,
+      "thermal": 0.9500584267753595,
+      "grayscale": 0.5412660256410257,
+      "gray_trust_rgb_R": 0.5208333333333334,
+      "leakage": 0.0925587624731014,
+      "gray_gain_ci": [
+        0.1270593318048748,
+        0.23640222235224864
+      ]
+    },
+    {
+      "feature": "area_diff",
+      "n": 14,
+      "overall": 0.9369464022762906,
+      "thermal": 0.949299047431889,
+      "grayscale": 0.5401715201206295,
+      "gray_trust_rgb_R": 0.5,
+      "leakage": 0.1100415267179406
+    }
+  ],
+  "winner": {
+    "feature": "aspect_ratio_diff",
+    "n": 13,
+    "overall": 0.93756009113237,
+    "thermal": 0.9500584267753595,
+    "grayscale": 0.5412660256410257,
+    "gray_trust_rgb_R": 0.5208333333333334,
+    "leakage": 0.0925587624731014,
+    "gray_gain_ci": [
+      0.1270593318048748,
+      0.23640222235224864
+    ]
+  },
+  "excluded_from_pool": [
+    "rgb_img_std",
+    "rgb_n_dets",
+    "ir_n_dets",
+    "rgb_detected",
+    "ir_detected",
+    "both_detect",
+    "neither_detect",
+    "rgb_only_detect",
+    "ir_only_detect",
+    "rgb_img_dynamic_range",
+    "rgb_img_entropy",
+    "ir_img_entropy",
+    "rgb_edge_density",
+    "ir_blurriness",
+    "det_count_diff",
+    "total_dets",
+    "scene_entropy_mean"
+  ]
+}

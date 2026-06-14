@@ -1,0 +1,101 @@
+{
+  "tag": "optimal_v1",
+  "n_features": 8,
+  "features": [
+    "area_diff",
+    "rgb_blurriness",
+    "ir_best_local_contrast",
+    "ir_best_aspect_ratio",
+    "rgb_mean_conf",
+    "rgb_best_log_bbox_area",
+    "ir_best_dist_to_center",
+    "xmodal_centroid_dist"
+  ],
+  "n_train": 47346,
+  "n_test": 17846,
+  "accuracy": 0.973775635996862,
+  "f1_macro": 0.926378121206702,
+  "f1_weighted": 0.9728147876221895,
+  "per_class_auc": {
+    "reject_both": 0.9987535712006661,
+    "trust_rgb": 0.9648589330872602,
+    "trust_ir": 0.9903095630993864,
+    "trust_both": 0.9882247405284972
+  },
+  "per_dataset": {
+    "antiuav": {
+      "n": 14088,
+      "acc": 0.9800539466212379,
+      "f1_macro": 0.9149840669711352,
+      "f1_weighted": 0.9792144088317183
+    },
+    "svanstrom": {
+      "n": 3354,
+      "acc": 0.9827072152653548,
+      "f1_macro": 0.7355634207171653,
+      "f1_weighted": 0.9787908911108683
+    },
+    "video_airplanes_distant_airplane_over_head_flying_away": {
+      "n": 55,
+      "acc": 0.8545454545454545,
+      "f1_macro": 0.3071895424836601,
+      "f1_weighted": 0.9215686274509803
+    },
+    "video_drone_drone_and_bird_sky_and_trees_short": {
+      "n": 114,
+      "acc": 0.7631578947368421,
+      "f1_macro": 0.48059165797046455,
+      "f1_weighted": 0.7438587059940271
+    },
+    "video_drone_drone_seagull_attack": {
+      "n": 235,
+      "acc": 0.6,
+      "f1_macro": 0.44633934517471824,
+      "f1_weighted": 0.6219345140294985
+    }
+  },
+  "feature_importance": {
+    "xmodal_centroid_dist": 0.40236803889274597,
+    "ir_best_aspect_ratio": 0.30124911665916443,
+    "ir_best_dist_to_center": 0.08690757304430008,
+    "area_diff": 0.0610676072537899,
+    "rgb_best_log_bbox_area": 0.0511205792427063,
+    "rgb_blurriness": 0.04027050361037254,
+    "rgb_mean_conf": 0.03398749604821205,
+    "ir_best_local_contrast": 0.023029064759612083
+  },
+  "baselines": {
+    "always_ir": {
+      "accuracy": 0.13106578504987113,
+      "f1_macro": 0.24752202784674895,
+      "f1_weighted": 0.09164365521901802
+    },
+    "higher_conf": {
+      "accuracy": 0.8870335089095596,
+      "f1_macro": 0.7035719405216887,
+      "f1_weighted": 0.8852271536450503
+    }
+  },
+  "sa32_comparison": {
+    "metric": [
+      "accuracy",
+      "f1_macro",
+      "f1_weighted"
+    ],
+    "sa32 (32 feat)": [
+      "0.9792",
+      "0.9493",
+      "0.9786"
+    ],
+    "optimal (8 feat)": [
+      "0.9738",
+      "0.9264",
+      "0.9728"
+    ],
+    "delta": [
+      "-0.0054",
+      "-0.0229",
+      "-0.0058"
+    ]
+  }
+}
