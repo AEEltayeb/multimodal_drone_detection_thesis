@@ -35,7 +35,7 @@ required by this repo.)
 |---|---|---|
 | RGB detector | `models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt` | FT4; imgsz 1280 for Svanström/SelCom, 640 default |
 | IR detector | `models/ir/corrective_finetune/finetune_v3b/weights/best.pt` | v3b |
-| Trust router | `models/routers/robust8.joblib` | τ = 0.20 (sa32 / robust6 kept for comparison) |
+| Trust router | `models/routers/robust8_noreject.joblib` (**robust8-nr**) | **shipped** no-reject 3-class, argmax (no τ); per-frame filter owns FP rejection. `robust8` (τ=0.20) / `sa32` / `robust6` kept for comparison |
 | RGB verifier | `models/verifiers/rgb_v5/mlp_v5.pt` | V5 distillation MLP, per-frame, thr 0.15 |
 | IR verifier | `models/verifiers/ir_aligned/mlp_aligned.pt` (+ `mlp_aligned_gray.pt`) | thermal + grayscale scalers |
 | Patch verifier (fallback) | `models/patches/confuser_filter4_{rgb,ir}_v2_backup.pt` | 5-class MobileNetV3, fail-open, thr 0.9 |

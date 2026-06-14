@@ -13,7 +13,18 @@ Source of truth for numbers: `knowledge/{models,evals,ledger}.csv` in the workin
 
 ## PRODUCTION
 
-### `robust8.joblib` — the shipped trust router (τ=0.20)
+### `robust8_noreject.joblib` (**robust8-nr**) — the SHIPPED trust router (no-reject, 2026-06-14)
+- **What:** robust8's exact 8 features + training recipe, but the `reject` class is removed
+  (3-class: `1=trust_rgb, 2=trust_ir, 3=both`). **argmax, no τ** — the router always routes; the
+  per-frame MLP/patch filter owns all FP rejection. Stored with `label_map {0:1,1:2,2:3}`; the GUI
+  maps the model's 0-indexed classes back to trust labels in `gui/fusion/engine.py classify()`.
+- **Why shipped:** best mean drone-surface F1 (clf→filt 0.834 vs robust8 0.733); removes robust8's
+  over-rejection of hard/grayscale drones. Deployed composition is **`filt→clf`** (MLP filter first,
+  then route the survivors). Flat path `models/routers/robust8_noreject.joblib`; trained by
+  `classifier/train_robust8_noreject.py`. (Never emits class 0, so the 4-class header above still
+  describes the bundle label space.)
+
+### `robust8.joblib` — reject-class ablation / paired-stream comparison (τ=0.20)
 - **What:** 8 free features — `rgb_max_conf, ir_max_conf, rgb/ir_best_log_bbox_area,
   rgb/ir_best_aspect_ratio` (= robust6) **+ `rgb_mean_conf` + `is_grayscale`** — with the
   τ=0.20 trust_rgb rule. Closes the grayscale trust_rgb hole (argmax recall 0.12 → 0.91).

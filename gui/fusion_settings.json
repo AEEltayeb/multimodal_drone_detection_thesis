@@ -50,7 +50,7 @@
   "last_rgb_path": "",
   "last_ir_path": "",
   "last_mode": "Grayscale Fusion",
-  "mlp_cascade_order": "classifier_then_filter",
+  "mlp_cascade_order": "filter_then_classifier",
   "confuser_filter_mode": "alert_gate",
   "filter_every_frame": false,
   "filter_before_alert": true,

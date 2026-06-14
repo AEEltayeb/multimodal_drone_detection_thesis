@@ -217,7 +217,7 @@ From `models.csv` (production=yes) + EVIDENCE_LEDGER §1 / §13.6. The V5 verifi
 |---|---|---|
 | RGB detector | `ft4` (Yolo26n_selcom_confuser_ft4_1280) | confuser-hardened; `baseline` for general RGB |
 | IR detector | `ir_v3b` | F1 0.967 on IR_dset_final |
-| Trust classifier | `robust8`@τ0.20 (8 free feats; grayscale-hardened) | **chosen 2026-06-05** (single prod model). `robust6` = real-video-confuser-robust comparison; `sa32`/`fnfn` superseded |
+| Trust classifier | `robust8-nr` (`models/routers/robust8_noreject.joblib`; no-reject, argmax, no τ) | **shipped 2026-06-14**; per-frame filter owns FP rejection; composition `filt→clf`. `robust8`@τ0.20 = reject-class ablation; `robust6`/`sa32`/`fnfn` superseded |
 | Post-detection verifier | `mlp_v5` (per-frame) — **CANDIDATE, NOT signed off** | +8-10pp Svan F1, 7.5× cleaner confuser, 46-72× faster; `patch_v2` is current shipped verifier; **v5.2 train/eval in progress** |
 | Cascade | `alert_gate_only` | per-frame filtering costs ~1pp F1 |
 | imgsz | 1280 (Svan + selcom), 640 elsewhere | |
