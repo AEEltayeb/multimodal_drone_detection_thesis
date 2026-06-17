@@ -1,0 +1,18 @@
+model: retrained_v2
+name: Yolo26n_retrained_v2
+type: rgb_yolo
+role: RGB detector ablation (§3.1)
+production: false
+weights: models/rgb/Yolo26n_retrained_v2/weights/best.pt
+trained_on:
+- aggressive confuser negatives
+tested_on:
+- (thesis §4.1 / §3.1 surfaces; see knowledge/models.csv)
+training_config:
+  base_model: yolo26n.pt
+  epochs: 70
+  imgsz: 640
+  data_yaml: /workspace/retrain_dataset/data.yaml
+  args_yaml: models/rgb/Yolo26n_retrained_v2/args.yaml
+training_script: training/finetune_run_v2.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

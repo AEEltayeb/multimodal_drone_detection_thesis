@@ -1,0 +1,18 @@
+model: ir_final
+name: IR Final
+type: ir_yolo
+role: IR detector evolution (§4.1)
+production: false
+weights: models/ir/IR_final_cleaned/weights/best.pt
+trained_on:
+- IR_dset_final
+tested_on:
+- (thesis §4.1 / §3.1 surfaces; see knowledge/models.csv)
+training_config:
+  base_model: yolo26n.pt
+  epochs: 70
+  imgsz: 640
+  data_yaml: /workspace/IR_dset_final/dataset.yaml
+  args_yaml: models/ir/IR_final_cleaned/args.yaml
+training_script: eval/ir_version_comparison.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

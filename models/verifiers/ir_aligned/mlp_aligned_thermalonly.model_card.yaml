@@ -1,0 +1,32 @@
+model: mlp_aligned_thermalonly
+name: mlp_v5_ir_aligned thermal-only (CBAM)
+type: mlp
+role: IR thermal confuser filter — production (filter swap 2026-06-18)
+production: true
+weights: models/verifiers/ir_aligned/mlp_aligned_thermalonly.pt
+sha256_16: 63ea157a4252971f
+deploy_threshold: '0.05'
+feature_detector: models/ir/corrective_finetune/finetune_v3b/weights/best.pt
+trained_on:
+- thermal drones (8112) — Svanstrom IR, Anti-UAV val/IR, IR_dset_final/train, IR_video/train, CBAM/train
+  (GT class D = drone)
+- thermal confusers (2045) — IR_confusers/train, Svanstrom IR, IR_video/train, CBAM/train (balanced by
+  category x size, cap 1000)
+tested_on:
+- surface: CBAM
+  data: CBAM/valid
+  drone_recall: 0.967
+- surface: IR confusers
+  data: IR_confusers/{val,test}
+  result: 94% of confuser fires removed (@0.05)
+- surface: IR_dset_final test
+  data: IR_dset_final/test
+  drone_recall: 0.928
+- surface: Anti-UAV IR test
+  data: Anti-UAV/test/IR
+  drone_recall: 0.937
+- surface: IR video test
+  data: IR_video/test
+  drone_recall: 0.971
+training_script: mri/train_aligned.py --thermal-confusers --cbam --no-gray
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

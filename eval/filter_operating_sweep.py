@@ -68,8 +68,14 @@ def confuser_frame_probs(verif, slot, surface):
 
 
 def main():
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--fig-dir", default=str(FIGDIR), help="figure output dir (default = committed)")
+    ap.add_argument("--json", default=str(OUTJSON), help="caption-numbers JSON path")
+    a = ap.parse_args()
+    figdir, outjson = Path(a.fig_dir), Path(a.json)
     verifs = U.load_verifiers("cpu")
-    FIGDIR.mkdir(parents=True, exist_ok=True); OUTJSON.parent.mkdir(parents=True, exist_ok=True)
+    figdir.mkdir(parents=True, exist_ok=True); outjson.parent.mkdir(parents=True, exist_ok=True)
     fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.0))
     summary = {}
     for ax, (name, vk, slot, dsurf, csurf, shipped) in zip(axes, FILTERS):
@@ -100,10 +106,10 @@ def main():
                          "shipped": at(shipped), "t0.05": at(0.05), "t0.10": at(0.10), "t0.25": at(0.25)}
 
     fig.tight_layout()
-    fig.savefig(FIGDIR / "fig_filter_operating.pdf", bbox_inches="tight")
-    fig.savefig(FIGDIR / "fig_filter_operating.png", dpi=150, bbox_inches="tight")
-    json.dump(summary, open(OUTJSON, "w"), indent=2)
-    print("WROTE", FIGDIR / "fig_filter_operating.pdf")
+    fig.savefig(figdir / "fig_filter_operating.pdf", bbox_inches="tight")
+    fig.savefig(figdir / "fig_filter_operating.png", dpi=150, bbox_inches="tight")
+    json.dump(summary, open(outjson, "w"), indent=2)
+    print("WROTE", figdir / "fig_filter_operating.pdf")
     for k, v in summary.items():
         print(f"  {k:20s} POS={v['n_pos']} shipped(t={v['shipped_thr']}) recall/fire={v['shipped']}"
               f"  | t0.05={v['t0.05']}  t0.10={v['t0.10']}  t0.25={v['t0.25']}")

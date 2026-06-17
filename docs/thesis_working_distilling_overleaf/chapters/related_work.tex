@@ -113,14 +113,14 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
                                                    & \textbf{This thesis (IR \texttt{v3b}, @640)} & IoU@0.5 & 0.966 & 0.956 & 0.961 \\
         \midrule
         Confuser corpus (no GT, RGB)               & \emph{No published baseline} & ND & ND & ND & ND \\
-                                                   & \textbf{This thesis (confuser filter, @640)} & fire-rate & ND & ND & 1.1\% fire \\
+                                                   & \textbf{This thesis (confuser filter, @640)} & fire-rate & ND & ND & 1.4\% fire \\
         \midrule
         Thermal confuser corpus (no GT, IR)        & \emph{No published baseline} & ND & ND & ND & ND \\
-                                                   & \textbf{This thesis (best composition, @640)} & fire-rate & ND & ND & 29.4\% $\to$ 17.9\% fire \\
+                                                   & \textbf{This thesis (best ablation, \texttt{robust6}, @640)} & fire-rate & ND & ND & 29.4\% $\to$ 1.9\% fire \\
         \bottomrule
     \end{tabular}
 \end{table}
-% [source: thesis_eval/results/tier1_results.json (ir_confusers C: bare 0.2943, clf->filt[robust6] 0.1792)]
+% [source: thesis_eval/results/tier1_results.json (ir_confusers C: bare 0.2943, clf->filt[robust6] 0.0192 with thermal-native cbam filter); honest held-out IR_confusers val/test shipped 90 -> 22, see Section~\ref{sec:ir_xmodal_verifier}]
 % [source: svanstrom2021real (arXiv 2007.07396): visible avg F1 0.7849 (close 0.8682), IR avg F1 0.7601 (close 0.8845); YOLOv2, inputs 416x416/256x256, bboxPrecisionRecall IoU 0.5, det thr 0.5; eval set = 120 IR + 120 visible clips (5 per class x distance bin), 240 clips train]
 
 Three caveats apply to every row of Table~\ref{tab:numerical_comparison}.
@@ -133,7 +133,7 @@ Three caveats apply to every row of Table~\ref{tab:numerical_comparison}.
 % [source: ledger=antiuav-saturated; eval=rgb_antiuav_baseline; run=eval/ablate.py; cache=eval/results/_ablation/2026-05-18T22-48-19/master.csv; config=antiuav_iou_1280_s5]
 % [source: github.com/DroneDetectionThesis/Drone-detection-dataset (no published split; MATLAB groundTruth labels)]
 
-Two claims survive these caveats. First, this thesis's per-modality numbers \emph{exceed} the published Svanstr\"om averages ($0.950$ vs $0.785$ visible, $0.961$ vs $0.760$ IR); the caveats above carry the qualification, since part of that gap is attributable to detector generation (YOLOv26n vs YOLOv2), inference resolution ($1280$/$640$ vs $416$/$256$), and matcher leniency (IoP vs IoU) rather than to a like-for-like superiority. At minimum, the detectors are competitive baselines rather than weak strawmen. Second, no published system reports a separately-evaluated OOD confuser fire rate at the granularity of Table~\ref{tab:ablation_confusers}, because no published system explicitly separates a confuser-rejection stage from drone detection. The suppression numbers of Section~\ref{sec:pipeline_confusers} ($30.4\% \to 4.9\%$ at the router, $\to 1.1\%$ at the per-frame filter, at the canonical configuration) therefore cannot be directly benchmarked. The contribution is the architectural separation that makes such numbers measurable.
+Two claims survive these caveats. First, this thesis's per-modality numbers \emph{exceed} the published Svanstr\"om averages ($0.950$ vs $0.785$ visible, $0.961$ vs $0.760$ IR); the caveats above carry the qualification, since part of that gap is attributable to detector generation (YOLOv26n vs YOLOv2), inference resolution ($1280$/$640$ vs $416$/$256$), and matcher leniency (IoP vs IoU) rather than to a like-for-like superiority. At minimum, the detectors are competitive baselines rather than weak strawmen. Second, no published system reports a separately-evaluated OOD confuser fire rate at the granularity of Table~\ref{tab:ablation_confusers}, because no published system explicitly separates a confuser-rejection stage from drone detection. The suppression numbers of Section~\ref{sec:pipeline_confusers} ($30.4\% \to 4.9\%$ at the router, $\to 1.4\%$ at the per-frame filter, at the canonical configuration) therefore cannot be directly benchmarked. The contribution is the architectural separation that makes such numbers measurable.
 % [source: thesis_eval/results/tier1_results.json (rgb_confuser C_confuser)]
 
 % ======================================================================

@@ -1,0 +1,20 @@
+model: selcom_mixed_ft2_1280
+name: Yolo26n_selcom_mixed_ft2_1280
+type: rgb_yolo
+role: RGB CCTV detector ablation (§3.4)
+production: false
+weights: models/rgb/Yolo26n_selcom_mixed_ft2_1280/weights/best.pt
+trained_on:
+- 80% general RGB + 20% selcom CCTV (pure-selcom val)
+- 'train split: G:\drone\_finetune_selcom_mixed_ft2\images\train'
+tested_on:
+- surface: val split
+  data: G:\drone\_finetune_selcom_mixed_ft2\images\val
+training_config:
+  base_model: Yolo26n_trained
+  epochs: 10
+  imgsz: 1280
+  data_yaml: G:\drone\_finetune_selcom_mixed_ft2\data.yaml
+  args_yaml: models/rgb/Yolo26n_selcom_mixed_ft2_1280/args.yaml
+training_script: training/finetune_selcom.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

@@ -274,11 +274,14 @@ def md_paired(L, name, meta, res):
 
 
 def main():
+    global OUT_DIR
     ap = argparse.ArgumentParser()
     ap.add_argument("--cache-dir", default="thesis_eval/cache_conf005")
     ap.add_argument("--only", default="", help="comma list of surfaces")
     ap.add_argument("--device", default="cpu")
+    ap.add_argument("--out", default=str(OUT_DIR), help="results dir (default = committed conf_sweep/)")
     args = ap.parse_args()
+    OUT_DIR = Path(args.out) if Path(args.out).is_absolute() else (REPO / args.out)
     cdir = Path(args.cache_dir)
     if not cdir.is_absolute():
         cdir = REPO / cdir

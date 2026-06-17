@@ -1,0 +1,62 @@
+{
+  "scan_images": 17189,
+  "stride": 8,
+  "total_supply_scanned": 14625,
+  "edges_norm_short_side": [
+    0.0,
+    0.015,
+    0.03,
+    0.06,
+    1.01
+  ],
+  "size_names": [
+    "xs(<~16px)",
+    "s(16-32)",
+    "m(32-64)",
+    "l(>=64)"
+  ],
+  "per_cell_cap": 1200,
+  "by_size": {
+    "supply": [
+      2654,
+      4303,
+      4946,
+      2722
+    ],
+    "current": [
+      618,
+      1542,
+      3663,
+      2177
+    ],
+    "balanced": [
+      1821,
+      2768,
+      2710,
+      1987
+    ]
+  },
+  "by_prefix": {
+    "anti": {
+      "supply": 7079,
+      "current": 7079,
+      "balanced": 4065
+    },
+    "dut": {
+      "supply": 525,
+      "current": 525,
+      "balanced": 525
+    },
+    "mav": {
+      "supply": 1078,
+      "current": 396,
+      "balanced": 1078
+    },
+    "wosdetc": {
+      "supply": 5943,
+      "current": 0,
+      "balanced": 3618
+    }
+  },
+  "figure": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\docs\\analysis\\images\\2026-06-17_rgbtest_balanced_quota.png"
+}

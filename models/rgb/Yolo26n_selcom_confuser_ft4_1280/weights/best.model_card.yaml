@@ -1,0 +1,20 @@
+model: ft4
+name: Yolo26n_selcom_confuser_ft4_1280 (FT4 R3)
+type: rgb_yolo
+role: RGB production detector; verifier-stack feature source (§13)
+production: true
+weights: models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt
+trained_on:
+- selcom + confuser hard-negs
+- 'train split: C:\drone_cache\_finetune_selcom_confuser_ft4\images\train'
+tested_on:
+- surface: val split
+  data: C:\drone_cache\_finetune_selcom_confuser_ft4\images\val
+training_config:
+  base_model: Yolo26n_selcom_mixed_ft3_1280
+  epochs: 3
+  imgsz: 1280
+  data_yaml: C:\drone_cache\_finetune_selcom_confuser_ft4\data.yaml
+  args_yaml: models/rgb/Yolo26n_selcom_confuser_ft4_1280/args.yaml
+training_script: scripts/auto_confuser_ft4.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

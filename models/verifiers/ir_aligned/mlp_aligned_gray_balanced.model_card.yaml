@@ -1,0 +1,18 @@
+model: mlp_aligned_gray_balanced
+name: mlp_v5_ir_aligned grayscale head (balanced)
+type: mlp
+role: IR grayscale confuser filter — production (filter swap 2026-06-18)
+production: true
+weights: models/verifiers/ir_aligned/mlp_aligned_gray_balanced.pt
+sha256_16: 80660bd64fdbfa4a
+feature_detector: models/ir/corrective_finetune/finetune_v3b/weights/best.pt (RGB converted to grayscale)
+deploy_threshold: 0.25
+trained_on:
+- thermal drones + grayscale-harvested confusers (rgb_confusers, RGB_video, Svanstrom RGB converted to
+  grayscale); from the balanced run
+tested_on:
+- surface: grayscale confusers
+  data: rgb_confusers_merged/images/test (converted to grayscale)
+  result: '15 fires kept (predecessor grayscale head: 21)'
+training_script: mri/train_aligned.py --thermal-confusers
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

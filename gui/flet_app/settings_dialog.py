@@ -23,8 +23,9 @@ DEFAULTS = {
     "mlp_filter_mode": "per_frame", "mlp_alert_gate_conf": 0.4,
     "use_ir_mlp_verifier": False, "ir_mlp_verifier_weights": "", "ir_mlp_threshold": 0.25,
     "ir_mlp_filter_mode": "per_frame", "ir_mlp_alert_gate_conf": 0.4,
-    # grayscale-scaler packaging of the SAME aligned net; auto-swapped in Grayscale Fusion mode
-    "ir_mlp_verifier_weights_gray": "",
+    # grayscale head (separate checkpoint) with its own operating point; auto-swapped + thresholded
+    # in Grayscale Fusion mode (thermal head=0.05, grayscale head=0.25)
+    "ir_mlp_verifier_weights_gray": "", "ir_mlp_threshold_gray": 0.25,
     "cascade_order": "filter_then_classifier",
     "mlp_cascade_order": "classifier_then_filter",
     # conf floor for ROUTER feature computation: 0.25 = robust8/robust6/sa32 training regime;
@@ -44,7 +45,7 @@ FLOAT_KEYS = {"rgb_conf", "ir_conf_real", "ir_conf_gray", "nms_iou",
               "alert_avg_conf_threshold", "warning_cooldown_s",
               "alert_cooldown_s", "roi_expand", "patch_threshold",
               "mlp_threshold", "mlp_alert_gate_conf",
-              "ir_mlp_threshold", "ir_mlp_alert_gate_conf", "router_conf"}
+              "ir_mlp_threshold", "ir_mlp_threshold_gray", "ir_mlp_alert_gate_conf", "router_conf"}
 INT_KEYS = {"gpu_device", "infer_fps", "warning_window_frames",
             "warning_require_hits", "alert_window_frames",
             "alert_require_hits", "roi_ttl",
@@ -106,7 +107,8 @@ LABELS = {
     "ir_mlp_threshold": "IR MLP Drone-Prob Threshold",
     "ir_mlp_filter_mode": "IR MLP Filter Mode",
     "ir_mlp_alert_gate_conf": "IR MLP Alert-Gate Conf Threshold",
-    "ir_mlp_verifier_weights_gray": "IR MLP Weights — GRAY scaler (auto in Grayscale mode)",
+    "ir_mlp_verifier_weights_gray": "IR MLP Weights — GRAY head (auto in Grayscale mode)",
+    "ir_mlp_threshold_gray": "IR MLP GRAY Drone-Prob Threshold (Grayscale mode)",
     "cascade_order": "Cascade Order (patch verifier)",
     "mlp_cascade_order": "MLP Cascade Order (router vs filter)",
     "router_conf": "Router Conf Floor (0.25=shipped routers; 0=multifloor)",
@@ -142,8 +144,8 @@ SECTIONS = [
                            "mlp_alert_gate_conf"]),
     ("IR MLP Verifier (V5)", ["use_ir_mlp_verifier", "ir_mlp_verifier_weights",
                               "ir_mlp_verifier_weights_gray",
-                              "ir_mlp_threshold", "ir_mlp_filter_mode",
-                              "ir_mlp_alert_gate_conf"]),
+                              "ir_mlp_threshold", "ir_mlp_threshold_gray",
+                              "ir_mlp_filter_mode", "ir_mlp_alert_gate_conf"]),
     ("Confuser Classes", ["suppress_helicopter", "suppress_airplane",
                            "suppress_bird"]),
     ("Output", ["save_output_enabled", "save_output_dir"]),

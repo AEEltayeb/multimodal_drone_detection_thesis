@@ -1,0 +1,48 @@
+  MISMATCH svan composed F1: thesis=0.9485  json=0.948
+  MISMATCH svan composed P: thesis=0.9388  json=0.941
+  MISMATCH svan composed R: thesis=0.9584  json=0.9552
+  MISMATCH svan filt->clf F1: thesis=0.9629  json=0.9636
+  MISMATCH rgbconf mlp fire: thesis=0.0106  json=0.0144
+  MISMATCH rgbconf mlp FP: thesis=29  json=39
+  MISMATCH rgbconf composed FP: thesis=4  json=3
+  MISMATCH irconf composed r8 fire: thesis=0.2167  json=0.0243
+  MISMATCH irconf composed r6 fire: thesis=0.1792  json=0.0192
+  MISMATCH grayconf mlp fire: thesis=0.0076  json=0.0053
+  MISMATCH grayconf mlp FP: thesis=21  json=15
+  MISMATCH rgbtest mlp F1: thesis=0.8092  json=0.9222
+  MISMATCH irtest mlp F1: thesis=0.9578  json=0.9421
+  MISMATCH video composed r8 F1: thesis=0.56  json=0.5436
+  MISMATCH video composed r8 fire: thesis=0.0732  json=0.0756
+  MISMATCH SZ rgbtest <16 filt R: thesis=0.2562  json=0.7672
+  MISMATCH SZ rgbtest 16-32 filt R: thesis=0.4465  json=0.8435
+  MISMATCH SZ rgbtest >=64 filt R: thesis=0.9506  json=0.9513
+  MISMATCH SWING trust-aware pipeline F1: thesis=0.9485  json=0.948
+  MISMATCH SWING identical precision: thesis=0.9388  json=0.941
+  MISMATCH SWING trust-aware precision: thesis=0.9388  json=0.941
+  MISMATCH SWEEP selcom filt@0.05: thesis=0.692  json=0.6993
+  MISMATCH CLEAN frozen==live (svan pipeline): thesis=0.9348  json=0.934
+  MISMATCH DUT clf->filt[robust8] P: thesis=0.898  json=0.9
+  MISMATCH DUT filt->clf[robust8] P: thesis=0.9  json=0.901
+  MISMATCH NR svan composed F1: thesis=0.93  json=0.931
+  MISMATCH NR svan composed R: thesis=0.96  json=0.957
+  MISMATCH NR svan composed P: thesis=0.902  json=0.906
+  MISMATCH NR svan filt->clf F1: thesis=0.944  json=0.946
+  MISMATCH NR dut composed F1: thesis=0.792  json=0.79
+  MISMATCH NR dut composed R: thesis=0.728  json=0.721
+  MISMATCH NR dut filt->clf F1: thesis=0.837  json=0.835
+  MISMATCH NR rgb_conf fire: thesis=0.0106  json=0.0144
+  MISMATCH NR ir_conf fire: thesis=0.237  json=0.028
+  MISMATCH NR rgb_conf fire filt->clf: thesis=0.0106  json=0.0144
+  MISMATCH NR ir_conf fire filt->clf: thesis=0.237  json=0.028
+  MISMATCH NR rgb_test composed F1: thesis=0.809  json=0.922
+  MISMATCH NR video composed F1: thesis=0.687  json=0.646
+  MISMATCH NR video_conf fire: thesis=0.2252  json=0.213
+  MISMATCH dut filt_mlp_rgb F1: thesis=0.726  json=0.722
+  MISMATCH dut filt_mlp_ir F1: thesis=0.725  json=0.728
+  MISMATCH FIG rgb recall@0.25: thesis=0.956  json=0.949
+  MISMATCH FIG rgb fire@0.25: thesis=0.011  json=0.014
+  MISMATCH FIG gray recall@0.25: thesis=0.467  json=0.476
+  MISMATCH FIG gray recall@0.05: thesis=0.618  json=0.633
+  MISMATCH FIG gray fire@0.25: thesis=0.008  json=0.005
+  MISMATCH FIG gray fire@0.05: thesis=0.036  json=0.033
+140/187 checks pass (147 headline cells + 40 cited paths); 47 failures

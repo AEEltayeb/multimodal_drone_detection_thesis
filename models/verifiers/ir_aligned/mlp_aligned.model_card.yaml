@@ -1,0 +1,20 @@
+model: mlp_v5_ir_aligned
+name: mlp_v5_ir_aligned
+type: mlp
+role: IR confuser filter — predecessor (aligned)
+production: false
+weights: models/verifiers/ir_aligned/mlp_aligned.pt
+feature_detector: models/ir/corrective_finetune/finetune_v3b/weights/best.pt
+deploy_threshold: 0.05
+trained_on:
+- thermal drones (Svanstrom IR, Anti-UAV val/IR, IR_dset_final/train, IR_video/train)
+- grayscale-harvested confusers, per-modality z-aligned (one network, thermal + grayscale deploy scalers)
+tested_on:
+- surface: CBAM
+  data: CBAM/valid
+  drone_recall: 0.917
+- surface: IR_dset_final test
+  data: IR_dset_final/test
+  drone_recall: 0.965
+training_script: mri_train_aligned
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

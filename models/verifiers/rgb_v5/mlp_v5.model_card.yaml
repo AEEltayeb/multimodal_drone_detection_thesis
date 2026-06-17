@@ -1,0 +1,18 @@
+model: mlp_v5
+name: mlp_v5 pure_1x8
+type: mlp
+role: RGB confuser filter — predecessor (§13)
+production: false
+weights: models/verifiers/rgb_v5/mlp_v5.pt
+feature_detector: models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt
+deploy_threshold: 0.25
+trained_on:
+- distilled FT4 p3+p5 ROI features (517-D)
+- SelCom CCTV (pure_1x8), Svanstrom, Anti-UAV, rgb_confusers, RGB_video
+- rgb_dataset drones via the parent distill (alphabetical stride-8, 8000-drone quota)
+tested_on:
+- surface: rgb_dataset test
+  data: dataset/dataset/images/test
+  drone_recall: 0.694
+training_script: eval/distill_v5_swap_selcom.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

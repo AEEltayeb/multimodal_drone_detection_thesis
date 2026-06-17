@@ -1,0 +1,38 @@
+{
+  "tag": "smoke_v2",
+  "created": "2026-06-17 20:36:31",
+  "git_sha": "b1bd1c2",
+  "weights": {
+    "rgb": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\eval\\results\\_v5_balanced_v2\\classifiers\\mlp_v5_balanced_v2.pt",
+      "sha256_16": "aabb07c0822ecb26"
+    },
+    "ir": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\mri\\results\\ir_aligned_balanced\\classifiers\\mlp_aligned.pt",
+      "sha256_16": "e7f64a4ba5755eff"
+    },
+    "ir_gray": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\mri\\results\\ir_aligned_balanced\\classifiers\\mlp_aligned_gray.pt",
+      "sha256_16": "80660bd64fdbfa4a"
+    }
+  },
+  "thresholds": {
+    "rgb": "0.25",
+    "ir": "0.01",
+    "gray": "0.25"
+  },
+  "jobs": [
+    {
+      "job": "pipeline",
+      "cmd": "py -u thesis_eval/pipeline_eval_unified.py --out C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\thesis_eval\\_filter_swap\\smoke_v2 --only antiuav",
+      "rc": 0,
+      "seconds": 97.3
+    },
+    {
+      "job": "temporal",
+      "cmd": "py -u thesis_eval/temporal_replay.py --out C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\thesis_eval\\_filter_swap\\smoke_v2",
+      "rc": 0,
+      "seconds": 100.5
+    }
+  ]
+}

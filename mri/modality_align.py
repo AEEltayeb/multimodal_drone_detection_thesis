@@ -55,6 +55,9 @@ def mine_multi(ex, specs, grayscale, cap, stride, conf, device):
     parts = []
     per = max(200, cap // max(1, len(specs)))
     for d, pre, imgsz in specs:
+        if not Path(d).exists():
+            print(f"    [skip missing source: {d}]")
+            continue
         prefixes = pre if isinstance(pre, tuple) else (pre,)
         for p in prefixes:
             X = mine(ex, Path(d), p, grayscale, per, stride, imgsz, conf, device)

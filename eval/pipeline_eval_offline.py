@@ -26,9 +26,11 @@ from eval_v4_vs_patch import MLPv4Verifier                   # noqa: E402
 
 CACHE = REPO / "eval" / "results" / "_offline_pipeline" / "cache"
 OUT = REPO / "eval" / "results" / "_offline_pipeline"
-MLP_V5 = str(REPO / "models/verifiers/rgb_v5/mlp_v5.pt")
-ALIGNED_THR = str(REPO / "models/verifiers/ir_aligned/mlp_aligned.pt")
-ALIGNED_GRAY = str(REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt")
+import os
+# env-overridable (defaults = shipped); set THESIS_* to score the offline cache with candidate filters
+MLP_V5 = os.environ.get("THESIS_MLP_V5", str(REPO / "models/verifiers/rgb_v5/mlp_v5.pt"))
+ALIGNED_THR = os.environ.get("THESIS_ALIGNED", str(REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"))
+ALIGNED_GRAY = os.environ.get("THESIS_ALIGNED_GRAY", str(REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt"))
 
 # modality -> list of (label, kind, arg, thr). kind: bare|patch|mlp
 VARIANTS = {

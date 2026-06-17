@@ -1,0 +1,11 @@
+model: patch_v2
+name: confuser_filter4 v2 (rgb+ir)
+type: verifier
+role: Patch verifier (filter ablation §6, §13)
+production: false
+weights: models/patches/confuser_filter4_rgb_v2_backup.pt
+trained_on:
+- 45,917 RGB+IR patches (drone/bird/airplane/heli; NO CCTV)
+tested_on:
+- (thesis ablation surfaces; see knowledge/models.csv)
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

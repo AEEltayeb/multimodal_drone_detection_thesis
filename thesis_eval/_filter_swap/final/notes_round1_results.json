@@ -1,0 +1,2558 @@
+{
+  "antiuav": {
+    "M_modality_ab": {
+      "rgb_only bare": {
+        "TP": 3657,
+        "FP": 41,
+        "FN": 4016,
+        "TN": 0,
+        "precision": 0.9889,
+        "recall": 0.4766,
+        "f1": 0.6432,
+        "f1_ci": [
+          0.6402,
+          0.646
+        ]
+      },
+      "rgb_only +filt": {
+        "TP": 3654,
+        "FP": 36,
+        "FN": 4019,
+        "TN": 0,
+        "precision": 0.9902,
+        "recall": 0.4762,
+        "f1": 0.6431,
+        "f1_ci": [
+          0.6402,
+          0.6458
+        ]
+      },
+      "ir_only bare": {
+        "TP": 3775,
+        "FP": 133,
+        "FN": 3898,
+        "TN": 0,
+        "precision": 0.966,
+        "recall": 0.492,
+        "f1": 0.6519,
+        "f1_ci": [
+          0.648,
+          0.6556
+        ]
+      },
+      "ir_only +filt": {
+        "TP": 3775,
+        "FP": 132,
+        "FN": 3898,
+        "TN": 0,
+        "precision": 0.9662,
+        "recall": 0.492,
+        "f1": 0.652,
+        "f1_ci": [
+          0.6481,
+          0.6556
+        ]
+      },
+      "both bare": {
+        "TP": 7432,
+        "FP": 174,
+        "FN": 241,
+        "TN": 0,
+        "precision": 0.9771,
+        "recall": 0.9686,
+        "f1": 0.9728,
+        "f1_ci": [
+          0.9697,
+          0.9757
+        ]
+      },
+      "both +filt": {
+        "TP": 7429,
+        "FP": 168,
+        "FN": 244,
+        "TN": 0,
+        "precision": 0.9779,
+        "recall": 0.9682,
+        "f1": 0.973,
+        "f1_ci": [
+          0.9698,
+          0.9759
+        ]
+      },
+      "routed[robust8] bare": {
+        "TP": 7408,
+        "FP": 141,
+        "FN": 265,
+        "TN": 0,
+        "precision": 0.9813,
+        "recall": 0.9655,
+        "f1": 0.9733,
+        "f1_ci": [
+          0.9702,
+          0.9762
+        ]
+      },
+      "routed[robust8] +filt": {
+        "TP": 7405,
+        "FP": 136,
+        "FN": 268,
+        "TN": 0,
+        "precision": 0.982,
+        "recall": 0.9651,
+        "f1": 0.9734,
+        "f1_ci": [
+          0.9702,
+          0.9763
+        ]
+      },
+      "routed[robust8-nr] bare": {
+        "TP": 7430,
+        "FP": 160,
+        "FN": 243,
+        "TN": 0,
+        "precision": 0.9789,
+        "recall": 0.9683,
+        "f1": 0.9736,
+        "f1_ci": [
+          0.9705,
+          0.9764
+        ]
+      },
+      "routed[robust8-nr] +filt": {
+        "TP": 7427,
+        "FP": 154,
+        "FN": 246,
+        "TN": 0,
+        "precision": 0.9797,
+        "recall": 0.9679,
+        "f1": 0.9738,
+        "f1_ci": [
+          0.9706,
+          0.9767
+        ]
+      }
+    },
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 93.1,
+        "n_gt_total": 3725,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 38,
+              "FP": 3,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.9268,
+              "recall": 1.0,
+              "f1": 0.962,
+              "n_gt": 38
+            },
+            "32-64px": {
+              "TP": 733,
+              "FP": 10,
+              "FN": 14,
+              "TN": 0,
+              "precision": 0.9865,
+              "recall": 0.9813,
+              "f1": 0.9839,
+              "n_gt": 747
+            },
+            ">=64px": {
+              "TP": 2886,
+              "FP": 28,
+              "FN": 54,
+              "TN": 0,
+              "precision": 0.9904,
+              "recall": 0.9816,
+              "f1": 0.986,
+              "n_gt": 2940
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 38,
+              "FP": 2,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.95,
+              "recall": 1.0,
+              "f1": 0.9744,
+              "n_gt": 38
+            },
+            "32-64px": {
+              "TP": 730,
+              "FP": 7,
+              "FN": 17,
+              "TN": 0,
+              "precision": 0.9905,
+              "recall": 0.9772,
+              "f1": 0.9838,
+              "n_gt": 747
+            },
+            ">=64px": {
+              "TP": 2886,
+              "FP": 27,
+              "FN": 54,
+              "TN": 0,
+              "precision": 0.9907,
+              "recall": 0.9816,
+              "f1": 0.9862,
+              "n_gt": 2940
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 37.0,
+        "n_gt_total": 3948,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 18,
+              "FP": 8,
+              "FN": 5,
+              "TN": 0,
+              "precision": 0.6923,
+              "recall": 0.7826,
+              "f1": 0.7347,
+              "n_gt": 23
+            },
+            "16-32px": {
+              "TP": 860,
+              "FP": 41,
+              "FN": 78,
+              "TN": 0,
+              "precision": 0.9545,
+              "recall": 0.9168,
+              "f1": 0.9353,
+              "n_gt": 938
+            },
+            "32-64px": {
+              "TP": 2821,
+              "FP": 83,
+              "FN": 90,
+              "TN": 0,
+              "precision": 0.9714,
+              "recall": 0.9691,
+              "f1": 0.9702,
+              "n_gt": 2911
+            },
+            ">=64px": {
+              "TP": 76,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.987,
+              "recall": 1.0,
+              "f1": 0.9935,
+              "n_gt": 76
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 18,
+              "FP": 8,
+              "FN": 5,
+              "TN": 0,
+              "precision": 0.6923,
+              "recall": 0.7826,
+              "f1": 0.7347,
+              "n_gt": 23
+            },
+            "16-32px": {
+              "TP": 860,
+              "FP": 40,
+              "FN": 78,
+              "TN": 0,
+              "precision": 0.9556,
+              "recall": 0.9168,
+              "f1": 0.9358,
+              "n_gt": 938
+            },
+            "32-64px": {
+              "TP": 2821,
+              "FP": 83,
+              "FN": 90,
+              "TN": 0,
+              "precision": 0.9714,
+              "recall": 0.9691,
+              "f1": 0.9702,
+              "n_gt": 2911
+            },
+            ">=64px": {
+              "TP": 76,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.987,
+              "recall": 1.0,
+              "f1": 0.9935,
+              "n_gt": 76
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "antiuav",
+      "kind": "paired",
+      "rule": "iou",
+      "n": 4000,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 4000
+    }
+  },
+  "antiuav_clean": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 92.6,
+        "n_gt_total": 54823,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 194,
+              "FP": 29,
+              "FN": 4,
+              "TN": 0,
+              "precision": 0.87,
+              "recall": 0.9798,
+              "f1": 0.9216,
+              "n_gt": 198
+            },
+            "32-64px": {
+              "TP": 11909,
+              "FP": 176,
+              "FN": 173,
+              "TN": 0,
+              "precision": 0.9854,
+              "recall": 0.9857,
+              "f1": 0.9856,
+              "n_gt": 12082
+            },
+            ">=64px": {
+              "TP": 41969,
+              "FP": 377,
+              "FN": 574,
+              "TN": 0,
+              "precision": 0.9911,
+              "recall": 0.9865,
+              "f1": 0.9888,
+              "n_gt": 42543
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 191,
+              "FP": 14,
+              "FN": 7,
+              "TN": 0,
+              "precision": 0.9317,
+              "recall": 0.9646,
+              "f1": 0.9479,
+              "n_gt": 198
+            },
+            "32-64px": {
+              "TP": 11874,
+              "FP": 160,
+              "FN": 208,
+              "TN": 0,
+              "precision": 0.9867,
+              "recall": 0.9828,
+              "f1": 0.9847,
+              "n_gt": 12082
+            },
+            ">=64px": {
+              "TP": 41962,
+              "FP": 373,
+              "FN": 581,
+              "TN": 0,
+              "precision": 0.9912,
+              "recall": 0.9863,
+              "f1": 0.9888,
+              "n_gt": 42543
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 37.2,
+        "n_gt_total": 57025,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 269,
+              "FP": 106,
+              "FN": 82,
+              "TN": 0,
+              "precision": 0.7173,
+              "recall": 0.7664,
+              "f1": 0.741,
+              "n_gt": 351
+            },
+            "16-32px": {
+              "TP": 11768,
+              "FP": 562,
+              "FN": 963,
+              "TN": 0,
+              "precision": 0.9544,
+              "recall": 0.9244,
+              "f1": 0.9391,
+              "n_gt": 12731
+            },
+            "32-64px": {
+              "TP": 41740,
+              "FP": 901,
+              "FN": 1280,
+              "TN": 0,
+              "precision": 0.9789,
+              "recall": 0.9702,
+              "f1": 0.9745,
+              "n_gt": 43020
+            },
+            ">=64px": {
+              "TP": 922,
+              "FP": 8,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.9914,
+              "recall": 0.9989,
+              "f1": 0.9951,
+              "n_gt": 923
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 269,
+              "FP": 101,
+              "FN": 82,
+              "TN": 0,
+              "precision": 0.727,
+              "recall": 0.7664,
+              "f1": 0.7462,
+              "n_gt": 351
+            },
+            "16-32px": {
+              "TP": 11767,
+              "FP": 562,
+              "FN": 964,
+              "TN": 0,
+              "precision": 0.9544,
+              "recall": 0.9243,
+              "f1": 0.9391,
+              "n_gt": 12731
+            },
+            "32-64px": {
+              "TP": 41735,
+              "FP": 897,
+              "FN": 1285,
+              "TN": 0,
+              "precision": 0.979,
+              "recall": 0.9701,
+              "f1": 0.9745,
+              "n_gt": 43020
+            },
+            ">=64px": {
+              "TP": 922,
+              "FP": 8,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.9914,
+              "recall": 0.9989,
+              "f1": 0.9951,
+              "n_gt": 923
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "antiuav_clean",
+      "kind": "paired",
+      "rule": "iou",
+      "n": 57542,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 57542
+    }
+  },
+  "dut_antiuav_640": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 40.9,
+        "n_gt_total": 2245,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 48,
+              "FP": 8,
+              "FN": 35,
+              "TN": 0,
+              "precision": 0.8571,
+              "recall": 0.5783,
+              "f1": 0.6906,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 566,
+              "FP": 27,
+              "FN": 199,
+              "TN": 0,
+              "precision": 0.9545,
+              "recall": 0.7399,
+              "f1": 0.8336,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 473,
+              "FP": 25,
+              "FN": 113,
+              "TN": 0,
+              "precision": 0.9498,
+              "recall": 0.8072,
+              "f1": 0.8727,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 670,
+              "FP": 35,
+              "FN": 141,
+              "TN": 0,
+              "precision": 0.9504,
+              "recall": 0.8261,
+              "f1": 0.8839,
+              "n_gt": 811
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 48,
+              "FP": 8,
+              "FN": 35,
+              "TN": 0,
+              "precision": 0.8571,
+              "recall": 0.5783,
+              "f1": 0.6906,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 555,
+              "FP": 24,
+              "FN": 210,
+              "TN": 0,
+              "precision": 0.9585,
+              "recall": 0.7255,
+              "f1": 0.8259,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 457,
+              "FP": 23,
+              "FN": 129,
+              "TN": 0,
+              "precision": 0.9521,
+              "recall": 0.7799,
+              "f1": 0.8574,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 641,
+              "FP": 31,
+              "FN": 170,
+              "TN": 0,
+              "precision": 0.9539,
+              "recall": 0.7904,
+              "f1": 0.8645,
+              "n_gt": 811
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 40.9,
+        "n_gt_total": 2245,
+        "verifier": "aligned_gray",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 41,
+              "FP": 74,
+              "FN": 42,
+              "TN": 0,
+              "precision": 0.3565,
+              "recall": 0.494,
+              "f1": 0.4141,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 341,
+              "FP": 235,
+              "FN": 424,
+              "TN": 0,
+              "precision": 0.592,
+              "recall": 0.4458,
+              "f1": 0.5086,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 225,
+              "FP": 48,
+              "FN": 361,
+              "TN": 0,
+              "precision": 0.8242,
+              "recall": 0.384,
+              "f1": 0.5239,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 333,
+              "FP": 19,
+              "FN": 478,
+              "TN": 0,
+              "precision": 0.946,
+              "recall": 0.4106,
+              "f1": 0.5727,
+              "n_gt": 811
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 32,
+              "FP": 61,
+              "FN": 51,
+              "TN": 0,
+              "precision": 0.3441,
+              "recall": 0.3855,
+              "f1": 0.3636,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 282,
+              "FP": 200,
+              "FN": 483,
+              "TN": 0,
+              "precision": 0.5851,
+              "recall": 0.3686,
+              "f1": 0.4523,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 177,
+              "FP": 42,
+              "FN": 409,
+              "TN": 0,
+              "precision": 0.8082,
+              "recall": 0.302,
+              "f1": 0.4398,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 252,
+              "FP": 10,
+              "FN": 559,
+              "TN": 0,
+              "precision": 0.9618,
+              "recall": 0.3107,
+              "f1": 0.4697,
+              "n_gt": 811
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "dut_antiuav_640",
+      "kind": "grayrgb_paired",
+      "rule": "iou",
+      "n": 2200,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 2200
+    }
+  },
+  "dut_antiuav_960": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 40.9,
+        "n_gt_total": 2245,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 67,
+              "FP": 3,
+              "FN": 16,
+              "TN": 0,
+              "precision": 0.9571,
+              "recall": 0.8072,
+              "f1": 0.8758,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 685,
+              "FP": 27,
+              "FN": 80,
+              "TN": 0,
+              "precision": 0.9621,
+              "recall": 0.8954,
+              "f1": 0.9276,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 522,
+              "FP": 24,
+              "FN": 64,
+              "TN": 0,
+              "precision": 0.956,
+              "recall": 0.8908,
+              "f1": 0.9223,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 643,
+              "FP": 50,
+              "FN": 168,
+              "TN": 0,
+              "precision": 0.9278,
+              "recall": 0.7928,
+              "f1": 0.8551,
+              "n_gt": 811
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 64,
+              "FP": 0,
+              "FN": 19,
+              "TN": 0,
+              "precision": 1.0,
+              "recall": 0.7711,
+              "f1": 0.8707,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 624,
+              "FP": 18,
+              "FN": 141,
+              "TN": 0,
+              "precision": 0.972,
+              "recall": 0.8157,
+              "f1": 0.887,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 453,
+              "FP": 13,
+              "FN": 133,
+              "TN": 0,
+              "precision": 0.9721,
+              "recall": 0.773,
+              "f1": 0.8612,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 530,
+              "FP": 37,
+              "FN": 281,
+              "TN": 0,
+              "precision": 0.9347,
+              "recall": 0.6535,
+              "f1": 0.7692,
+              "n_gt": 811
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 40.9,
+        "n_gt_total": 2245,
+        "verifier": "aligned_gray",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 51,
+              "FP": 110,
+              "FN": 32,
+              "TN": 0,
+              "precision": 0.3168,
+              "recall": 0.6145,
+              "f1": 0.418,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 425,
+              "FP": 204,
+              "FN": 340,
+              "TN": 0,
+              "precision": 0.6757,
+              "recall": 0.5556,
+              "f1": 0.6098,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 257,
+              "FP": 39,
+              "FN": 329,
+              "TN": 0,
+              "precision": 0.8682,
+              "recall": 0.4386,
+              "f1": 0.5828,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 380,
+              "FP": 22,
+              "FN": 431,
+              "TN": 0,
+              "precision": 0.9453,
+              "recall": 0.4686,
+              "f1": 0.6265,
+              "n_gt": 811
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 42,
+              "FP": 96,
+              "FN": 41,
+              "TN": 0,
+              "precision": 0.3043,
+              "recall": 0.506,
+              "f1": 0.3801,
+              "n_gt": 83
+            },
+            "16-32px": {
+              "TP": 338,
+              "FP": 172,
+              "FN": 427,
+              "TN": 0,
+              "precision": 0.6627,
+              "recall": 0.4418,
+              "f1": 0.5302,
+              "n_gt": 765
+            },
+            "32-64px": {
+              "TP": 212,
+              "FP": 35,
+              "FN": 374,
+              "TN": 0,
+              "precision": 0.8583,
+              "recall": 0.3618,
+              "f1": 0.509,
+              "n_gt": 586
+            },
+            ">=64px": {
+              "TP": 301,
+              "FP": 11,
+              "FN": 510,
+              "TN": 0,
+              "precision": 0.9647,
+              "recall": 0.3711,
+              "f1": 0.5361,
+              "n_gt": 811
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "dut_antiuav_960",
+      "kind": "grayrgb_paired",
+      "rule": "iou",
+      "n": 2200,
+      "rgb_imgsz": 960,
+      "ir_imgsz": 960,
+      "n_source": 2200
+    }
+  },
+  "gray_confuser": {
+    "CAT_confuser": {
+      "airplane": {
+        "n": 1133,
+        "verifier": "aligned_gray",
+        "bare": {
+          "FP": 205,
+          "fired": 201,
+          "fire_rate": 0.1774,
+          "fire_ci": [
+            0.1562,
+            0.1977
+          ]
+        },
+        "filt_mlp": {
+          "FP": 1,
+          "fired": 1,
+          "fire_rate": 0.0009,
+          "fire_ci": [
+            0.0,
+            0.0026
+          ]
+        }
+      },
+      "bird": {
+        "n": 575,
+        "verifier": "aligned_gray",
+        "bare": {
+          "FP": 10,
+          "fired": 9,
+          "fire_rate": 0.0157,
+          "fire_ci": [
+            0.0052,
+            0.0261
+          ]
+        },
+        "filt_mlp": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "helicopter": {
+        "n": 486,
+        "verifier": "aligned_gray",
+        "bare": {
+          "FP": 370,
+          "fired": 349,
+          "fire_rate": 0.7181,
+          "fire_ci": [
+            0.679,
+            0.7573
+          ]
+        },
+        "filt_mlp": {
+          "FP": 2,
+          "fired": 2,
+          "fire_rate": 0.0041,
+          "fire_ci": [
+            0.0,
+            0.0103
+          ]
+        }
+      },
+      "other": {
+        "n": 439,
+        "verifier": "aligned_gray",
+        "bare": {
+          "FP": 71,
+          "fired": 67,
+          "fire_rate": 0.1526,
+          "fire_ci": [
+            0.1185,
+            0.1868
+          ]
+        },
+        "filt_mlp": {
+          "FP": 12,
+          "fired": 11,
+          "fire_rate": 0.0251,
+          "fire_ci": [
+            0.0114,
+            0.041
+          ]
+        }
+      }
+    },
+    "meta": {
+      "name": "gray_confuser",
+      "kind": "gray",
+      "rule": "iou",
+      "n": 2633,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 2633
+    }
+  },
+  "ir_confusers": {
+    "CAT_confuser": {
+      "airplane": {
+        "n": 3043,
+        "verifier": "aligned",
+        "bare": {
+          "FP": 1094,
+          "fired": 1071,
+          "fire_rate": 0.352,
+          "fire_ci": [
+            0.3352,
+            0.3687
+          ]
+        },
+        "filt_mlp": {
+          "FP": 101,
+          "fired": 99,
+          "fire_rate": 0.0325,
+          "fire_ci": [
+            0.0266,
+            0.0391
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 1020,
+          "fired": 999,
+          "fire_rate": 0.3283,
+          "fire_ci": [
+            0.3122,
+            0.3444
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 90,
+          "fired": 88,
+          "fire_rate": 0.0289,
+          "fire_ci": [
+            0.0233,
+            0.0355
+          ]
+        }
+      },
+      "bird": {
+        "n": 871,
+        "verifier": "aligned",
+        "bare": {
+          "FP": 109,
+          "fired": 106,
+          "fire_rate": 0.1217,
+          "fire_ci": [
+            0.0999,
+            0.1435
+          ]
+        },
+        "filt_mlp": {
+          "FP": 12,
+          "fired": 12,
+          "fire_rate": 0.0138,
+          "fire_ci": [
+            0.0069,
+            0.0218
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 97,
+          "fired": 94,
+          "fire_rate": 0.1079,
+          "fire_ci": [
+            0.0872,
+            0.1286
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 9,
+          "fired": 9,
+          "fire_rate": 0.0103,
+          "fire_ci": [
+            0.0046,
+            0.0172
+          ]
+        }
+      },
+      "helicopter": {
+        "n": 86,
+        "verifier": "aligned",
+        "bare": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "filt_mlp": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        }
+      }
+    },
+    "meta": {
+      "name": "ir_confusers",
+      "kind": "ir",
+      "rule": "iou",
+      "n": 4000,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 5237
+    }
+  },
+  "ir_dset_final": {
+    "SZ_per_size": {
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 26.1,
+        "n_gt_total": 2615,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 742,
+              "FP": 96,
+              "FN": 35,
+              "TN": 0,
+              "precision": 0.8854,
+              "recall": 0.955,
+              "f1": 0.9189,
+              "n_gt": 777
+            },
+            "16-32px": {
+              "TP": 769,
+              "FP": 24,
+              "FN": 9,
+              "TN": 0,
+              "precision": 0.9697,
+              "recall": 0.9884,
+              "f1": 0.979,
+              "n_gt": 778
+            },
+            "32-64px": {
+              "TP": 834,
+              "FP": 28,
+              "FN": 3,
+              "TN": 0,
+              "precision": 0.9675,
+              "recall": 0.9964,
+              "f1": 0.9818,
+              "n_gt": 837
+            },
+            ">=64px": {
+              "TP": 219,
+              "FP": 9,
+              "FN": 4,
+              "TN": 0,
+              "precision": 0.9605,
+              "recall": 0.9821,
+              "f1": 0.9712,
+              "n_gt": 223
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 700,
+              "FP": 91,
+              "FN": 77,
+              "TN": 0,
+              "precision": 0.885,
+              "recall": 0.9009,
+              "f1": 0.8929,
+              "n_gt": 777
+            },
+            "16-32px": {
+              "TP": 756,
+              "FP": 21,
+              "FN": 22,
+              "TN": 0,
+              "precision": 0.973,
+              "recall": 0.9717,
+              "f1": 0.9723,
+              "n_gt": 778
+            },
+            "32-64px": {
+              "TP": 814,
+              "FP": 28,
+              "FN": 23,
+              "TN": 0,
+              "precision": 0.9667,
+              "recall": 0.9725,
+              "f1": 0.9696,
+              "n_gt": 837
+            },
+            ">=64px": {
+              "TP": 186,
+              "FP": 3,
+              "FN": 37,
+              "TN": 0,
+              "precision": 0.9841,
+              "recall": 0.8341,
+              "f1": 0.9029,
+              "n_gt": 223
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "ir_dset_final",
+      "kind": "ir",
+      "rule": "iou",
+      "n": 4000,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 9612
+    }
+  },
+  "rgb_confuser": {
+    "CAT_confuser": {
+      "airplane": {
+        "n": 1133,
+        "verifier": "mlp_v5",
+        "bare": {
+          "FP": 268,
+          "fired": 265,
+          "fire_rate": 0.2339,
+          "fire_ci": [
+            0.2092,
+            0.2586
+          ]
+        },
+        "filt_mlp": {
+          "FP": 3,
+          "fired": 3,
+          "fire_rate": 0.0026,
+          "fire_ci": [
+            0.0,
+            0.0062
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 53,
+          "fired": 52,
+          "fire_rate": 0.0459,
+          "fire_ci": [
+            0.0335,
+            0.0583
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "bird": {
+        "n": 575,
+        "verifier": "mlp_v5",
+        "bare": {
+          "FP": 247,
+          "fired": 224,
+          "fire_rate": 0.3896,
+          "fire_ci": [
+            0.3513,
+            0.4313
+          ]
+        },
+        "filt_mlp": {
+          "FP": 25,
+          "fired": 24,
+          "fire_rate": 0.0417,
+          "fire_ci": [
+            0.0261,
+            0.0591
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 1,
+          "fired": 1,
+          "fire_rate": 0.0017,
+          "fire_ci": [
+            0.0,
+            0.0052
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 0,
+          "fired": 0,
+          "fire_rate": 0.0,
+          "fire_ci": [
+            0.0,
+            0.0
+          ]
+        }
+      },
+      "helicopter": {
+        "n": 486,
+        "verifier": "mlp_v5",
+        "bare": {
+          "FP": 290,
+          "fired": 282,
+          "fire_rate": 0.5802,
+          "fire_ci": [
+            0.537,
+            0.6255
+          ]
+        },
+        "filt_mlp": {
+          "FP": 3,
+          "fired": 3,
+          "fire_rate": 0.0062,
+          "fire_ci": [
+            0.0,
+            0.0144
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 70,
+          "fired": 67,
+          "fire_rate": 0.1379,
+          "fire_ci": [
+            0.1111,
+            0.1688
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 1,
+          "fired": 1,
+          "fire_rate": 0.0021,
+          "fire_ci": [
+            0.0,
+            0.0062
+          ]
+        }
+      },
+      "other": {
+        "n": 439,
+        "verifier": "mlp_v5",
+        "bare": {
+          "FP": 30,
+          "fired": 28,
+          "fire_rate": 0.0638,
+          "fire_ci": [
+            0.0433,
+            0.0888
+          ]
+        },
+        "filt_mlp": {
+          "FP": 8,
+          "fired": 8,
+          "fire_rate": 0.0182,
+          "fire_ci": [
+            0.0068,
+            0.0319
+          ]
+        },
+        "clf[robust8]": {
+          "FP": 10,
+          "fired": 9,
+          "fire_rate": 0.0205,
+          "fire_ci": [
+            0.0091,
+            0.0342
+          ]
+        },
+        "clf->filt[robust8]": {
+          "FP": 2,
+          "fired": 2,
+          "fire_rate": 0.0046,
+          "fire_ci": [
+            0.0,
+            0.0114
+          ]
+        }
+      }
+    },
+    "meta": {
+      "name": "rgb_confuser",
+      "kind": "rgb",
+      "rule": "iou",
+      "n": 2633,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 2633
+    }
+  },
+  "rgb_dataset_test": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 47.7,
+        "n_gt_total": 3452,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 568,
+              "FP": 40,
+              "FN": 158,
+              "TN": 0,
+              "precision": 0.9342,
+              "recall": 0.7824,
+              "f1": 0.8516,
+              "n_gt": 726
+            },
+            "16-32px": {
+              "TP": 525,
+              "FP": 53,
+              "FN": 82,
+              "TN": 0,
+              "precision": 0.9083,
+              "recall": 0.8649,
+              "f1": 0.8861,
+              "n_gt": 607
+            },
+            "32-64px": {
+              "TP": 657,
+              "FP": 27,
+              "FN": 45,
+              "TN": 0,
+              "precision": 0.9605,
+              "recall": 0.9359,
+              "f1": 0.9481,
+              "n_gt": 702
+            },
+            ">=64px": {
+              "TP": 1354,
+              "FP": 29,
+              "FN": 63,
+              "TN": 0,
+              "precision": 0.979,
+              "recall": 0.9555,
+              "f1": 0.9671,
+              "n_gt": 1417
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 557,
+              "FP": 38,
+              "FN": 169,
+              "TN": 0,
+              "precision": 0.9361,
+              "recall": 0.7672,
+              "f1": 0.8433,
+              "n_gt": 726
+            },
+            "16-32px": {
+              "TP": 512,
+              "FP": 41,
+              "FN": 95,
+              "TN": 0,
+              "precision": 0.9259,
+              "recall": 0.8435,
+              "f1": 0.8828,
+              "n_gt": 607
+            },
+            "32-64px": {
+              "TP": 646,
+              "FP": 22,
+              "FN": 56,
+              "TN": 0,
+              "precision": 0.9671,
+              "recall": 0.9202,
+              "f1": 0.9431,
+              "n_gt": 702
+            },
+            ">=64px": {
+              "TP": 1348,
+              "FP": 27,
+              "FN": 69,
+              "TN": 0,
+              "precision": 0.9804,
+              "recall": 0.9513,
+              "f1": 0.9656,
+              "n_gt": 1417
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "rgb_dataset_test",
+      "kind": "rgb",
+      "rule": "iou",
+      "n": 4000,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 17209
+    }
+  },
+  "selcom_val": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 39.6,
+        "n_gt_total": 295,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 31,
+              "FP": 5,
+              "FN": 19,
+              "TN": 0,
+              "precision": 0.8611,
+              "recall": 0.62,
+              "f1": 0.7209,
+              "n_gt": 50
+            },
+            "32-64px": {
+              "TP": 47,
+              "FP": 12,
+              "FN": 118,
+              "TN": 0,
+              "precision": 0.7966,
+              "recall": 0.2848,
+              "f1": 0.4196,
+              "n_gt": 165
+            },
+            ">=64px": {
+              "TP": 55,
+              "FP": 5,
+              "FN": 25,
+              "TN": 0,
+              "precision": 0.9167,
+              "recall": 0.6875,
+              "f1": 0.7857,
+              "n_gt": 80
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            "16-32px": {
+              "TP": 31,
+              "FP": 1,
+              "FN": 19,
+              "TN": 0,
+              "precision": 0.9688,
+              "recall": 0.62,
+              "f1": 0.7561,
+              "n_gt": 50
+            },
+            "32-64px": {
+              "TP": 47,
+              "FP": 1,
+              "FN": 118,
+              "TN": 0,
+              "precision": 0.9792,
+              "recall": 0.2848,
+              "f1": 0.4413,
+              "n_gt": 165
+            },
+            ">=64px": {
+              "TP": 55,
+              "FP": 5,
+              "FN": 25,
+              "TN": 0,
+              "precision": 0.9167,
+              "recall": 0.6875,
+              "f1": 0.7857,
+              "n_gt": 80
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "selcom_val",
+      "kind": "rgb",
+      "rule": "iop",
+      "n": 311,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 311
+    }
+  },
+  "svanstrom": {
+    "M_modality_ab": {
+      "rgb_only bare": {
+        "TP": 1532,
+        "FP": 1845,
+        "FN": 1782,
+        "TN": 0,
+        "precision": 0.4537,
+        "recall": 0.4623,
+        "f1": 0.4579,
+        "f1_ci": [
+          0.4477,
+          0.4678
+        ]
+      },
+      "rgb_only +filt": {
+        "TP": 1423,
+        "FP": 163,
+        "FN": 1891,
+        "TN": 0,
+        "precision": 0.8972,
+        "recall": 0.4294,
+        "f1": 0.5808,
+        "f1_ci": [
+          0.5721,
+          0.5896
+        ]
+      },
+      "ir_only bare": {
+        "TP": 1610,
+        "FP": 174,
+        "FN": 1704,
+        "TN": 0,
+        "precision": 0.9025,
+        "recall": 0.4858,
+        "f1": 0.6316,
+        "f1_ci": [
+          0.6261,
+          0.6368
+        ]
+      },
+      "ir_only +filt": {
+        "TP": 1610,
+        "FP": 173,
+        "FN": 1704,
+        "TN": 0,
+        "precision": 0.903,
+        "recall": 0.4858,
+        "f1": 0.6317,
+        "f1_ci": [
+          0.6263,
+          0.6369
+        ]
+      },
+      "both bare": {
+        "TP": 3142,
+        "FP": 2019,
+        "FN": 172,
+        "TN": 0,
+        "precision": 0.6088,
+        "recall": 0.9481,
+        "f1": 0.7415,
+        "f1_ci": [
+          0.7295,
+          0.7536
+        ]
+      },
+      "both +filt": {
+        "TP": 3033,
+        "FP": 336,
+        "FN": 281,
+        "TN": 0,
+        "precision": 0.9003,
+        "recall": 0.9152,
+        "f1": 0.9077,
+        "f1_ci": [
+          0.9005,
+          0.9151
+        ]
+      },
+      "routed[robust8] bare": {
+        "TP": 3092,
+        "FP": 354,
+        "FN": 222,
+        "TN": 0,
+        "precision": 0.8973,
+        "recall": 0.933,
+        "f1": 0.9148,
+        "f1_ci": [
+          0.9075,
+          0.9213
+        ]
+      },
+      "routed[robust8] +filt": {
+        "TP": 2983,
+        "FP": 187,
+        "FN": 331,
+        "TN": 0,
+        "precision": 0.941,
+        "recall": 0.9001,
+        "f1": 0.9201,
+        "f1_ci": [
+          0.9134,
+          0.9265
+        ]
+      },
+      "routed[robust8-nr] bare": {
+        "TP": 3136,
+        "FP": 1997,
+        "FN": 178,
+        "TN": 0,
+        "precision": 0.6109,
+        "recall": 0.9463,
+        "f1": 0.7425,
+        "f1_ci": [
+          0.7307,
+          0.7547
+        ]
+      },
+      "routed[robust8-nr] +filt": {
+        "TP": 3027,
+        "FP": 314,
+        "FN": 287,
+        "TN": 0,
+        "precision": 0.906,
+        "recall": 0.9134,
+        "f1": 0.9097,
+        "f1_ci": [
+          0.9024,
+          0.9169
+        ]
+      }
+    },
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 29.8,
+        "n_gt_total": 1673,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 17,
+              "FP": 1040,
+              "FN": 10,
+              "TN": 0,
+              "precision": 0.0161,
+              "recall": 0.6296,
+              "f1": 0.0314,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 892,
+              "FP": 390,
+              "FN": 102,
+              "TN": 0,
+              "precision": 0.6958,
+              "recall": 0.8974,
+              "f1": 0.7838,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 605,
+              "FP": 283,
+              "FN": 28,
+              "TN": 0,
+              "precision": 0.6813,
+              "recall": 0.9558,
+              "f1": 0.7955,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 18,
+              "FP": 132,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.12,
+              "recall": 0.9474,
+              "f1": 0.213,
+              "n_gt": 19
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 17,
+              "FP": 73,
+              "FN": 10,
+              "TN": 0,
+              "precision": 0.1889,
+              "recall": 0.6296,
+              "f1": 0.2906,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 812,
+              "FP": 61,
+              "FN": 182,
+              "TN": 0,
+              "precision": 0.9301,
+              "recall": 0.8169,
+              "f1": 0.8698,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 576,
+              "FP": 23,
+              "FN": 57,
+              "TN": 0,
+              "precision": 0.9616,
+              "recall": 0.91,
+              "f1": 0.9351,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 18,
+              "FP": 6,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.75,
+              "recall": 0.9474,
+              "f1": 0.8372,
+              "n_gt": 19
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 14.8,
+        "n_gt_total": 1641,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 963,
+              "FP": 74,
+              "FN": 30,
+              "TN": 0,
+              "precision": 0.9286,
+              "recall": 0.9698,
+              "f1": 0.9488,
+              "n_gt": 993
+            },
+            "16-32px": {
+              "TP": 642,
+              "FP": 97,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.8687,
+              "recall": 0.9984,
+              "f1": 0.9291,
+              "n_gt": 643
+            },
+            "32-64px": {
+              "TP": 5,
+              "FP": 2,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7143,
+              "recall": 1.0,
+              "f1": 0.8333,
+              "n_gt": 5
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 1,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 963,
+              "FP": 74,
+              "FN": 30,
+              "TN": 0,
+              "precision": 0.9286,
+              "recall": 0.9698,
+              "f1": 0.9488,
+              "n_gt": 993
+            },
+            "16-32px": {
+              "TP": 642,
+              "FP": 97,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.8687,
+              "recall": 0.9984,
+              "f1": 0.9291,
+              "n_gt": 643
+            },
+            "32-64px": {
+              "TP": 5,
+              "FP": 2,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7143,
+              "recall": 1.0,
+              "f1": 0.8333,
+              "n_gt": 5
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "svanstrom",
+      "kind": "paired",
+      "rule": "iop",
+      "n": 4000,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 4000
+    }
+  },
+  "svanstrom_clean": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 29.0,
+        "n_gt_total": 2074,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 49,
+              "FP": 1526,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.0311,
+              "recall": 0.98,
+              "f1": 0.0603,
+              "n_gt": 50
+            },
+            "16-32px": {
+              "TP": 1135,
+              "FP": 405,
+              "FN": 97,
+              "TN": 0,
+              "precision": 0.737,
+              "recall": 0.9213,
+              "f1": 0.8189,
+              "n_gt": 1232
+            },
+            "32-64px": {
+              "TP": 728,
+              "FP": 634,
+              "FN": 25,
+              "TN": 0,
+              "precision": 0.5345,
+              "recall": 0.9668,
+              "f1": 0.6884,
+              "n_gt": 753
+            },
+            ">=64px": {
+              "TP": 38,
+              "FP": 233,
+              "FN": 1,
+              "TN": 0,
+              "precision": 0.1402,
+              "recall": 0.9744,
+              "f1": 0.2452,
+              "n_gt": 39
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 44,
+              "FP": 146,
+              "FN": 6,
+              "TN": 0,
+              "precision": 0.2316,
+              "recall": 0.88,
+              "f1": 0.3667,
+              "n_gt": 50
+            },
+            "16-32px": {
+              "TP": 1040,
+              "FP": 42,
+              "FN": 192,
+              "TN": 0,
+              "precision": 0.9612,
+              "recall": 0.8442,
+              "f1": 0.8989,
+              "n_gt": 1232
+            },
+            "32-64px": {
+              "TP": 724,
+              "FP": 22,
+              "FN": 29,
+              "TN": 0,
+              "precision": 0.9705,
+              "recall": 0.9615,
+              "f1": 0.966,
+              "n_gt": 753
+            },
+            ">=64px": {
+              "TP": 35,
+              "FP": 16,
+              "FN": 4,
+              "TN": 0,
+              "precision": 0.6863,
+              "recall": 0.8974,
+              "f1": 0.7778,
+              "n_gt": 39
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 14.6,
+        "n_gt_total": 1961,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 1162,
+              "FP": 204,
+              "FN": 145,
+              "TN": 0,
+              "precision": 0.8507,
+              "recall": 0.8891,
+              "f1": 0.8694,
+              "n_gt": 1307
+            },
+            "16-32px": {
+              "TP": 654,
+              "FP": 203,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7631,
+              "recall": 1.0,
+              "f1": 0.8657,
+              "n_gt": 654
+            },
+            "32-64px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 3,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 1162,
+              "FP": 204,
+              "FN": 145,
+              "TN": 0,
+              "precision": 0.8507,
+              "recall": 0.8891,
+              "f1": 0.8694,
+              "n_gt": 1307
+            },
+            "16-32px": {
+              "TP": 654,
+              "FP": 203,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.7631,
+              "recall": 1.0,
+              "f1": 0.8657,
+              "n_gt": 654
+            },
+            "32-64px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            },
+            ">=64px": {
+              "TP": 0,
+              "FP": 0,
+              "FN": 0,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 0
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "svanstrom_clean",
+      "kind": "paired",
+      "rule": "iop",
+      "n": 5557,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 5557
+    }
+  },
+  "svanstrom_gray": {
+    "SZ_per_size": {
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 29.8,
+        "n_gt_total": 1673,
+        "verifier": "aligned_gray",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 12,
+              "FP": 340,
+              "FN": 15,
+              "TN": 0,
+              "precision": 0.0341,
+              "recall": 0.4444,
+              "f1": 0.0633,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 513,
+              "FP": 162,
+              "FN": 481,
+              "TN": 0,
+              "precision": 0.76,
+              "recall": 0.5161,
+              "f1": 0.6147,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 498,
+              "FP": 190,
+              "FN": 135,
+              "TN": 0,
+              "precision": 0.7238,
+              "recall": 0.7867,
+              "f1": 0.754,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 16,
+              "FP": 181,
+              "FN": 3,
+              "TN": 0,
+              "precision": 0.0812,
+              "recall": 0.8421,
+              "f1": 0.1481,
+              "n_gt": 19
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 6,
+              "FN": 27,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 27
+            },
+            "16-32px": {
+              "TP": 23,
+              "FP": 2,
+              "FN": 971,
+              "TN": 0,
+              "precision": 0.92,
+              "recall": 0.0231,
+              "f1": 0.0451,
+              "n_gt": 994
+            },
+            "32-64px": {
+              "TP": 99,
+              "FP": 5,
+              "FN": 534,
+              "TN": 0,
+              "precision": 0.9519,
+              "recall": 0.1564,
+              "f1": 0.2687,
+              "n_gt": 633
+            },
+            ">=64px": {
+              "TP": 10,
+              "FP": 4,
+              "FN": 9,
+              "TN": 0,
+              "precision": 0.7143,
+              "recall": 0.5263,
+              "f1": 0.6061,
+              "n_gt": 19
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "svanstrom_gray",
+      "kind": "gray",
+      "rule": "iop",
+      "n": 4000,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 4000
+    }
+  },
+  "svanstrom_rawrgb": {
+    "SZ_per_size": {
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 29.5,
+        "n_gt_total": 1630,
+        "verifier": "aligned",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 0,
+              "FP": 97,
+              "FN": 26,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 26
+            },
+            "16-32px": {
+              "TP": 82,
+              "FP": 170,
+              "FN": 907,
+              "TN": 0,
+              "precision": 0.3254,
+              "recall": 0.0829,
+              "f1": 0.1322,
+              "n_gt": 989
+            },
+            "32-64px": {
+              "TP": 120,
+              "FP": 31,
+              "FN": 475,
+              "TN": 0,
+              "precision": 0.7947,
+              "recall": 0.2017,
+              "f1": 0.3217,
+              "n_gt": 595
+            },
+            ">=64px": {
+              "TP": 4,
+              "FP": 65,
+              "FN": 16,
+              "TN": 0,
+              "precision": 0.058,
+              "recall": 0.2,
+              "f1": 0.0899,
+              "n_gt": 20
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 91,
+              "FN": 26,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 26
+            },
+            "16-32px": {
+              "TP": 81,
+              "FP": 170,
+              "FN": 908,
+              "TN": 0,
+              "precision": 0.3227,
+              "recall": 0.0819,
+              "f1": 0.1306,
+              "n_gt": 989
+            },
+            "32-64px": {
+              "TP": 117,
+              "FP": 28,
+              "FN": 478,
+              "TN": 0,
+              "precision": 0.8069,
+              "recall": 0.1966,
+              "f1": 0.3162,
+              "n_gt": 595
+            },
+            ">=64px": {
+              "TP": 4,
+              "FP": 58,
+              "FN": 16,
+              "TN": 0,
+              "precision": 0.0645,
+              "recall": 0.2,
+              "f1": 0.0976,
+              "n_gt": 20
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "svanstrom_rawrgb",
+      "kind": "rawrgb",
+      "rule": "iop",
+      "n": 4000,
+      "rgb_imgsz": 1280,
+      "ir_imgsz": 640,
+      "n_source": 28710
+    }
+  },
+  "video_drone": {
+    "SZ_per_size": {
+      "ft4/rgb": {
+        "median_gt_sqrt_area_px": 105.7,
+        "n_gt_total": 1234,
+        "verifier": "mlp_v5",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 9,
+              "FP": 1,
+              "FN": 35,
+              "TN": 0,
+              "precision": 0.9,
+              "recall": 0.2045,
+              "f1": 0.3333,
+              "n_gt": 44
+            },
+            "16-32px": {
+              "TP": 44,
+              "FP": 19,
+              "FN": 75,
+              "TN": 0,
+              "precision": 0.6984,
+              "recall": 0.3697,
+              "f1": 0.4835,
+              "n_gt": 119
+            },
+            "32-64px": {
+              "TP": 181,
+              "FP": 123,
+              "FN": 127,
+              "TN": 0,
+              "precision": 0.5954,
+              "recall": 0.5877,
+              "f1": 0.5915,
+              "n_gt": 308
+            },
+            ">=64px": {
+              "TP": 469,
+              "FP": 59,
+              "FN": 294,
+              "TN": 0,
+              "precision": 0.8883,
+              "recall": 0.6147,
+              "f1": 0.7266,
+              "n_gt": 763
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 0,
+              "FP": 1,
+              "FN": 44,
+              "TN": 0,
+              "precision": 0.0,
+              "recall": 0.0,
+              "f1": 0.0,
+              "n_gt": 44
+            },
+            "16-32px": {
+              "TP": 13,
+              "FP": 5,
+              "FN": 106,
+              "TN": 0,
+              "precision": 0.7222,
+              "recall": 0.1092,
+              "f1": 0.1898,
+              "n_gt": 119
+            },
+            "32-64px": {
+              "TP": 104,
+              "FP": 43,
+              "FN": 204,
+              "TN": 0,
+              "precision": 0.7075,
+              "recall": 0.3377,
+              "f1": 0.4571,
+              "n_gt": 308
+            },
+            ">=64px": {
+              "TP": 396,
+              "FP": 26,
+              "FN": 367,
+              "TN": 0,
+              "precision": 0.9384,
+              "recall": 0.519,
+              "f1": 0.6684,
+              "n_gt": 763
+            }
+          }
+        }
+      },
+      "v3b/ir": {
+        "median_gt_sqrt_area_px": 105.7,
+        "n_gt_total": 1234,
+        "verifier": "aligned_gray",
+        "buckets": {
+          "bare": {
+            "<16px": {
+              "TP": 13,
+              "FP": 7,
+              "FN": 31,
+              "TN": 0,
+              "precision": 0.65,
+              "recall": 0.2955,
+              "f1": 0.4062,
+              "n_gt": 44
+            },
+            "16-32px": {
+              "TP": 46,
+              "FP": 68,
+              "FN": 73,
+              "TN": 0,
+              "precision": 0.4035,
+              "recall": 0.3866,
+              "f1": 0.3948,
+              "n_gt": 119
+            },
+            "32-64px": {
+              "TP": 138,
+              "FP": 57,
+              "FN": 170,
+              "TN": 0,
+              "precision": 0.7077,
+              "recall": 0.4481,
+              "f1": 0.5487,
+              "n_gt": 308
+            },
+            ">=64px": {
+              "TP": 330,
+              "FP": 146,
+              "FN": 433,
+              "TN": 0,
+              "precision": 0.6933,
+              "recall": 0.4325,
+              "f1": 0.5327,
+              "n_gt": 763
+            }
+          },
+          "filt": {
+            "<16px": {
+              "TP": 10,
+              "FP": 3,
+              "FN": 34,
+              "TN": 0,
+              "precision": 0.7692,
+              "recall": 0.2273,
+              "f1": 0.3509,
+              "n_gt": 44
+            },
+            "16-32px": {
+              "TP": 9,
+              "FP": 40,
+              "FN": 110,
+              "TN": 0,
+              "precision": 0.1837,
+              "recall": 0.0756,
+              "f1": 0.1071,
+              "n_gt": 119
+            },
+            "32-64px": {
+              "TP": 60,
+              "FP": 17,
+              "FN": 248,
+              "TN": 0,
+              "precision": 0.7792,
+              "recall": 0.1948,
+              "f1": 0.3117,
+              "n_gt": 308
+            },
+            ">=64px": {
+              "TP": 127,
+              "FP": 15,
+              "FN": 636,
+              "TN": 0,
+              "precision": 0.8944,
+              "recall": 0.1664,
+              "f1": 0.2807,
+              "n_gt": 763
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "name": "video_drone",
+      "kind": "grayrgb_paired",
+      "rule": "iop",
+      "n": 1359,
+      "rgb_imgsz": 640,
+      "ir_imgsz": 640,
+      "n_source": 1359
+    }
+  }
+}

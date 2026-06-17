@@ -65,8 +65,10 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 (OUT_DIR / "classifiers").mkdir(parents=True, exist_ok=True)
 
 MODEL_PATHS = {
-    "selcom_ft3_1280": str(REPO / "RGB model" / "Yolo26n_selcom_mixed_ft3_1280" / "weights" / "best.pt"),
-    "ft4_r3":          str(REPO / "RGB model" / "Yolo26n_selcom_confuser_ft4_1280" / "weights" / "best.pt"),
+    # ES_Drone_Thesis layout: weights live under models/rgb/ (the pre-reorg
+    # "RGB model/" dir no longer exists). Repointed 2026-06-17.
+    "selcom_ft3_1280": str(REPO / "models" / "rgb" / "Yolo26n_selcom_mixed_ft3_1280" / "weights" / "best.pt"),
+    "ft4_r3":          str(REPO / "models" / "rgb" / "Yolo26n_selcom_confuser_ft4_1280" / "weights" / "best.pt"),
 }
 
 ANTIUAV_DIR  = Path("G:/drone/Anti-UAV-RGBT_yolo_converted/test/RGB/images")

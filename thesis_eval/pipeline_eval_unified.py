@@ -29,7 +29,7 @@ smaller; n (and n_source) printed everywhere.
   py -u thesis_eval/pipeline_eval_unified.py --only svanstrom      # one surface
 """
 from __future__ import annotations
-import argparse, json, pickle, time
+import argparse, json, os, pickle, time
 from pathlib import Path
 import numpy as np
 
@@ -49,13 +49,18 @@ ROBUST6_JBL  = REPO / "models/routers/lean_ft4/trust_ft4_robust6.joblib"  # 6-fe
 SA32_JBL     = REPO / "models/routers/scene_aware_v3more_32feat/model.joblib"  # sad 32-feat router
 NR_DROP_JBL  = REPO / "models/routers/robust8_noreject_drop/model.joblib"   # no-reject 3-class (reject rows dropped)
 NR_BOTH_JBL  = REPO / "models/routers/robust8_noreject_both/model.joblib"   # no-reject 3-class (reject -> both)
-MLP_V5       = REPO / "models/verifiers/rgb_v5/mlp_v5.pt"   # RGB verifier
-ALIGNED      = REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"        # IR verifier (thermal scaler)
-ALIGNED_GRAY = REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt"   # same net, GRAYSCALE scaler
+# Weights/thresholds are env-overridable (defaults = SHIPPED, so committed numbers are unchanged).
+# Filter A/B harness sets THESIS_* to repoint at candidate filters WITHOUT clobbering the committed stack.
+MLP_V5       = Path(os.environ.get("THESIS_MLP_V5",       REPO / "models/verifiers/rgb_v5/mlp_v5.pt"))   # RGB verifier
+ALIGNED      = Path(os.environ.get("THESIS_ALIGNED",      REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"))        # IR verifier (thermal scaler)
+ALIGNED_GRAY = Path(os.environ.get("THESIS_ALIGNED_GRAY", REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt"))   # same net, GRAYSCALE scaler
 CACHE_DIR    = REPO / "thesis_eval" / "cache"
 OUT_DIR      = REPO / "thesis_eval" / "results"
 
-RGB_THR_MLP, IR_THR_MLP, GRAY_THR_MLP, TAU = 0.25, 0.05, 0.25, 0.20              # shipped thresholds
+RGB_THR_MLP  = float(os.environ.get("THESIS_RGB_THR_MLP",  0.25))
+IR_THR_MLP   = float(os.environ.get("THESIS_IR_THR_MLP",   0.05))
+GRAY_THR_MLP = float(os.environ.get("THESIS_GRAY_THR_MLP", 0.25))
+TAU = 0.20                                                                       # shipped thresholds
 REJECT_FLOOR = 0.80   # round-8 reject-probability-floor ablation: ONE global x* applied to every surface
 DUMMY_G, DUMMY_WH = np.zeros((64, 64), np.uint8), (64, 64)                       # f8 recompute ignores pixels
 BOOT_ITERS, BOOT_SEED = 1000, 0

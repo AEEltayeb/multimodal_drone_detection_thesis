@@ -35,7 +35,7 @@ The per-prefix distribution is in Table~\ref{tab:ds_ir_components}. The Svanstr\
 
 \section{Thermal Confuser Corpus (\texttt{IR\_confusers})}
 
-5{,}938 thermal frames containing aerial confusers and no drones: 4{,}281 airplane, 1{,}200 bird, and 457 helicopter frames (category encoded in the filename prefix), exported from Roboflow-hosted thermal confuser video; source streams disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split holds 5{,}237 frames, sampled to 4{,}000 by even spread (3{,}043 airplane / 871 bird / 86 helicopter). All frames carry empty YOLO labels; every detection on this surface is a false positive by construction. The corpus contributes no training data to any model; it is the OOD stress surface for the IR branch (Section~\ref{sec:ds_ir_confusers}). The 180-frame CBAM probe used during the aligned filter's development remains that filter's held-out training gate, since \texttt{IR\_confusers} postdates the training.
+5{,}938 thermal frames containing aerial confusers and no drones: 4{,}281 airplane, 1{,}200 bird, and 457 helicopter frames (category encoded in the filename prefix), exported from Roboflow-hosted thermal confuser video; source streams disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split holds 5{,}237 frames, sampled to 4{,}000 by even spread (3{,}043 airplane / 871 bird / 86 helicopter). All frames carry empty YOLO labels; every detection on this surface is a false positive by construction. The corpus contributes no training data to any model; it is the OOD stress surface for the IR branch (Section~\ref{sec:ds_ir_confusers}). The thermal-native head is trained with the GT-aware CBAM \emph{train} split; its held-out gates are the disjoint \emph{CBAM valid} split (drone recall recovered $0.717 \to 0.967$) and the held-out \texttt{IR\_confusers} val/test re-mine ($90 \to 22$ residual fires, $94\%$ removed; Section~\ref{sec:ir_xmodal_verifier}).
 
 \section{Svanstr\"om Paired}
 
@@ -153,16 +153,16 @@ Model & Role & Note \\
 \texttt{robust8-nr} & \textbf{production} & Shipped trust router: the eight \texttt{robust8} features with the \texttt{reject} class dropped (always routes RGB/IR/both; the filter owns false-positive rejection). \\
 \texttt{robust8} & ablation & Four-class router (\texttt{robust6} $+$ two free features $+$ a tuned per-class threshold); recommended on confuser-rich paired streams, retained as the reject-class ablation. \\
 \texttt{robust6} & comparison & Six statistically-selected, leakage-free features; the base extended into \texttt{robust8}/\texttt{robust8-nr}. \\
-\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, superseded in production by \texttt{robust8-nr}. \\
+\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, but leaks scene statistics so its lead is not trusted to generalise to unseen surfaces; superseded in production by \texttt{robust8-nr}. \\
 \texttt{control40} & comparison & 40-feature control: best raw drone metrics but the worst confuser rejection. \\
 \texttt{fusion\_no\_fn\_v1.1} & comparison & Open-world fallback; the most conservative variant on the OOD confuser zoo. \\
 \midrule
 \multicolumn{3}{l}{\textbf{Confuser filters}} \\
 \midrule
-\texttt{mlp\_v5} & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} ROI features, run per-frame. \\
-\texttt{mlp\_v5\_ir\_aligned} & \textbf{production} & Production IR filter (one network, two per-modality scalers); held-out CBAM $F1\;0.699\to0.846$, FP $48\to15$, recall-safe. \\
-\texttt{mlp\_v5\_gray} & comparison & Grayscale-mode filter; cuts held-out grayscale confuser FPs by ${\sim}96\%$. \\
-\texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch filter; documented fallback on the photo-style \texttt{rgb\_dataset} surface. \\
+\texttt{mlp\_v5} (\texttt{v4} build) & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} ROI features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.809\to0.922$, recall $0.691\to0.887$). \\
+\texttt{mlp\_aligned\_thermalonly} & \textbf{production} & Thermal-native head of the two-head IR filter (CBAM-trained, @0.05); held-out CBAM recall recovered $0.717\to0.967$ at FP $6$, with $94\%$ of held-out thermal confusers removed. \\
+\texttt{mlp\_aligned\_gray\_balanced} & \textbf{production} & Grayscale-aligned head of the two-head IR filter (@0.25); cuts held-out grayscale confuser FPs by ${\sim}97.7\%$ ($656\to15$). \\
+\texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch filter; audited predecessor, the \texttt{v4} RGB filter removes its last fallback role. \\
 \bottomrule
 \caption{Models referenced in this thesis: the production pick at each cascade stage and the comparison or ablation variants discussed in the main text. The complete experimental registry is retained in the project repository.}
 \label{tab:models_evaluated}
@@ -214,19 +214,18 @@ Every headline number in this thesis is the value of a named cell in a canonical
 
 \begin{table}[htbp]
     \centering
-    \caption{Headline-number provenance: thesis claim $\to$ canonical results file (under \texttt{runs/}, frozen copies of \texttt{thesis\_eval/results/}) $\to$ reproduction command. All replay commands are zero-GPU.}
+    \caption{Headline-number provenance: thesis claim $\to$ canonical results file (under \texttt{runs/}, frozen copies of \texttt{thesis\_eval/results/}) $\to$ reproduction command. All \emph{pipeline} replay commands are zero-GPU; the two rows marked \texttt{(GPU)} (the IR-detector trajectory and stage latencies) require the detectors and target hardware.}
     \label{tab:provenance}
     \footnotesize
     \begin{tabular}{p{4.4cm}p{4.6cm}p{4.6cm}}
         \toprule
         Thesis number & File (cell) & Reproduce \\
         \midrule
-        Svanstr\"om composed F1 $0.742 \to 0.944$ (shipped \texttt{robust8-nr}, \texttt{filt$\to$clf}) & \texttt{results\_noreject/tier1\_results.json} (\texttt{svanstrom.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only svanstrom} \\
-        Confuser fire $30.4\% \to 1.1\%$ (shipped \texttt{robust8-nr}; $0.15\%$ \texttt{robust8} ablation) & \texttt{results\_noreject/tier1\_results.json} (\texttt{rgb\_confuser.C\_confuser}) & \texttt{pipeline\_eval\_unified.py --only rgb\_confuser} \\
+        Svanstr\"om composed F1 $0.742 \to 0.946$ (shipped \texttt{robust8-nr}, \texttt{filt$\to$clf}) & \texttt{results\_noreject/tier1\_results.json} (\texttt{svanstrom.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only svanstrom} \\
+        Confuser fire $30.4\% \to 1.4\%$ (shipped \texttt{robust8-nr}; $0.11\%$ \texttt{robust8} ablation) & \texttt{results\_noreject/tier1\_results.json} (\texttt{rgb\_confuser.C\_confuser}) & \texttt{pipeline\_eval\_unified.py --only rgb\_confuser} \\
         Anti-UAV no-harm $0.973 \to 0.984$ & \texttt{tier1\_results.json} (\texttt{antiuav.B\_pipeline}) & \texttt{pipeline\_eval\_unified.py --only antiuav} \\
         Grayscale 3-way $0.607/0.187/0.580$ & \texttt{tier1\_results.json} (D table) & \texttt{pipeline\_eval\_unified.py} \\
         Temporal 2-of-3 windows (Table~\ref{tab:temporal_production}) & \texttt{temporal\_results.json} & \texttt{temporal\_replay.py} \\
-        Modality A/B (Table~\ref{tab:modality_ab}) & \texttt{notes\_round1\_results.json} (\texttt{M\_modality\_ab}) & \texttt{notes\_round1\_replays.py} \\
         Per-size buckets (Table~\ref{tab:per_size}) & \texttt{notes\_round1\_results.json} (\texttt{SZ\_per\_size}) & \texttt{notes\_round1\_replays.py} \\
         Background profile (Table~\ref{tab:failure_profile}) & \texttt{failure\_profile\_results.json} & \texttt{failure\_profile\_aggregate.py} \\
         Low-conf mode (Table~\ref{tab:lowconf_selcom}) & \texttt{conf\_sweep/conf\_sweep\_results.json} & \texttt{conf\_sweep\_replay.py} \\
@@ -261,13 +260,13 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[robust6] The six-feature trust classifier (per-modality detection confidence $+$ box geometry), its features screened by the scene-fingerprint ratio (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
     \item[robust8] The four-class trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features and a tuned per-class decision threshold; retained as the reject-class ablation and recommended on confuser-rich paired streams.
     \item[robust8-nr] The shipped production trust router (Section~\ref{sec:classifier_results}): the eight \texttt{robust8} features with the \texttt{reject} class dropped, so it always routes RGB/IR/both and the per-frame filter owns false-positive rejection.
-    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost), superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
+    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
     \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
     \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate 40-feature trust classifier; deprecated.
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
     \item[v2 (patch filter)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
-    \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame.
-    \item[\texttt{mlp\_v5\_ir\_aligned}] The cross-modal IR confuser filter (Section~\ref{sec:grayscale_verifier}): one network with two per-modality input scalers, serving the thermal-deploy and grayscale-fallback paths.
+    \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
+    \item[IR filter (two heads)] The cross-modal IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}), now two heads selected per modality: a thermal-native head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) for thermal deployment and a grayscale-aligned head (\texttt{mlp\_aligned\_gray\_balanced}, @0.25) for the grayscale-fallback path.
     \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
     \item[\texttt{imgsz}] Ultralytics short for input letterbox size. Drives small-object recall (Section~\ref{sec:resolution_arch}).

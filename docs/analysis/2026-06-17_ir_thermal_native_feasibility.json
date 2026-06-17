@@ -1,0 +1,12 @@
+{
+  "n_thermal_drone_feats": 2934,
+  "n_thermal_confuser_feats": 288,
+  "auroc_max": 0.9659191966056824,
+  "n_feats_auroc_gt_0.8": 87,
+  "n_feats_auroc_gt_0.7": 218,
+  "lda_train_acc": 1.0,
+  "lda_test_acc": 0.9807321772639692,
+  "lda_test_drone_recall": 0.9861111111111112,
+  "lda_test_confuser_recall": 0.9540229885057471,
+  "figure": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\docs\\analysis\\images\\2026-06-17_ir_thermal_native_feasibility.png"
+}

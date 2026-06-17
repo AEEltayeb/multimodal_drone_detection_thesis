@@ -1,0 +1,11 @@
+model: sa32
+name: scene_aware_v3more_32feat
+type: classifier
+role: Trust-router ablation
+production: false
+weights: models/routers/scene_aware_v3more_32feat/model.joblib
+trained_on:
+- fusion features (32)
+tested_on:
+- (thesis ablation surfaces; see knowledge/models.csv)
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

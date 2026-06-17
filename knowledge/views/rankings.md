@@ -65,6 +65,9 @@ Per purpose, the meaningful metric differs: detection purposes rank by best F1 (
 | robust6 |  | 4 |
 | robust8 |  | 3 |
 | robust8_nr_drop_2 |  | 0 |
+| mlp_v5_balanced_v4 |  | 1 |
+| mlp_aligned_thermalonly |  | 1 |
+| mlp_aligned_gray_balanced |  | 0 |
 
 ## drone-detection  _(by best_f1)_
 

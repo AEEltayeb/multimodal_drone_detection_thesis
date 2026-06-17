@@ -19,14 +19,14 @@
     },
     "filt_mlp": {
       "frame": [
-        0.9487,
-        0.5401,
-        0.6884
+        0.9475,
+        0.5126,
+        0.6653
       ],
       "window": [
-        0.9538,
-        0.5405,
-        0.69
+        0.9537,
+        0.489,
+        0.6465
       ]
     },
     "filt_patch": {
@@ -55,14 +55,14 @@
     },
     "clf->filt[robust8]": {
       "frame": [
-        0.9591,
-        0.3998,
-        0.5644
+        0.9606,
+        0.3958,
+        0.5606
       ],
       "window": [
-        0.9717,
-        0.3933,
-        0.56
+        0.9746,
+        0.3769,
+        0.5436
       ]
     },
     "clf[robust6]": {
@@ -79,14 +79,14 @@
     },
     "clf->filt[robust6]": {
       "frame": [
-        0.987,
-        0.4323,
-        0.6012
+        0.9868,
+        0.4242,
+        0.5933
       ],
       "window": [
-        0.9982,
-        0.4432,
-        0.6138
+        0.998,
+        0.4121,
+        0.5833
       ]
     },
     "clf[sa32]": {
@@ -103,14 +103,14 @@
     },
     "clf->filt[sa32]": {
       "frame": [
-        0.9652,
-        0.4274,
-        0.5925
+        0.9675,
+        0.4104,
+        0.5763
       ],
       "window": [
-        0.9761,
-        0.435,
-        0.6018
+        0.9838,
+        0.3982,
+        0.5669
       ]
     },
     "clf[robust8_nr_drop]": {
@@ -127,14 +127,14 @@
     },
     "clf->filt[robust8_nr_drop]": {
       "frame": [
-        0.9485,
-        0.5377,
-        0.6863
+        0.9475,
+        0.5126,
+        0.6653
       ],
       "window": [
-        0.9536,
-        0.5372,
-        0.6872
+        0.9537,
+        0.489,
+        0.6465
       ]
     },
     "clf[robust8_nr_both]": {
@@ -151,14 +151,14 @@
     },
     "clf->filt[robust8_nr_both]": {
       "frame": [
-        0.9487,
-        0.5401,
-        0.6884
+        0.9475,
+        0.5126,
+        0.6653
       ],
       "window": [
-        0.9538,
-        0.5405,
-        0.69
+        0.9537,
+        0.489,
+        0.6465
       ]
     },
     "clf->filt_patch[sa32]": {
@@ -185,8 +185,8 @@
       "window_fire": 0.3504
     },
     "filt_mlp": {
-      "frame_fire": 0.2472,
-      "window_fire": 0.226
+      "frame_fire": 0.236,
+      "window_fire": 0.213
     },
     "filt_patch": {
       "frame_fire": 0.2264,
@@ -197,40 +197,40 @@
       "window_fire": 0.1008
     },
     "clf->filt[robust8]": {
-      "frame_fire": 0.096,
-      "window_fire": 0.0732
+      "frame_fire": 0.0976,
+      "window_fire": 0.0756
     },
     "clf[robust6]": {
       "frame_fire": 0.1016,
       "window_fire": 0.0813
     },
     "clf->filt[robust6]": {
-      "frame_fire": 0.072,
-      "window_fire": 0.0569
+      "frame_fire": 0.0752,
+      "window_fire": 0.0585
     },
     "clf[sa32]": {
       "frame_fire": 0.1376,
       "window_fire": 0.1203
     },
     "clf->filt[sa32]": {
-      "frame_fire": 0.0856,
-      "window_fire": 0.0707
+      "frame_fire": 0.0808,
+      "window_fire": 0.0634
     },
     "clf[robust8_nr_drop]": {
       "frame_fire": 0.3632,
       "window_fire": 0.3504
     },
     "clf->filt[robust8_nr_drop]": {
-      "frame_fire": 0.2464,
-      "window_fire": 0.2252
+      "frame_fire": 0.236,
+      "window_fire": 0.213
     },
     "clf[robust8_nr_both]": {
       "frame_fire": 0.3632,
       "window_fire": 0.3504
     },
     "clf->filt[robust8_nr_both]": {
-      "frame_fire": 0.2472,
-      "window_fire": 0.226
+      "frame_fire": 0.236,
+      "window_fire": 0.213
     },
     "clf->filt_patch[sa32]": {
       "frame_fire": 0.1,

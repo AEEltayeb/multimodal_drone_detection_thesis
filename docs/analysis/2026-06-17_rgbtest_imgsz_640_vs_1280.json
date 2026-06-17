@@ -1,0 +1,60 @@
+{
+  "640": {
+    "buckets": {
+      "<16px": {
+        "n_gt": 115,
+        "matched": 94,
+        "kept": 24
+      },
+      "16-32px": {
+        "n_gt": 117,
+        "matched": 102,
+        "kept": 50
+      },
+      "32-64px": {
+        "n_gt": 116,
+        "matched": 113,
+        "kept": 97
+      },
+      ">=64px": {
+        "n_gt": 208,
+        "matched": 203,
+        "kept": 201
+      }
+    },
+    "total": {
+      "n_gt": 556,
+      "matched": 512,
+      "kept": 372
+    }
+  },
+  "1280": {
+    "buckets": {
+      "<16px": {
+        "n_gt": 115,
+        "matched": 98,
+        "kept": 22
+      },
+      "16-32px": {
+        "n_gt": 117,
+        "matched": 105,
+        "kept": 50
+      },
+      "32-64px": {
+        "n_gt": 116,
+        "matched": 112,
+        "kept": 76
+      },
+      ">=64px": {
+        "n_gt": 208,
+        "matched": 195,
+        "kept": 147
+      }
+    },
+    "total": {
+      "n_gt": 556,
+      "matched": 510,
+      "kept": 295
+    }
+  }
+}

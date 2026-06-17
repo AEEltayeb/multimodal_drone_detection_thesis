@@ -1,0 +1,11 @@
+model: ir_v4
+name: IR_dsetV4_300ep
+type: ir_yolo
+role: IR detector evolution (§4.1)
+production: false
+weights: models/ir/IR_dsetV4_300ep/best.pt
+trained_on:
+- (see knowledge/models.csv)
+tested_on:
+- (thesis ablation surfaces; see knowledge/models.csv)
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

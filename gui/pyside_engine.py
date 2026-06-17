@@ -263,7 +263,10 @@ class TalosEngine:
             gray_w = s.get("ir_mlp_verifier_weights_gray", "")
             if gray_w and Path(gray_w).exists():
                 kwargs["ir_mlp_verifier_weights"] = gray_w
-                log("IR MLP: grayscale scaler (mlp_aligned_gray)")
+                # grayscale head has its OWN operating point (thermal=0.05, gray=0.25); thermal and
+                # grayscale modes are mutually exclusive at load, so we override the IR threshold here.
+                kwargs["ir_mlp_threshold"] = float(s.get("ir_mlp_threshold_gray", 0.25))
+                log(f"IR MLP: grayscale head (mlp_aligned_gray) @ thr {kwargs['ir_mlp_threshold']}")
             elif kwargs.get("use_ir_mlp_verifier"):
                 log("IR MLP: ir_mlp_verifier_weights_gray not set — using thermal scaler on gray input")
         self.fe = FusionEngine(**kwargs)

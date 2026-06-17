@@ -1,0 +1,38 @@
+{
+  "tag": "final",
+  "created": "2026-06-17 23:58:42",
+  "git_sha": "b1bd1c2",
+  "weights": {
+    "rgb": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\models\\verifiers\\rgb_v5\\mlp_v5_v4.pt",
+      "sha256_16": "a2eb4bd7bd22f1e2"
+    },
+    "ir": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\models\\verifiers\\ir_aligned\\mlp_aligned_thermalonly.pt",
+      "sha256_16": "63ea157a4252971f"
+    },
+    "ir_gray": {
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\models\\verifiers\\ir_aligned\\mlp_aligned_gray_balanced.pt",
+      "sha256_16": "80660bd64fdbfa4a"
+    }
+  },
+  "thresholds": {
+    "rgb": "0.25",
+    "ir": "0.05",
+    "gray": "0.25"
+  },
+  "jobs": [
+    {
+      "job": "pipeline",
+      "cmd": "py -u thesis_eval/pipeline_eval_unified.py --out C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\thesis_eval\\_filter_swap\\final",
+      "rc": 0,
+      "seconds": 331.6
+    },
+    {
+      "job": "temporal",
+      "cmd": "py -u thesis_eval/temporal_replay.py --out C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Thesis\\thesis_eval\\_filter_swap\\final",
+      "rc": 0,
+      "seconds": 67.7
+    }
+  ]
+}

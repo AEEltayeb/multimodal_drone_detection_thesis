@@ -1,0 +1,50 @@
+{
+  "buckets": [
+    "<16px",
+    "16-32",
+    "32-64",
+    ">=64"
+  ],
+  "rgb_train_drone": [
+    4367,
+    1874,
+    3679,
+    9414
+  ],
+  "rgb_train_confuser": [
+    5331,
+    3385,
+    2628,
+    2253
+  ],
+  "fire_rgb_confuser": [
+    111,
+    39,
+    32,
+    34
+  ],
+  "fire_rgb_bird_confuser": [
+    0,
+    11,
+    144,
+    311
+  ],
+  "fire_gray_confuser": [
+    39,
+    32,
+    13,
+    59
+  ],
+  "fire_ir_confusers": [
+    115,
+    77,
+    68,
+    28
+  ],
+  "rgb_test_drone_dets": [
+    124,
+    138,
+    175,
+    347
+  ]
+}

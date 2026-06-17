@@ -5,6 +5,12 @@
 Same config_id = apples-to-apples (same dataset, n_samples, imgsz, scoring).
 
 
+## config: `acceptance_rgb`
+
+| target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
+|---|---|---|---|---|---|---|
+| rgb_bird_confuser |  |  |  |  |  |  |
+
 ## config: `antiuav_iou_1280_s5`
 
 | target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
@@ -43,6 +49,12 @@ Same config_id = apples-to-apples (same dataset, n_samples, imgsz, scoring).
 | target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
 |---|---|---|---|---|---|---|
 | selcom_1280 | 0.84 |  | 0.902 |  |  |  |
+
+## config: `birdtest_heldout`
+
+| target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
+|---|---|---|---|---|---|---|
+| bird_v1i_test |  |  |  |  |  |  |
 
 ## config: `cbam_ir_640`
 
@@ -162,6 +174,20 @@ Same config_id = apples-to-apples (same dataset, n_samples, imgsz, scoring).
 | ir_v5 |  |  | 0.737 |  |  |  |
 | ir_v3 |  |  | 0.611 |  |  |  |
 | ir_v2 | 0.661 | 0.406 | 0.503 |  |  |  |
+
+## config: `ir_heldout`
+
+| target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
+|---|---|---|---|---|---|---|
+| IR_confusers_valtest |  |  |  |  |  |  |
+| CBAM_valid |  | 0.967 |  |  |  |  |
+
+## config: `offline_cache_matrix`
+
+| target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
+|---|---|---|---|---|---|---|
+| mlp_v5_balanced_v4 |  |  | 0.861 |  |  |  |
+| mlp_aligned_thermalonly |  |  |  |  |  |  |
 
 ## config: `patch_catch_svan_1280_s9`
 
@@ -331,6 +357,13 @@ Same config_id = apples-to-apples (same dataset, n_samples, imgsz, scoring).
 |---|---|---|---|---|---|---|
 | antiuav | 0.9838 | 0.9885 | 0.9862 |  |  |  |
 | antiuav | 0.9826 | 0.988 | 0.9853 |  |  |  |
+
+## config: `tier1_strided`
+
+| target | precision | recall | f1 | fpr | halluc_rate | latency_ms |
+|---|---|---|---|---|---|---|
+| rgb_dataset_test |  | 0.8873 | 0.9222 |  |  |  |
+| ir_confusers |  |  |  |  | 0.0278 |  |
 
 ## config: `tier1_svan_iop_1280`
 

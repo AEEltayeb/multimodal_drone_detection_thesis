@@ -5,7 +5,40 @@
 # Project State
 
 ## 📍 Resume Here
-_Updated: 2026-06-14 (PUBLISH — ES_Drone_Thesis pushed to GitHub, runnable clone; prior: SESSION 9b)_
+_Updated: 2026-06-17 (FILTER REGRESSIONS — RGB veto diagnosed + fix authored; IR keep-aligned; prior: PUBLISH)_
+
+> **2026-06-17 (FILTER RECALL REGRESSIONS — RGB cause+fix, IR verdicts; all zero-GPU; user runs the retrain):**
+> Investigated `check.txt`. **RGB:** mlp_v5 vetoes **22.3%** of rgb_dataset_test real drones — **mechanism =
+> size×source COVERAGE GAP**, not confuser-likeness or imgsz (imgsz REFUTED). Vetoed drones are **3.33× OOD**
+> from the train-drone manifold (kept 1.26×), 55% 20-NN-confuser, **74% sub-16px veto**. Root cause nailed via
+> the parent distill per-source counts + a label-only dry-run: the **alphabetical stride-8 8000-drone quota**
+> took **anti=7079 / wosdetc=0** (wosdetc = largest small-drone source, sorts last) and only **23%** of
+> available xs drones → the small-drone manifold is unpopulated, so the precision boundary (owned by confusers
+> there) rejects. **Fix AUTHORED (GPU, gated):** `eval/distill_v5_balanced_remine.py` — rgb_dataset drones
+> balanced by (sub-source × size), confusers protected, reuses distill primitives → `mlp_v5_balanced.pt`;
+> dry-run shows xs 618→1821, wosdetc 0→3618. Bar = recover recall, hold confusers. **IR (diagnose+recommend,
+> no reship): KEEP ALIGNED** — own-GT threshold sweep (native `mlp_v5_ir` vs aligned `mlp_aligned` on thermal):
+> not redundant (filters remove 24–53% of thermal confuser dets), **grayscale did NOT hurt** (aligned more
+> recall-safe, R 0.945–0.960 vs native 0.905–0.947, and removes ≥ as many confusers at matched recall), native
+> only wins by sacrificing ≥4pp recall. **Thermal-native filter feasible** (held-out LDA 0.981, AUROC≤0.966)
+> **but low priority** (thermal confuser data scarce 288 dets; problem small 0.288 halluc/img; aligned already
+> halves it). Docs: `docs/analysis/2026-06-17_rgbtest_filter_regression{,_FIX}.md`,
+> `…_ir_filter_native_vs_aligned.md`. Ledger: `rgbtest-filter-coverage-gap`, `ir-filter-keep-aligned`,
+> `thermal-native-filter-feasible`. 6 scripts recorded; `diagnose_mlp_recall_drop` superseded (meta-last bug).
+> **GPU follow-ups gated on user:** the RGB retrain (above) + optional `mri.train_aligned --no-gray` clean A/B.
+> NOTE: thesis agent owns `.tex` — none touched.
+
+> **2026-06-17 (cont. — both fixes AUTHORED; reorg stale-path bugs fixed):** User ran the RGB re-mine →
+> it hit a stale `RGB model/` detector path (pre-reorg) → repointed `eval/distill_v5_p3p5_ft4.py`
+> `MODEL_PATHS` to `models/rgb/` (re-run ready). **IR fix authored** per user ("balance should be
+> hole-specific; the hole is airplanes"): `mri/train_aligned.py --thermal-confusers` adds the
+> **`IR_confusers` TRAIN split** (airplane 3984 / bird 1140 / heli 113; cap 6000) as thermal confusers,
+> **val 536 + test 165 held out**; `mri/modality_align.py mine_multi` now **guards missing dirs** (fixes
+> train_aligned's absent `dataset_v3` thermal-drone source). Run: `py -m mri.train_aligned --thermal-confusers`
+> → `mri/results/ir_aligned_balanced/`. Docs `_rgbtest_filter_regression_FIX.md`,
+> `_ir_filter_airplane_balance_FIX.md`. ⚠️ ~20 other legacy `training/`+`eval/` scripts still carry the
+> pre-reorg `RGB model/` path (run_roboflow_eval, overnight_confuser_distill, finetune_*, compare_*, etc.) —
+> out of scope, not fixed; repoint if/when run.
 
 > **2026-06-14 (PUBLISH — pushed to GitHub `AEEltayeb/dorne_thesis`):** Made the repo a runnable, self-
 > contained clone (weights + thesis + figures + all code, ~1.19 GB, plain git, NO LFS; `main` @ `fe4d735`).

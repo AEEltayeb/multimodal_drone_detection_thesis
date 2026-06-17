@@ -1,0 +1,34 @@
+model: mlp_v5_balanced_v4
+name: mlp_v5 balanced_v4 (birdsplit)
+type: mlp
+role: RGB confuser filter — production (filter swap 2026-06-18)
+production: true
+weights: models/verifiers/rgb_v5/mlp_v5_v4.pt
+sha256_16: a2eb4bd7bd22f1e2
+deploy_threshold: '0.25'
+feature_detector: models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt
+trained_on:
+- rgb_dataset drones — dataset/dataset/images/{train,val} (balanced by sub-source x size)
+- Anti-UAV val/RGB drones
+- SelCom CCTV — 833 drones + 149 confusers (pure-selcom; the 311 SelCom-val images excluded; imgsz 1280)
+- Svanstrom RGB drones (imgsz 1280)
+- confusers — rgb_confusers_merged/images/{train,val}, RGB_video, Svanstrom drone-empty frames
+- bird.v1i — 728 of 1212 images (60% train split, seed 0), as confusers
+tested_on:
+- surface: rgb_dataset test
+  data: dataset/dataset/images/test
+  drone_recall: 0.874
+- surface: Anti-UAV RGB test
+  data: Anti-UAV/test/RGB
+  drone_recall: 0.982
+- surface: SelCom val
+  data: _finetune_selcom_mixed_ft2/images/val
+  drone_recall: 0.451
+- surface: RGB confusers test
+  data: rgb_confusers_merged/images/test
+  result: confuser fires held
+- surface: bird.v1i held-out test
+  data: bird.v1i 484 of 1212 (40% test split, not trained on)
+  result: '30 of 230 fires kept (predecessor mlp_v5: 91 of 230)'
+training_script: eval/build_balanced_v4_birdsplit.py
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

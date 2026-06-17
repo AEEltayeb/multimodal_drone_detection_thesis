@@ -1,0 +1,17 @@
+model: ir_v3b
+name: IR finetune_v3b
+type: ir_yolo
+role: IR production detector (§4.1)
+production: true
+weights: models/ir/corrective_finetune/finetune_v3b/weights/best.pt
+trained_on:
+- IR_dset_final (+ HITL hard-negs)
+tested_on:
+- (thesis §4.1 / §3.1 surfaces; see knowledge/models.csv)
+training_config:
+  base_model: finetune_v3
+  epochs: 2
+  imgsz: 640
+  data_yaml: runs/corrective_finetune/dataset_v3/dataset.yaml
+  args_yaml: models/ir/corrective_finetune/finetune_v3b/args.yaml
+generated_by: knowledge/_tools/gen_model_cards.py -- DO NOT hand-edit; re-run to refresh

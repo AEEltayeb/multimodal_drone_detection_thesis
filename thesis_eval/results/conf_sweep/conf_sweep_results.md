@@ -1,5 +1,5 @@
 # Detector-confidence sweep × MLP verifier — does recall+filter beat the defaults?
-2026-06-11 16:12 | cache: cache_conf005 | defaults rgb=0.25 / ir=0.40 / gray=0.40 (fusion_settings.json) | verifier thr rgb=0.25 / ir=0.05 / gray=0.25 | robust8 tau=0.20
+2026-06-17 13:43 | cache: cache_conf005 | defaults rgb=0.25 / ir=0.40 / gray=0.40 (fusion_settings.json) | verifier thr rgb=0.25 / ir=0.05 / gray=0.25 | robust8 tau=0.20
 Points below a cache's conf floor are censored. Bootstrap CIs: frame resample, 1000 iters.
 
 
