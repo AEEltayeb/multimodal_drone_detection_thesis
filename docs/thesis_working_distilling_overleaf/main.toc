@@ -103,52 +103,53 @@
 \contentsline {subsection}{\numberline {5.5.1}The Fair Three-Way Comparison}{65}{subsection.5.5.1}%
 \contentsline {subsection}{\numberline {5.5.2}Mechanism and Bounds}{65}{subsection.5.5.2}%
 \contentsline {subsection}{\numberline {5.5.3}The Fallback Value and the Honest Bound}{67}{subsection.5.5.3}%
-\contentsline {section}{\numberline {5.6}Threats to Validity}{67}{section.5.6}%
-\contentsline {paragraph}{Internal validity.}{67}{paragraph*.73}%
-\contentsline {paragraph}{Construct validity.}{68}{paragraph*.74}%
-\contentsline {paragraph}{External validity.}{68}{paragraph*.75}%
-\contentsline {paragraph}{Sampling and uncertainty.}{68}{paragraph*.76}%
-\contentsline {paragraph}{Conclusion validity.}{68}{paragraph*.77}%
-\contentsline {section}{\numberline {5.7}Limitations and Future Work}{68}{section.5.7}%
-\contentsline {paragraph}{Edge latency.}{68}{paragraph*.78}%
-\contentsline {paragraph}{GUI integration of the aligned filter.}{68}{paragraph*.79}%
-\contentsline {paragraph}{The airplane gap (largely closed).}{69}{paragraph*.80}%
-\contentsline {paragraph}{IR OOD recall.}{69}{paragraph*.81}%
-\contentsline {paragraph}{Track-level classification.}{69}{paragraph*.82}%
-\contentsline {paragraph}{Open evaluation items.}{69}{paragraph*.83}%
-\contentsline {chapter}{\numberline {6}Conclusion}{70}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Answers to the Research Questions}{70}{section.6.1}%
-\contentsline {paragraph}{RQ1 (capability).}{70}{paragraph*.84}%
-\contentsline {paragraph}{RQ2 (attribution).}{70}{paragraph*.85}%
-\contentsline {paragraph}{RQ3 (dual-modality value).}{71}{paragraph*.86}%
-\contentsline {paragraph}{The methodological thread.}{71}{paragraph*.87}%
-\contentsline {paragraph}{The findings.}{71}{paragraph*.88}%
-\contentsline {section}{\numberline {6.2}Production Stack}{72}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Future Work}{72}{section.6.3}%
-\contentsline {chapter}{\numberline {A}Datasets in Detail}{74}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{74}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{74}{section.A.2}%
-\contentsline {section}{\numberline {A.3}IR Detector Corpus}{75}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{75}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{75}{section.A.5}%
-\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{76}{section.A.6}%
-\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{76}{section.A.7}%
-\contentsline {section}{\numberline {A.8}SelCom CCTV}{76}{section.A.8}%
-\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{76}{section.A.9}%
-\contentsline {section}{\numberline {A.10}Licensing and Ethics}{77}{section.A.10}%
-\contentsline {chapter}{\numberline {B}Models Evaluated}{78}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{80}{appendix.C}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{81}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{83}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{85}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{85}{section.F.1}%
-\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{87}{section.F.2}%
-\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{88}{section.F.3}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{88}{paragraph*.96}%
-\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{88}{section.F.4}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{88}{paragraph*.97}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{88}{paragraph*.98}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{89}{paragraph*.99}%
-\contentsline {paragraph}{The surface reversal.}{89}{paragraph*.100}%
-\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{90}{appendix.G}%
-\contentsline {chapter}{Bibliography}{93}{appendix*.106}%
+\contentsline {chapter}{\numberline {6}Discussion}{68}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Answers to the Research Questions}{68}{section.6.1}%
+\contentsline {paragraph}{RQ1 (capability).}{68}{paragraph*.73}%
+\contentsline {paragraph}{RQ2 (attribution).}{68}{paragraph*.74}%
+\contentsline {paragraph}{RQ3 (dual-modality value).}{69}{paragraph*.75}%
+\contentsline {paragraph}{The methodological thread.}{69}{paragraph*.76}%
+\contentsline {paragraph}{The findings.}{69}{paragraph*.77}%
+\contentsline {section}{\numberline {6.2}Threats to Validity}{70}{section.6.2}%
+\contentsline {paragraph}{Internal validity.}{70}{paragraph*.78}%
+\contentsline {paragraph}{Construct validity.}{70}{paragraph*.79}%
+\contentsline {paragraph}{External validity.}{70}{paragraph*.80}%
+\contentsline {paragraph}{Sampling and uncertainty.}{70}{paragraph*.81}%
+\contentsline {paragraph}{Conclusion validity.}{70}{paragraph*.82}%
+\contentsline {section}{\numberline {6.3}Limitations and Future Work}{71}{section.6.3}%
+\contentsline {paragraph}{Edge latency.}{71}{paragraph*.83}%
+\contentsline {paragraph}{GUI integration of the aligned filter.}{71}{paragraph*.84}%
+\contentsline {paragraph}{The airplane gap (largely closed).}{71}{paragraph*.85}%
+\contentsline {paragraph}{IR OOD recall.}{71}{paragraph*.86}%
+\contentsline {paragraph}{Track-level classification.}{71}{paragraph*.87}%
+\contentsline {paragraph}{Open evaluation items.}{71}{paragraph*.88}%
+\contentsline {chapter}{\numberline {7}Conclusion}{73}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Production Stack}{73}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Future Work}{74}{section.7.2}%
+\contentsline {chapter}{\numberline {A}Datasets in Detail}{75}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{75}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{75}{section.A.2}%
+\contentsline {section}{\numberline {A.3}IR Detector Corpus}{76}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{76}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{76}{section.A.5}%
+\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{77}{section.A.6}%
+\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{77}{section.A.7}%
+\contentsline {section}{\numberline {A.8}SelCom CCTV}{77}{section.A.8}%
+\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{77}{section.A.9}%
+\contentsline {section}{\numberline {A.10}Licensing and Ethics}{78}{section.A.10}%
+\contentsline {chapter}{\numberline {B}Models Evaluated}{79}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{81}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{82}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{84}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{86}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{86}{section.F.1}%
+\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{88}{section.F.2}%
+\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{89}{section.F.3}%
+\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{89}{paragraph*.96}%
+\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{89}{section.F.4}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{89}{paragraph*.97}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{89}{paragraph*.98}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{90}{paragraph*.99}%
+\contentsline {paragraph}{The surface reversal.}{90}{paragraph*.100}%
+\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{91}{appendix.G}%
+\contentsline {chapter}{Bibliography}{94}{appendix*.106}%

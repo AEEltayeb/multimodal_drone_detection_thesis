@@ -1,0 +1,60 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+This chapter interprets the results of Chapter~\ref{ch:hitl}. It draws the three research-question answers from the full-pipeline evidence, states the threats to those conclusions, and sets out the limitations that remain together with the future work each one points to.
+
+\section{Answers to the Research Questions}
+\label{sec:rq_answers}
+
+\paragraph{RQ1 (capability).}
+\emph{Yes: the pipeline suppresses false positives while raising, not merely maintaining, detection performance.} On the discriminating Svanstr\"om benchmark the full production pipeline lifts drone $F1$ from $0.742$ (bare detectors) to $0.946$, with recall \emph{rising} from $0.948$ to $0.991$ and precision from $0.609$ to $0.905$ (Table~\ref{tab:ablation_svanstrom}). On the out-of-distribution confuser corpus, where the bare detector fires on $30.4\%$ of frames, the per-frame filter reduces fire to $1.4\%$; the reject-capable router drives it to $0.11\%$ (three frames in $2{,}633$, Table~\ref{tab:ablation_confusers}), the suppression the shipped stack trades for recall. The thermal-confuser surface, once the pipeline's weakest front, is largely closed by the thermal-native IR filter: the shipped stack cuts ${\sim}91\%$ of thermal-confuser fire ($29.4\% \to 2.8\%$, Table~\ref{tab:ablation_confusers}), and airplanes, once the resistant class, no longer dominate the residual (the honest held-out IR\_confusers val/test figure is $94\%$ removed, Section~\ref{sec:ir_xmodal_verifier}). On the saturated Anti-UAV control the pipeline does no harm ($F1$ $0.973 \to 0.984$, Table~\ref{tab:ablation_antiuav}); on ordinary, confuser-free footage the false-alarm problem was already small at the detector, which is precisely why the thesis locates the problem in confuser scenes and solves it there.
+% [source: thesis_eval/results/tier1_results.json (svanstrom/antiuav B_pipeline, rgb_confuser C_confuser)]
+
+\paragraph{RQ2 (attribution).}
+\emph{Each stage earns its place, and the stages are complementary rather than redundant.} The router and the filter address different false positives. With the shipped router, the per-frame filter does most of the work: on Svanstr\"om it removes $83\%$ of bare false positives, while the always-routing router removes almost none on its own, and on the confuser corpus the filter is again decisive, with about $7\times$ fewer residual false positives than the patch-filter predecessor (Table~\ref{tab:ablation_confusers}). The reject-capable router supplies the complementary mechanism: it vetoes whole untrustworthy frames, the net the shipped stack trades away for recall. Composition order is a recall/precision dial. Filter-then-route keeps the router's recall ($F1=0.946$), while route-then-filter trades about $1.5$~pp of it for precision, so the choice is operational, not structural. Temporal aggregation carries the chapter's sharpest design lesson (Table~\ref{tab:temporal_production}): a per-frame filter veto, with thresholds tuned on benchmark stills, over-vetoes out-of-distribution drones, whereas the same veto applied at the alert gate gains F1. The gate position, not the gate itself, is the variable, so the deployment routes per frame and verifies at the alert gate. Both stages are cheap enough to run on every frame ($1$--$4\%$ total overhead; Table~\ref{tab:speed}), which is why the predecessor's alert-gating compromise disappears.
+% [source: thesis_eval/results/tier1_results.json; ledger=cascade-segment-recovers,robust6-speed-feature-efficiency,v5-ship-per-frame]
+
+\paragraph{RQ3 (dual-modality value).}
+\emph{Yes: the modality ranking reverses across surfaces, and routing pays on both sides of the reversal.} On Svanstr\"om the thermal detector dominates the visible one ($F1$ $0.940$ vs $0.607$); on Anti-UAV the visible detector dominates ($0.985$ vs $0.961$); the routed pipeline matches or beats the better single modality on each (Table~\ref{tab:rq3}). The accounting nuance matters: the thermal channel's value concentrates exactly on frames where the visible channel fails, so each modality is scored against its own ground truth and never unioned; under a union rule the same detections would mis-attribute the contribution by double-digit F1 (Section~\ref{sec:scoring_audit}).
+
+\paragraph{The methodological thread.}
+Both contributions behind the components delivered measurable value. The \emph{Model MRI}'s statistics-before-training discipline trained the filter family directly from measured drone/confuser separability (linear separability $\approx$95\% RGB / $0.981$ IR; drone detections as positives, confuser detections as negatives), and selected the router's eight features by leakage analysis. Re-running it on its own shipped corpus corrected two figures in an earlier report (Section~\ref{sec:mri_findings}). The \emph{HITL data engine} carried the IR detector from $F1$ $0.503$ to $0.967$ across six revisions on a fixed test split; the one revision that bypassed the review loop (V5) cost $12.7$~points of precision and is reported as the protocol's clearest negative result: the dataset state, not the model state, is what regressed (Section~\ref{sec:ir_evolution}).
+% [source: ledger=ir-version-progression,mri-v5-report-regen]
+
+\paragraph{The findings.}
+The grayscale result stands as measured: a thermal-only-trained detector, run zero-shot on grayscale-converted RGB, still detects drones when the visible channel fails, landing within $2.7$~pp F1 of the dedicated RGB detector at matched configuration ($0.580$ vs $0.607$), with higher precision and lower recall, and tying it on the hardest bird-cluttered clip. Its raw-RGB control collapses on both surfaces ($F1=0.187$ on Svanstr\"om, $0.295$ on video), isolating the single-channel conversion as the load-bearing step (Section~\ref{sec:grayscale}). Its practical payoff is a recall-preserving fallback when thermal hardware is unavailable.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\paragraph{Internal validity.}
+Three threats. First, the RGB detector's training stances and the patch filter's versions were iterated against Svanstr\"om evaluation results; some design decisions are implicitly biased toward Svanstr\"om performance. The real-video clips and the SelCom footage, neither consulted during those iterations, are the partial mitigation. Second, \texttt{imgsz} acts as a hidden hyperparameter; the protocol (Section~\ref{sec:canonical_configs}) pins it per surface, and the one cross-resolution comparison the thesis needs (Svanstr\"om RGB@1280 vs IR@640) is flagged where it appears. Third, the trust classifier was trained against a specific RGB confidence calibration; swapping the RGB detector without re-mining classifier data risks silent degradation (the documented calibration-mismatch failure, Section~\ref{sec:classifier_variants}).
+
+\paragraph{Construct validity.}
+IoP at 0.5 is more lenient than IoU at 0.5 for small-object detection; numbers here are not directly comparable to IoU-based literature without conversion (Section~\ref{sec:metrics}). Trust-aware scoring is the second construct choice, justified in Section~\ref{sec:scoring_audit}; both rules are declared per table.
+
+\paragraph{External validity.}
+The IR detector and the trust classifier train on frames and sequences that overlap both paired evaluation surfaces; the overlap is quantified per component, and bounded by the held-out clean split, in Section~\ref{sec:svanstrom_audit}: Anti-UAV conclusions are unchanged on $57{,}542$ held-out frames ($0.973 \to 0.977$ bare, $0.984 \to 0.986$ pipeline), the Svanstr\"om IR detector's solo numbers carry at most $7.3$~pp of in-distribution inflation (part of it sequence difficulty, per the leakage-free RGB control), and the cascade leakage bound is small (the reject-capable router moves $-1.4$~pp, $0.948 \to 0.934$; the shipped router $-3.5$~pp, $0.946 \to 0.911$). The deployment evidence is one site (SelCom) and one camera class; generalisation to other CCTV installations is untested.
+% [source: runs/clean_split/clean_split_results.json]
+
+\paragraph{Sampling and uncertainty.}
+Large surfaces are evaluated on $\approx$4{,}000-frame even-spread samples (Section~\ref{sec:canonical_configs}); all tables print $n$ and the source size, and headline cells carry 95\% bootstrap CIs. Differences within overlapping CIs are treated as ties; this includes the grayscale three-way's $2.7$~pp gap, which is reported as ``slightly behind'', not as parity. Per-clip real-video numbers ($20$--$340$ frames per clip) are indicative; aggregates are the reliable quantities.
+
+\paragraph{Conclusion validity.}
+Single-run point estimates are never compared at sub-CI granularity; the production-stack choices are justified on cost and OOD behaviour where in-domain differences are within noise (Section~\ref{sec:pipeline_ablation}).
+
+\section{Limitations and Future Work}
+\label{sec:limits}
+
+\paragraph{Edge latency.} All evaluation ran on a GTX 1050~Ti; the cascade is interactive there, but Jetson-class edge latency is unmeasured. The per-stage budget (Table~\ref{tab:speed}) makes the port plausible; it remains future work.
+
+\paragraph{GUI integration of the aligned filter.} The production design runs \texttt{mlp\_v5\_ir\_aligned} per-frame on the IR branch; it is validated in the evaluation engine, while its operator-GUI wiring is an open engineering item at the time of writing.
+
+\paragraph{The airplane gap (largely closed).} Airplanes were every earlier filter generation's weakest category (patch: $52\%$ catch on Svanstr\"om airplanes, below the decisiveness bar; the grayscale-harvested thermal filter left the thermal-confuser surface airplane-dominated). The production thermal-native head (Section~\ref{sec:grayscale_verifier}) closes most of this: thermal-confuser fire falls $29.4\% \to 2.8\%$ on-cache and $94\%$ of held-out IR confusers are removed, by training on thermal airplane crops directly. The residual is no longer an untrained-confuser hole but an in-distribution recall trade ($-3.7$~pp on genuinely airplane-like \texttt{ir\_dset} thermal drones no threshold separates from airplanes); choosing that operating point, and reducing it with more diverse thermal airplane-vs-drone data, is the remaining future-work item.
+
+\paragraph{IR OOD recall.} The IR detector's recall on independent, verified thermal drone footage outside its corpus families is unmeasured (the available community thermal sets could not be quality-verified and are not used); this is the evaluation gap the RGB parallel channel hedges against.
+
+\paragraph{Track-level classification.} The temporal smoother maintains per-track state and renders flight paths, but does not yet classify on track dynamics (velocity, persistence). Drones, birds, and aircraft have distinct flight signatures; a track-based classifier is a largely orthogonal evidence channel and the most promising single direction, particularly for the residual airplane-like thermal drones that appearance alone cannot fully separate.
+
+\paragraph{Open evaluation items.} The thermal-confuser per-category breakdown formerly registered here has since been run (a CPU replay of the existing cache): the \emph{bare}-detector \texttt{IR\_confusers} fire is airplane-driven ($35.2\%$ bare airplane fire vs $12.2\%$ bird and $0\%$ helicopter), which is why the thermal-native filter that now suppresses most of it (Section~\ref{sec:grayscale_verifier}) had to be trained on thermal airplane crops specifically. The video-tuned filter-threshold question is closed by the sweep in Section~\ref{sec:temporal_results}.
+% [source: thesis_eval/results/notes_round1_results.json (ir_confusers CAT)]

@@ -16,6 +16,8 @@ A level-1 auxiliary file: chapters/methodology.aux
 Reallocating 'name_of_file' (item size: 1) to 23 items.
 A level-1 auxiliary file: chapters/empirical.aux
 Reallocating 'name_of_file' (item size: 1) to 24 items.
+A level-1 auxiliary file: chapters/discussion.aux
+Reallocating 'name_of_file' (item size: 1) to 24 items.
 A level-1 auxiliary file: chapters/conclusion.aux
 Reallocating 'name_of_file' (item size: 1) to 24 items.
 A level-1 auxiliary file: chapters/appendices.aux
@@ -42,7 +44,7 @@ Reallocating 'wiz_functions' (item size: 4) to 9000 items.
 Reallocating 'singl_function' (item size: 4) to 100 items.
 You've used 43 entries,
             6402 wiz_defined-function locations,
-            1432 strings with 18029 characters,
+            1433 strings with 18052 characters,
 and the built_in function-call counts, 412680 in all, are:
 = -- 35420
 > -- 4914
