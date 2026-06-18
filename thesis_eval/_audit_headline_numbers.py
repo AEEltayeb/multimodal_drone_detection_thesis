@@ -103,12 +103,12 @@ CHECKS += [
 ]
 
 # CBAM held-out FP for the THERMAL-NATIVE filter (mlp_aligned_thermalonly) is stated in two places
-# (methodology sec:ir_xmodal_verifier prose + empirical tab:ir_aligned). Canonical = the saved held-out
+# (system_design sec:ir_xmodal_verifier prose + empirical tab:ir_aligned). Canonical = the saved held-out
 # JSON eval/results/ir_heldout_results.json (cbam@0.05 FP=6, R=0.967); kb evals cbam_heldout_thermalonly.
 # Pin both .tex restatements to the canonical value and to each other (catches silent prose drift).
 import re
 _CBAM_CANON_FP = json.load(open(REPO / "eval/results/ir_heldout_results.json"))["cbam"]["results"]["cbam@0.05"]["confuser_FP"]
-_meth = (REPO / "docs/thesis_working_distilling_overleaf/chapters/methodology.tex").read_text(encoding="utf-8")
+_meth = (REPO / "docs/thesis_working_distilling_overleaf/chapters/system_design.tex").read_text(encoding="utf-8") + (REPO / "docs/thesis_working_distilling_overleaf/chapters/methodology.tex").read_text(encoding="utf-8")
 _emp = (REPO / "docs/thesis_working_distilling_overleaf/chapters/empirical.tex").read_text(encoding="utf-8")
 _m_meth = re.search(r"cutting false positives to \$(\d+)\$ \(bare \$48\$\)", _meth)
 _m_emp = re.search(r"0\.905/0\.967/0\.935\}\$\s*\(\\textbf\{(\d+)\}\)", _emp)
