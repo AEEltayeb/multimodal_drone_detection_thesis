@@ -3,7 +3,7 @@
 \chapter{Datasets in Detail}
 \label{app:datasets}
 
-This appendix consolidates the per-source / per-clip dataset metadata that the methodology chapter summarises. Numbers come from the dataset YAMLs (\texttt{rgb\_dataset/dataset.yaml}, \texttt{IR\_dset\_final/dataset.yaml}), the documentation file shipped with the confuser corpus (\texttt{rgb\_confusers\_merged/dataset\_documentation.md}), the Svanstr\"om paired-corpus meta file, and the YouTube extraction manifests.
+This appendix consolidates the per-source / per-clip dataset metadata that the methodology chapter summarises. Numbers come from the dataset YAMLs (\texttt{rgb\_dataset/\allowbreak dataset.yaml}, \texttt{IR\_dset\_final/\allowbreak dataset.yaml}), the documentation file shipped with the confuser corpus (\texttt{rgb\_confusers\_merged/\allowbreak dataset\_documentation.md}), the Svanstr\"om paired-corpus meta file, and the YouTube extraction manifests.
 
 \section{Composite RGB Training Corpus}
 
@@ -175,7 +175,7 @@ Model & Role & Note \\
 \chapter{Model MRI Sample Report}
 \label{app:mri_report}
 
-The Model MRI renders a full human-readable report for every run (Section~\ref{sec:model_mri}); the report for the production RGB filter's corpus is at \texttt{mri/results/v5\_report\_regen/report.md}, and Figure~\ref{fig:mri_report} reproduces its verdict block. For that corpus ($19{,}334$ drone / $13{,}597$ confuser detections, bare-detector hallucination $54.4\%$, LDA separability $0.952$) the instrument projected, \emph{before any training}, a $97.4\%$ confuser false-positive cut at $98.9\%$ drone-recall retention, and recommended the filter on that basis. The shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches that projection; the agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
+The Model MRI renders a full human-readable report for every run (Section~\ref{sec:model_mri}); the report for the production RGB filter's corpus is at \texttt{mri/results/\allowbreak v5\_report\_regen/\allowbreak report.md}, and Figure~\ref{fig:mri_report} reproduces its verdict block. For that corpus ($19{,}334$ drone / $13{,}597$ confuser detections, bare-detector hallucination $54.4\%$, LDA separability $0.952$) the instrument projected, \emph{before any training}, a $97.4\%$ confuser false-positive cut at $98.9\%$ drone-recall retention, and recommended the filter on that basis. The shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches that projection; the agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
 
 \chapter{Number Provenance and Reproducibility}
 \label{app:provenance}
@@ -236,14 +236,14 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[robust6] The six-feature trust classifier (per-modality detection confidence $+$ box geometry), its features screened by the scene-fingerprint ratio (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
     \item[robust8] The four-class trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features and a tuned per-class decision threshold; retained as the reject-class ablation and recommended on confuser-rich paired streams.
     \item[robust8-nr] The shipped production trust router (Section~\ref{sec:classifier_results}): the eight \texttt{robust8} features with the \texttt{reject} class dropped, so it always routes RGB/IR/both and the per-frame filter owns false-positive rejection.
-    \item[sa32] \texttt{scene\_aware\_v3more\_32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
+    \item[sa32] \texttt{scene\_aware\_\allowbreak v3more\_\allowbreak 32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
     \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
-    \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate 40-feature trust classifier; deprecated.
+    \item[control40] \texttt{control\_\allowbreak v3more\_\allowbreak 40feat}. A previous-candidate 40-feature trust classifier; deprecated.
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
-    \item[v2 (patch filter)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
+    \item[v2 (patch filter)] \texttt{confuser\_filter4\_\allowbreak \{rgb,ir\}\_\allowbreak v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
     \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
     \item[IR filter] The thermal-native IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}): a single head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) trained directly on thermal confuser crops.
-    \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
+    \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_\allowbreak selcom\_\allowbreak mixed\_\allowbreak ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
     \item[\texttt{imgsz}] Ultralytics short for input letterbox size. Drives small-object recall (Section~\ref{sec:resolution_arch}).
     \item[\texttt{patch\_thr}] The decision threshold on $p_\text{confuser}$ at the patch-filter alert gate. Production: 0.9 on Svanstr\"om-like inputs, 0.7 on real-video.
