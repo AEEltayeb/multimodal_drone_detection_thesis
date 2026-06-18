@@ -218,6 +218,26 @@
     \field{year}{2025}
   \endentry
 
+  \entry{jiang2021antiuav}{inproceedings}{}{}
+    \true{moreauthor}
+    \true{morelabelname}
+    \name{author}{1}{}{%
+      {{hash=JN}{%
+         family={Jiang},
+         familyi={J\bibinitperiod},
+         given={Nan},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{JN+1}
+    \strng{fullhash}{JN+1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{note}{Anti-UAV RGBT benchmark dataset}
+    \field{title}{Anti-UAV: A Large Multi-Modal Benchmark for UAV Tracking}
+    \field{year}{2021}
+  \endentry
+
   \entry{redmon2016yolo}{inproceedings}{}{}
     \name{author}{4}{}{%
       {{hash=RJ}{%
@@ -273,26 +293,6 @@
     \verb https://docs.ultralytics.com/
     \endverb
     \field{year}{2024}
-  \endentry
-
-  \entry{jiang2021antiuav}{inproceedings}{}{}
-    \true{moreauthor}
-    \true{morelabelname}
-    \name{author}{1}{}{%
-      {{hash=JN}{%
-         family={Jiang},
-         familyi={J\bibinitperiod},
-         given={Nan},
-         giveni={N\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{JN+1}
-    \strng{fullhash}{JN+1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{note}{Anti-UAV RGBT benchmark dataset}
-    \field{title}{Anti-UAV: A Large Multi-Modal Benchmark for UAV Tracking}
-    \field{year}{2021}
   \endentry
 
   \entry{ren2015fasterrcnn}{inproceedings}{}{}
