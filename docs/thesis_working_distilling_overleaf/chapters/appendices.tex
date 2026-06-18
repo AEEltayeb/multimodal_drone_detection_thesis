@@ -201,7 +201,6 @@ Every headline number in this thesis is the value of a named cell in a canonical
         Grayscale 3-way $0.607/0.187/0.580$ & \texttt{tier1\_results.json} (D table) & \texttt{pipeline\_eval\_unified.py} \\
         Temporal 2-of-3 windows (Table~\ref{tab:temporal_production}) & \texttt{temporal\_results.json} & \texttt{temporal\_replay.py} \\
         Per-size buckets (Table~\ref{tab:per_size}) & \texttt{notes\_round1\_results.json} (\texttt{SZ\_per\_size}) & \texttt{notes\_round1\_replays.py} \\
-        Background profile (Table~\ref{tab:failure_profile}) & \texttt{failure\_profile\_results.json} & \texttt{failure\_profile\_aggregate.py} \\
         Low-conf mode (Table~\ref{tab:lowconf_selcom}) & \texttt{conf\_sweep/conf\_sweep\_results.json} & \texttt{conf\_sweep\_replay.py} \\
         IR HITL trajectory $0.503 \to 0.967$ & \texttt{knowledge/evals.csv} (\texttt{ir\_final\_*}, one fixed split) & \texttt{eval/ir\_version\_comparison.py} (GPU) \\
         Stage latencies (Table~\ref{tab:speed}) & \texttt{knowledge/ledger.csv} (speed rows) & \texttt{eval/bench\_speed.py} (GPU) \\
@@ -319,3 +318,147 @@ The first quantitative router comparison ran the predecessor cascade (baseline R
 \paragraph{The surface reversal.}
 On real video the ranking inverted: \texttt{sa32} dominated segment drone $F1$ ($0.826$ baseline RGB) while \texttt{fusion\_no\_fn\_v1.1} accepted only about one in eight of the correct RGB drone TPs (segment $R=0.128$; seven of eight drone events missed) and \texttt{control\_v3more\_40feat} trailed \texttt{sa32} by 18~pp with no compensating win anywhere. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where missed drones cost less than false alarms. This reversal is what discredited hand-ranking classifiers on single benchmarks and motivated the statistical selection that produced \texttt{robust6}/\texttt{robust8} above. Even \texttt{sa32}'s real-video win is not bankable: its scene-statistic leakage (Section~\ref{sec:feature_selection}) lets it score partly by memorising surface identity, so its lead is not trusted to generalise beyond the surfaces measured.
 % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn; config=pipe_video_drone_iop]
+
+\chapter{Full Per-Surface Ablation Tables}
+\label{app:full_ablation}
+
+The body reports the production pipeline in aggregate (Table~\ref{tab:ablation_overview}); this appendix gives the full per-surface ablation behind it, including every comparison arm (the reject-class \texttt{robust8}, \texttt{robust6}, the hand-engineered \texttt{sa32}, and the superseded patch filter). All cells replay the same unified detection cache (Section~\ref{sec:unified_cache}); the comparison arms are discussed in the component deep-dives of Chapter~\ref{ch:hitl}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Full-pipeline ablation, Svanstr\"om paired ($n=4{,}000$ frames, even-strided across the full 28{,}710-frame set, not the first $4{,}000$; RGB @1280 / IR @640, IoP@0.5). \emph{RGB only}/\emph{IR only} score that detector alone against its own ground truth; every row below the second rule is trust-aware and \emph{sums both modalities} (RGB-side scored vs RGB GT $+$ IR-side vs IR GT), so its TP/FP/FN base is both modalities' drones combined, not the frame count. \texttt{clf} $=$ $+$trust router; \texttt{filt} $=$ $+$per-frame filter; \texttt{clf$\to$filt} $=$ router then filter. The shipped production cell is \texttt{filt$\to$clf[robust8-nr]} (filter then the no-reject router; \texttt{robust8} with the reject class is the adjacent ablation, Section~\ref{sec:classifier_results}); the pipeline \emph{raises} recall over bare ($0.948\to0.991$) while adding $\sim$29~pp precision. \texttt{clf$\to$filt} is the same router in the other order (Section~\ref{sec:classifier_results} on why \texttt{filt$\to$clf} is shipped).}
+    \label{tab:ablation_svanstrom}
+    \begin{tabular}{lcccccl}
+        \toprule
+        cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
+        \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)   & 1532 & 1845 & 141 & 0.454 & 0.916 & 0.607 [0.590--0.623] \\
+        IR only (\texttt{v3b}, vs IR GT)     & 1610 &  174 &  31 & 0.903 & 0.981 & 0.940 [0.931--0.949] \\
+        \midrule
+        bare (both detectors)        & 3142 & 2019 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
+        filt only (\texttt{mlp\_v5}, RGB)    & 3043 &  337 & 271 & 0.900 & 0.915 & 0.908 [0.900--0.914] \\
+        filt only (\texttt{aligned}, IR)     & 3142 & 2018 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
+        filt only (patch)            & 3004 &  782 & 310 & 0.793 & 0.907 & 0.846 [0.836--0.855] \\
+        clf only [robust8-nr]        & 3136 & 1997 &  27 & 0.611 & 0.992 & 0.756 [0.745--0.768] \\
+        clf only [robust8]           & 3092 &  354 &  31 & 0.897 & 0.990 & 0.941 [0.935--0.947] \\
+        clf only [robust6]           & 3132 &  286 &  34 & 0.916 & 0.989 & 0.951 [0.946--0.957] \\
+        clf only [sa32]              & 3137 &  187 &  30 & 0.944 & 0.991 & 0.967 [0.962--0.971] \\
+        clf$\to$filt [robust8-nr]    & 3037 & 314 & 126 & 0.906 & 0.957 & 0.931 [0.923--0.937] \\
+        clf$\to$filt [robust8]       & 2993 & 187 & 130 & 0.941 & 0.955 & 0.948 [0.943--0.954] \\
+        clf$\to$filt [sa32]          & 3039 &  162 & 128 & 0.949 & 0.960 & 0.955 [0.949--0.960] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 3037 & 317 & 29 & \textbf{0.905} & \textbf{0.991} & \textbf{0.946 [0.938--0.950]} \\
+        filt$\to$clf [robust8]       & 2996 &  191 &  35 & 0.940 & 0.989 & 0.964 [0.957--0.968] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results/tier1_results.json (svanstrom B_pipeline); run=thesis_eval/pipeline_eval_unified.py]
+
+\begin{table}[htbp]
+    \centering
+    \caption{Full-pipeline ablation, Anti-UAV paired ($n=4{,}000$ frames, even-strided across the 85{,}374-frame set, both modalities @640, IoU@0.5). Row conventions as in Table~\ref{tab:ablation_svanstrom} (\emph{RGB/IR only} score one detector vs its own GT; the trust-aware rows sum both modalities). The no-harm control: every pipeline cell is within $\sim$1~pp of bare or above it, the shipped no-reject \texttt{robust8-nr} included (this saturated surface rarely rejects, so dropping the reject class changes nothing here).}
+    \label{tab:ablation_antiuav}
+    \begin{tabular}{lcccccl}
+        \toprule
+        cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
+        \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)   & 3657 &  41 &  68 & 0.989 & 0.982 & 0.985 [0.982--0.988] \\
+        IR only (\texttt{v3b}, vs IR GT)     & 3775 & 133 & 173 & 0.966 & 0.956 & 0.961 [0.956--0.966] \\
+        \midrule
+        bare (both detectors)        & 7432 & 174 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
+        filt only (\texttt{mlp\_v5}, RGB)    & 7430 & 172 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        filt only (\texttt{aligned}, IR)     & 7432 & 173 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
+        filt only (patch)            & 7430 & 174 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        clf only [robust8-nr]        & 7430 & 160 &  81 & 0.979 & 0.989 & 0.984 [0.981--0.986] \\
+        clf only [robust8]           & 7408 & 141 &  93 & 0.981 & 0.988 & 0.984 [0.982--0.987] \\
+        clf only [robust6]           & 7384 & 156 & 170 & 0.979 & 0.978 & 0.978 [0.975--0.981] \\
+        clf only [sa32]              & 7426 & 135 &  75 & 0.982 & 0.990 & 0.986 [0.984--0.988] \\
+        clf$\to$filt [robust8-nr]    & 7428 & 157 & 83 & 0.979 & 0.989 & 0.984 [0.982--0.987] \\
+        clf$\to$filt [robust8]       & 7406 & 139 & 95 & 0.982 & 0.987 & 0.984 [0.982--0.987] \\
+        clf$\to$filt [sa32]          & 7424 & 134 &  77 & 0.982 & 0.990 & 0.986 [0.984--0.988] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 7428 & 157 & 81 & \textbf{0.979} & \textbf{0.989} & \textbf{0.984 [0.982--0.987]} \\
+        filt$\to$clf [robust8]       & 7406 & 139 &  93 & 0.982 & 0.988 & 0.985 [0.982--0.987] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results/tier1_results.json (antiuav B_pipeline); run=thesis_eval/pipeline_eval_unified.py]
+
+\begin{table}[htbp]
+    \centering
+    \caption{Full-pipeline ablation, DUT Anti-UAV \emph{test split} ($n=2{,}200$ frames, $2{,}245$ GT drones, RGB \texttt{ft4} $+$ grayscale-IR \texttt{v3b}, both @960, IoU@0.5, trust-aware). The grayscale-IR channel is the IR detector's no-thermal \emph{fallback} mode (thermal model on grayscale RGB), not its native thermal performance. The full test split is used (not strided). Row conventions as in Table~\ref{tab:ablation_svanstrom} (\emph{RGB/IR only} score one detector vs its own GT; the trust-aware rows sum both modalities). Confuser-free (all-drone): filters can only delete true positives, so here the pipeline buys precision, not FP suppression. \texttt{filt$\to$clf[robust8-nr]} (the shipped no-reject router) is the production configuration; dropping the reject class recovers the recall \texttt{robust8} surrenders on this clean surface (at \texttt{filt$\to$clf}, $R\,0.574\to0.800$, F1 $0.702\to0.835$).}
+    \label{tab:ablation_dut}
+    \begin{tabular}{lcccccl}
+        \toprule
+        cell & TP & FP & FN & $P$ & $R$ & F1 [95\% CI] \\
+        \midrule
+        RGB only (\texttt{ft4}, vs RGB GT)            & 1917 & 104 &  328 & 0.949 & 0.854 & 0.899 [0.889--0.908] \\
+        grayscale-IR only (\texttt{v3b}, vs IR GT)    & 1113 & 375 & 1132 & 0.748 & 0.496 & 0.596 [0.576--0.616] \\
+        \midrule
+        RGB \texttt{ft4} $+$ grayscale-IR \texttt{v3b} & 3030 & 479 & 1460 & 0.864 & 0.675 & 0.758 [0.747--0.769] \\
+        filt only (\texttt{mlp\_v5}, RGB)        & 2820 & 443 & 1670 & 0.863 & 0.620 & 0.722 [0.715--0.739] \\
+        filt only (\texttt{aligned}, IR)         & 2796 & 418 & 1694 & 0.871 & 0.626 & 0.728 [0.715--0.736] \\
+        filt only (patch)            & 2931 & 470 & 1559 & 0.862 & 0.653 & 0.743 [0.732--0.754] \\
+        clf only [robust8-nr]        & 3024 & 464 &  522 & 0.867 & 0.853 & 0.860 [0.850--0.869] \\
+        clf only [robust8]           & 2586 & 302 & 1301 & 0.895 & 0.665 & 0.763 [0.749--0.778] \\
+        clf only [robust6]           & 2415 & 374 & 1808 & 0.866 & 0.572 & 0.689 [0.674--0.705] \\
+        clf only [sa32]              & 2651 & 430 & 1480 & 0.860 & 0.642 & 0.735 [0.721--0.750] \\
+        clf$\to$filt [robust8-nr]    & 2558 & 372 & 988 & 0.873 & 0.721 & 0.790 [0.781--0.803] \\
+        clf$\to$filt [robust8]       & 2234 & 247 & 1653 & 0.900 & 0.574 & 0.701 [0.686--0.717] \\
+        clf$\to$filt [sa32]          & 2265 & 361 & 1866 & 0.863 & 0.548 & 0.670 [0.655--0.686] \\
+        \textbf{filt$\to$clf [robust8-nr]} & 2558 & 372 & 638 & \textbf{0.873} & \textbf{0.800} & \textbf{0.835 [0.827--0.849]} \\
+        filt$\to$clf [robust8]       & 2182 & 237 & 1564 & 0.901 & 0.574 & 0.702 [0.691--0.725] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results_dut/tier1_results.json (dut_antiuav_960 A_bare + B_pipeline); run=thesis_eval/pipeline_eval_unified.py; ledger=dut-resolution-pipeline]
+
+\begin{table}[htbp]
+    \centering
+    \caption{Confuser-surface FP reduction. RGB confusers: $n=2{,}633$ (full test split) @640. IR confusers: $n=4{,}000$ of 5{,}237 (even spread) @640. Fire $=$ fraction of frames with $\geq$1 surviving detection. The shipped \texttt{filt$\to$clf[robust8-nr]} equals \texttt{filt only (mlp)} (and equals \texttt{clf$\to$filt[robust8-nr]} to the digit, since a no-reject router never vetoes a confuser frame, so composition order is immaterial here); the \texttt{robust8} ablation reaches $0.0011$ (RGB) by adding the reject net, the suppression the shipped stack trades for recall.}
+    \label{tab:ablation_confusers}
+    \begin{tabular}{lcc}
+        \toprule
+        cell & RGB confusers & IR confusers \\
+        \midrule
+        bare                      & 0.304 [0.287--0.321] & 0.294 [0.280--0.309] \\
+        clf only [robust8-nr]     & 0.304 [0.287--0.321] & 0.294 [0.280--0.309] \\
+        clf only [robust8]        & 0.049 [0.041--0.057] & 0.273 [0.259--0.287] \\
+        clf only [robust6]        & 0.035 [0.028--0.043] & 0.223 [0.209--0.235] \\
+        clf only [sa32]           & 0.003 [0.001--0.005] & 0.263 [0.249--0.277] \\
+        filt only (mlp)           & 0.014 [0.010--0.019] & 0.028 [0.023--0.033] \\
+        filt only (patch)         & 0.102 [0.091--0.114] & 0.246 [0.233--0.260] \\
+        \textbf{filt$\to$clf [robust8-nr]} & \textbf{0.014 [0.010--0.019]} & \textbf{0.028 [0.023--0.033]} \\
+        clf$\to$filt [robust6]    & 0.0011 [0.000--0.003] & 0.019 [0.014--0.024] \\
+        clf$\to$filt [robust8]    & 0.0011 [0.000--0.003] & 0.024 [0.019--0.030] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results/tier1_results.json (rgb_confuser, ir_confusers C_confuser)]
+
+\begin{table}[htbp]
+    \centering
+    \caption{Solo-surface ablation (single modality vs own GT). IR test split: $n=4{,}000$ of 9{,}612; RGB test split: $n=4{,}000$ of 17{,}209; SelCom: full 311. The \texttt{clf} rows show the router on a single live channel: the reject-class \texttt{robust8} collapses recall (it routes against a dead second modality), while the shipped no-reject \texttt{robust8-nr} degrades gracefully to the bare detector, which is why single-modality deployments can run the full router. The filter's in-distribution recall cost is the honest counterweight to its OOD benefit.}
+    \label{tab:ablation_solo}
+    \begin{tabular}{llccc}
+        \toprule
+        surface & cell & $P$ & $R$ & F1 [95\% CI] \\
+        \midrule
+        IR test split & bare (\texttt{v3b})   & 0.942 & 0.981 & 0.961 [0.955--0.967] \\
+        IR test split & clf [robust8]         & 0.947 & 0.923 & 0.935 [0.928--0.942] \\
+        IR test split & clf [robust8-nr]      & 0.942 & 0.981 & 0.961 [0.955--0.967] \\
+        IR test split & filt (aligned, thermal) & 0.945 & 0.939 & 0.942 [0.934--0.949] \\
+        IR test split & filt (patch)          & 0.949 & 0.931 & 0.940 [0.933--0.947] \\
+        RGB test split & bare (\texttt{ft4})  & 0.954 & 0.899 & 0.926 [0.919--0.933] \\
+        RGB test split & clf [robust8]        & 0.981 & 0.383 & 0.551 [0.532--0.570] \\
+        RGB test split & clf [robust8-nr]     & 0.954 & 0.899 & 0.926 [0.919--0.933] \\
+        RGB test split & filt (mlp)           & 0.960 & 0.887 & 0.922 [0.915--0.929] \\
+        RGB test split & filt (patch)         & 0.957 & 0.832 & 0.890 [0.881--0.898] \\
+        SelCom val & bare (\texttt{ft4})      & 0.858 & 0.451 & 0.591 [0.532--0.639] \\
+        SelCom val & clf [robust8]            & 0.881 & 0.125 & 0.220 [0.161--0.276] \\
+        SelCom val & clf [robust8-nr]         & 0.858 & 0.451 & 0.591 [0.531--0.639] \\
+        SelCom val & filt (mlp)               & 0.950 & 0.451 & 0.612 [0.551--0.659] \\
+        SelCom val & filt (patch)             & 0.858 & 0.451 & 0.591 [0.532--0.639] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: thesis_eval/results/tier1_results.json (ir_dset_final, rgb_dataset_test, selcom_val S4_verifier)]
+
