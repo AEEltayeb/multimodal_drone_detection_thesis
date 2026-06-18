@@ -36,7 +36,7 @@
 \contentsline {subsection}{\numberline {3.2.3}Canonical Configurations and Frame Budgets}{25}{subsection.3.2.3}%
 \contentsline {subsection}{\numberline {3.2.4}Unified Detection Cache}{27}{subsection.3.2.4}%
 \contentsline {section}{\numberline {3.3}Training--Evaluation Overlap Audit}{27}{section.3.3}%
-\contentsline {paragraph}{The held-out clean split.}{28}{paragraph*.17}%
+\contentsline {paragraph}{The held-out clean split.}{27}{paragraph*.17}%
 \contentsline {section}{\numberline {3.4}Training Recipes}{29}{section.3.4}%
 \contentsline {paragraph}{Backbone-freeze depth in confuser-injection fine-tuning.}{29}{paragraph*.20}%
 \contentsline {section}{\numberline {3.5}Human-in-the-Loop Data Engine}{30}{section.3.5}%
@@ -88,7 +88,7 @@
 \contentsline {subsection}{\numberline {4.1.4}Trust Classifier}{54}{subsection.4.1.4}%
 \contentsline {paragraph}{The shipped router: dropping the reject class.}{55}{paragraph*.61}%
 \contentsline {section}{\numberline {4.2}Model MRI Findings}{56}{section.4.2}%
-\contentsline {paragraph}{The signal is linear, supervised, and deep.}{56}{paragraph*.63}%
+\contentsline {paragraph}{The signal is linear, supervised, and deep.}{57}{paragraph*.63}%
 \contentsline {paragraph}{The instrument audits its own paper trail.}{57}{paragraph*.65}%
 \contentsline {section}{\numberline {4.3}Full-Pipeline Ablation}{58}{section.4.3}%
 \contentsline {paragraph}{Stack under test.}{58}{paragraph*.66}%
@@ -101,7 +101,7 @@
 \contentsline {subsection}{\numberline {4.3.5}The Filter Buys Back the Detector Floor}{64}{subsection.4.3.5}%
 \contentsline {subsection}{\numberline {4.3.6}Runtime Cost}{65}{subsection.4.3.6}%
 \contentsline {section}{\numberline {4.4}Temporal Evidence at the Segment Grain}{65}{section.4.4}%
-\contentsline {paragraph}{Design-evolution evidence (predecessor stack).}{67}{paragraph*.76}%
+\contentsline {paragraph}{Design-evolution evidence (predecessor stack).}{66}{paragraph*.76}%
 \contentsline {section}{\numberline {4.5}The Grayscale Finding}{67}{section.4.5}%
 \contentsline {subsection}{\numberline {4.5.1}The Fair Three-Way Comparison}{68}{subsection.4.5.1}%
 \contentsline {subsection}{\numberline {4.5.2}Mechanism and Bounds}{68}{subsection.4.5.2}%
@@ -138,18 +138,18 @@
 \contentsline {section}{\numberline {A.7}DUT Anti-UAV}{78}{section.A.7}%
 \contentsline {section}{\numberline {A.8}SelCom CCTV}{78}{section.A.8}%
 \contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{78}{section.A.9}%
-\contentsline {section}{\numberline {A.10}Licensing and Ethics}{80}{section.A.10}%
-\contentsline {chapter}{\numberline {B}Models Evaluated}{81}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{83}{appendix.C}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{84}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{86}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{88}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Superseded Confuser Filter (Patch CNN)}{88}{section.F.1}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{88}{paragraph*.104}%
-\contentsline {section}{\numberline {F.2}Trust-Classifier Design History}{90}{section.F.2}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{90}{paragraph*.105}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{90}{paragraph*.106}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{91}{paragraph*.107}%
-\contentsline {paragraph}{The surface reversal.}{91}{paragraph*.108}%
-\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{92}{appendix.G}%
-\contentsline {chapter}{Bibliography}{95}{appendix*.114}%
+\contentsline {section}{\numberline {A.10}Licensing and Ethics}{79}{section.A.10}%
+\contentsline {chapter}{\numberline {B}Models Evaluated}{80}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{82}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{83}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{85}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{87}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Superseded Confuser Filter (Patch CNN)}{87}{section.F.1}%
+\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{87}{paragraph*.104}%
+\contentsline {section}{\numberline {F.2}Trust-Classifier Design History}{89}{section.F.2}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{89}{paragraph*.105}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{89}{paragraph*.106}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{90}{paragraph*.107}%
+\contentsline {paragraph}{The surface reversal.}{90}{paragraph*.108}%
+\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{91}{appendix.G}%
+\contentsline {chapter}{Bibliography}{94}{appendix*.114}%

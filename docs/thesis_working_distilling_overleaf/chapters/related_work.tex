@@ -98,20 +98,21 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
     \caption{Numerical comparison on public benchmarks. \textbf{All comparisons require the caveats below the table.} ``Scoring'' indicates the matching rule used in the cited paper where it can be determined; where it cannot, the cell is marked \texttt{ND} (not disclosed).}
     \label{tab:numerical_comparison}
     \footnotesize
-    \begin{tabular}{p{2.3cm}p{4.0cm}p{3.0cm}ccc}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{p{2.7cm}p{3.6cm}p{3.0cm}ccc}
         \toprule
         Dataset & System & Scoring & $P$ & $R$ & F1 \\
         \midrule
-        \multirow{2}{*}{Svanstr\"om (visible video)} & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @416 & ND & ND & 0.785 \\
+        \multirow{2}{2.6cm}{Svanstr\"om (visible video)} & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @416 & ND & ND & 0.785 \\
                                                    & \textbf{This thesis (baseline RGB, S1)} & IoP@0.5, @1280 & 0.940 & 0.961 & 0.950 \\
         \midrule
-        \multirow{2}{*}{Svanstr\"om (thermal video)}  & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @256 & ND & ND & 0.760 \\
+        \multirow{2}{2.6cm}{Svanstr\"om (thermal video)}  & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @256 & ND & ND & 0.760 \\
                                                    & \textbf{This thesis (IR \texttt{v3b}, \texttt{imgsz=640})} & IoP@0.5 & 0.950 & 0.973 & 0.961 \\
         \midrule
-        \multirow{2}{*}{Anti-UAV (drone, RGB)}    & Anti-UAV baselines (range) & IoU & ND & ND & 0.90--0.97 \\
+        \multirow{2}{2.6cm}{Anti-UAV (drone, RGB)}    & Anti-UAV baselines (range) & IoU & ND & ND & 0.90--0.97 \\
                                                    & \textbf{This thesis (\texttt{ft4}, @640)} & IoU@0.5 & 0.989 & 0.982 & 0.985 \\
         \midrule
-        \multirow{2}{*}{Anti-UAV (drone, IR)}     & Anti-UAV baselines (range) & IoU & ND & ND & 0.90--0.96 \\
+        \multirow{2}{2.6cm}{Anti-UAV (drone, IR)}     & Anti-UAV baselines (range) & IoU & ND & ND & 0.90--0.96 \\
                                                    & \textbf{This thesis (IR \texttt{v3b}, @640)} & IoU@0.5 & 0.966 & 0.956 & 0.961 \\
         \midrule
         Confuser corpus (no GT, RGB)               & \emph{No published baseline} & ND & ND & ND & ND \\
@@ -120,7 +121,7 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
         Thermal confuser corpus (no GT, IR)        & \emph{No published baseline} & ND & ND & ND & ND \\
                                                    & \textbf{This thesis (best ablation, \texttt{robust6}, @640)} & fire-rate & ND & ND & 29.4\% $\to$ 1.9\% fire \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (ir_confusers C: bare 0.2943, clf->filt[robust6] 0.0192 with thermal-native cbam filter); honest held-out IR_confusers val/test shipped 90 -> 22, see Section~\ref{sec:ir_xmodal_verifier}]
 % [source: svanstrom2021real (arXiv 2007.07396): visible avg F1 0.7849 (close 0.8682), IR avg F1 0.7601 (close 0.8845); YOLOv2, inputs 416x416/256x256, bboxPrecisionRecall IoU 0.5, det thr 0.5; eval set = 120 IR + 120 visible clips (5 per class x distance bin), 240 clips train]

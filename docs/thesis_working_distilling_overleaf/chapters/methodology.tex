@@ -230,6 +230,7 @@ The size of the difference is the reason this is protocol rather than a footnote
     \centering
     \caption{Canonical evaluation configuration per surface. Numbers measured at any other configuration are labelled as such and never share a table with canonical numbers.}
     \label{tab:eval_protocol}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lrrll}
         \toprule
         Surface & $n$ eval'd & of & \texttt{imgsz} & Scoring \\
@@ -246,7 +247,7 @@ The size of the difference is the reason this is protocol rather than a footnote
         Svanstr\"om clean split   & 5{,}557 &  5{,}557 & 1280 (RGB) / 640 (IR) & IoP@0.5, trust-aware; Section~\ref{sec:svanstrom_audit} \\
         Anti-UAV clean split      & 57{,}542 & 57{,}542 & 640 / 640            & IoU@0.5, trust-aware; Section~\ref{sec:svanstrom_audit} \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 
 \textbf{Uncertainty.} Headline cells carry 95\% bootstrap confidence intervals. Each interval is computed by re-drawing the evaluated frames at random with replacement 1{,}000 times and recomputing the metric on every redraw; the central 95\% of those recomputed values is the interval. It answers one question: how much could this number have moved had the evaluation drawn a different sample of frames from the same surface. When two cells' intervals overlap substantially, the difference is within sampling noise, and this thesis treats the comparison as a tie rather than declaring a winner.
@@ -267,6 +268,7 @@ The two paired evaluation surfaces share data with the training corpora of some 
     \caption{Measured training--evaluation overlap per component and paired surface. ``Clean'' means the component's training data was verified to contain no frames from that evaluation surface; every non-clean cell is quantified.}
     \label{tab:svanstrom_audit}
     \footnotesize
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lll}
         \toprule
         Component & Svanstr\"om eval & Anti-UAV eval \\
@@ -283,7 +285,7 @@ The two paired evaluation surfaces share data with the training corpora of some 
         IR filter (\texttt{mlp\_aligned\_thermalonly}) & In-distribution (Svanstr\"om IR crops in & Clean (Anti-UAV val only; val$\cap$test $= 0$) \\
                                      & thermal-head training) & \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: runs/clean_split/README.md + thesis_eval/results/leakage_controlled.json derived (svan_full_train_frames 17314, czoom 1325, auv 22603, exact svan 10722/28710=37.3%, auv subset 6.3%, router 214/61); RGB-side check: G:/drone/dataset/dataset train holds 59,226 anti_uav_* frames over 318 segments incl. all 91 eval segments, 13,676 exact visible frames (16.0%)]
 % [source: mri/train_aligned.py GROUPS (thermal head mlp_aligned_thermalonly: svanstrom IR crops in training; Anti-UAV val split, val/test segment overlap = 0); knowledge/models.csv mlp_v5_balanced_v4 (rgb_dataset/rgb_confusers train+val, pure selcom, bird.v1i train)]
@@ -328,6 +330,7 @@ All detectors are YOLOv26n (nano) single-class drone detectors; the IR detector'
     \centering
     \caption{Detector training configurations. The baseline RGB and \texttt{retrained\_v2} share a recipe but differ in training corpus (Section~\ref{sec:rgb_three_variants}). All training was on an NVIDIA RTX 3090 (24~GB VRAM); evaluation was on a GTX 1050 Ti (4~GB VRAM).}
     \label{tab:training_recipes}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lcc}
         \toprule
         Parameter & RGB (baseline / \texttt{retrained\_v2}) & SelCom fine-tune (\texttt{ft2\_1280}) \\
@@ -347,7 +350,7 @@ All detectors are YOLOv26n (nano) single-class drone detectors; the IR detector'
         Scale / Translate / Flip-LR & 0.5 / 0.1 / 0.5  & 0.5 / 0.1 / 0.5                             \\
         HSV (H, S, V)     & 0.015 / 0.7 / 0.4          & 0.015 / 0.7 / 0.4                           \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: verified against the baseline's pre-finetune training report (D:/Downloads/Drone_detection_report.pdf, Table 3.1: YOLOv26n, imgsz 640, batch 48, 70 epochs, lr0 0.001, lrf 0.01, AdamW, wd 0.0005, warmup 3, mosaic off after epoch 50) -- all values match]
 
@@ -361,6 +364,7 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
     \centering
     \caption{The FT4 confuser-injection recipe grid. Gates: Svanstr\"om drone recall must not regress materially, and SelCom validation $F1$ must not drop. Only R3 passes both.}
     \label{tab:ft4_variants}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{llccll}
         \toprule
         Variant & Hard negatives & Freeze & Epochs & Svanstr\"om $R$ & Gate \\
@@ -371,7 +375,7 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
         A1 & 600 & 15 & 3 & 0.897 ($-3.0$~pp) & fail (recall) \\
         A2 & 600 $+$ 4{,}000 extra positives & 15 & 3 & 0.919 ($-0.8$~pp) & fail (SelCom $F1$) \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: docs/analysis/2026-05-26_classifier_ft4_analysis.md §2.2 (R1 0.898/-19.4pp halluc, R2 selcom F1 -0.023, R3 0.919/45.0% halluc vs 61% bare = -16pp, A1 0.897, A2 selcom fail); ledger=ft4-backbone-freeze]
 

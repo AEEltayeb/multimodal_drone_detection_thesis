@@ -14,6 +14,7 @@ This chapter answers the three research questions, building from the components 
     \centering
     \caption{RGB variants on Svanstr\"om @ \texttt{imgsz=1280} (IoP@0.5, drone class; full 28{,}710 frames, the pre-protocol full-set run, internally consistent). Aggressive retraining destroys recall on small Svanstr\"om drones while leaving its own in-domain test performance intact.}
     \label{tab:rgb_comparison}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lccccc}
         \toprule
         Model & Drone $P$ & Drone $R$ & Bird halluc & Airplane halluc & Heli halluc \\
@@ -22,7 +23,7 @@ This chapter answers the three research questions, building from the components 
         \texttt{hardneg\_v3more}  & 0.941 & 0.950 & 94.2\% & 64.7\% & 41.9\% \\
         \texttt{retrained\_v2}    & 0.943 & 0.306 & \textbf{3.4\%}  & \textbf{5.6\%}  & \textbf{4.5\%}  \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: ledger=retrainedv2-recall-collapse; eval=rgb_svan_baseline,rgb_svan_hardneg,rgb_svan_retrainedv2; run=eval/diagnose_failures_all.py; cache=eval/results/_failure_diagnosis/svanstrom_1280_by_category.csv; config=svan_iop_1280 (full set)]
 
@@ -63,6 +64,7 @@ The IR detector was developed across five numbered revisions (V2 through V6) plu
     \centering
     \caption{IR detector versions evaluated on the fixed \texttt{IR\_dset\_final} test split @ \texttt{imgsz=640}. Comparable across versions; supersedes the per-version best-epoch mAP narrative. \texttt{v3b} is the production weight.}
     \label{tab:ir_evolution}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lcccccc}
         \toprule
         Version & mAP50 & mAP50-95 & $P$ & $R$ & F1 & Status \\
@@ -75,7 +77,7 @@ The IR detector was developed across five numbered revisions (V2 through V6) plu
         Final  & \textbf{0.977} & \textbf{0.602} & 0.955 & \textbf{0.980} & 0.967 & base for prod \\
         \textbf{v3b (production)} & 0.972 & 0.591 & \textbf{0.957} & 0.977 & \textbf{0.967} & current \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 
 \begin{figure}[htbp]
@@ -103,6 +105,7 @@ The production filter supersedes a MobileNetV3 \emph{patch} CNN; that predecesso
     \centering
     \caption{Feature-reuse filter (the production \texttt{mlp\_v5\_v4}) vs the MobileNetV3 patch filter (v2), both on the FT4 RGB detector. $F1$ is drone-class (IoP@0.5 on Svanstr\"om/SelCom, IoU@0.5 on Anti-UAV/\texttt{rgb\_dataset}); \emph{halluc} is the confuser hallucination rate. \texttt{mlp\_v5\_v4} wins every confuser-rich surface and, with the bird-split re-mine, also closes the prior \texttt{rgb\_dataset} carve-out ($0.792\to0.916$), now leading the patch filter there too. (The Svanstr\"om bare $F1$ shown here, $0.596$, is on this table's stride-9 comparison sample; the canonical even-strided $n{=}4{,}000$ value is $0.607$, Table~\ref{tab:ablation_svanstrom} --- a sampling difference, not an inconsistency.)}
     \label{tab:distill_verifier}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lcccccc}
         \toprule
         & \multicolumn{3}{c}{Drone $F1$} & \multicolumn{3}{c}{Halluc. rate} \\
@@ -115,7 +118,7 @@ The production filter supersedes a MobileNetV3 \emph{patch} CNN; that predecesso
         \texttt{rgb\_dataset} (IoU)& \textbf{0.929} & 0.904 & \textbf{0.916} & 0.028 & 0.026 & \textbf{0.029} \\
         confuser-only              & ---   & ---   & ---            & 0.317 & 0.107 & \textbf{0.021} \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: ledger=v5-beats-patch,v5-rgbds-ceiling; eval=v5_svan_mlp,v5_rgbds_mlp,v5_confuser_mlp; run=eval/eval_v4_vs_patch.py; config=svan_iop_1280_s9,rgb_dataset_iou_640,confuser_test_640]
 
@@ -143,6 +146,7 @@ The production IR filter is a single thermal-native head (\texttt{mlp\_aligned\_
     \centering
     \caption{Thermal-native deploy filter (\texttt{mlp\_aligned\_thermalonly}, \texttt{conf}$=$0.40, \texttt{thr}$=$0.05) vs the bare IR detector; FP in parentheses. CBAM is held out of training. Trained directly on thermal confuser crops, the filter cuts held-out novel-confuser FPs $48\to6$ ($-88\%$) \emph{and} recovers the thermal drone recall the earlier grayscale-harvested filter collapsed (CBAM recall $0.967$, no collapse); its only cost is $-3.7$~pp recall on the genuinely airplane-like \texttt{ir\_dset} drones no threshold separates. The MobileNetV3 patch filter on the same held-out CBAM cuts only $7$ FP.}
     \label{tab:ir_aligned}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lrccc}
         \toprule
         Surface & $n$ & bare IR (\texttt{v3b}) $P/R/F1$ (FP) & + aligned MLP $P/R/F1$ (FP) & $\Delta R / \Delta F1$ \\
@@ -154,7 +158,7 @@ The production IR filter is a single thermal-native head (\texttt{mlp\_aligned\_
         \midrule
         \emph{patch filter on CBAM} & 180 & --- & $0.564/0.883/0.688$ (41) & (cut only 7 FP) \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: ledger=ir-grayscale-harvest-solves-thermal-filter; eval=ir_aligned_cbam_heldout,ir_aligned_irdset_final; run=mri_train_aligned,eval_run_aligned_full; config=cbam_ir_640,ir_final_640]
 
@@ -269,6 +273,7 @@ Five readings, each attributable to one element.
     \centering
     \caption{RQ3: single modality vs routed pipeline (bare per-modality rows vs the production cell). Each modality is scored against its own GT; the routed row is trust-aware. The modality ranking \emph{reverses} between surfaces; the routed no-reject system matches the stronger modality on each without being told which it is.}
     \label{tab:rq3}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lll}
         \toprule
         configuration & Svanstr\"om F1 & Anti-UAV F1 \\
@@ -277,7 +282,7 @@ Five readings, each attributable to one element.
         IR only (\texttt{v3b}, bare)   & 0.940 [0.931--0.949] & 0.961 [0.956--0.966] \\
         \textbf{Routed (production, \texttt{robust8-nr}, filt$\to$clf)}   & \textbf{0.946 [0.938--0.950]} & \textbf{0.984 [0.982--0.987]} \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (A_bare + B_pipeline)]
 
@@ -387,6 +392,7 @@ The mode does \emph{not} generalise to a new global default, and the sweep maps 
     \centering
     \caption{Per-stage runtime (GTX 1050 Ti). The production stages are cheap enough to run on every frame; the predecessors they replaced were the reason gating architectures existed at all.}
     \label{tab:speed}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{llll}
         \toprule
         stage & predecessor & production & speedup \\
@@ -394,7 +400,7 @@ The mode does \emph{not} generalise to a new global default, and the sweep maps 
         trust router    & \texttt{fusion\_no\_fn} 38.3 ms/frame & \texttt{robust8-nr} 0.095 ms/frame & $\sim$404$\times$ \\
         confuser filter & patch CNN 59--112 ms/det & \texttt{mlp\_v5} 1.3--2.1 ms/det & 37--72$\times$ \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: ledger=robust6-speed-feature-efficiency,v5-ship-per-frame; run=eval/bench_speed.py; cache=docs/analysis/2026-06-04_consolidated_sell_new_stack.md]
 
@@ -410,6 +416,7 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
     \centering
     \caption{Segment-level (2-of-3 windows) evaluation on the real-video clips. Fully out-of-distribution for every component. The per-frame filter thresholds are the benchmark-tuned production values; the last column is the relative confuser-fire cut from bare. The patch arm here is a per-frame approximation of the alert-gated original.}
     \label{tab:temporal_production}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lcccc}
         \toprule
         cell & window $P$ & window $R$ & window F1 & confuser window fire (cut) \\
@@ -426,7 +433,7 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
         clf$\to$filt [robust6]          & 0.998 & 0.412 & 0.583 & 0.059 ($-83\%$) \\
         clf$\to$filt patch [sa32]       & 0.969 & 0.535 & 0.689 & 0.080 ($-77\%$) \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: thesis_eval/results/temporal_results.json; run=thesis_eval/temporal_replay.py (window 2-of-3, patch_thr=0.7, mlp rgb@0.25/gray@0.25)]
 % [nr rows: thesis_eval/results_noreject/temporal_results.json — clf[robust8-nr]=bare; clf->filt[robust8-nr]=filt-only (no-reject router passes every confuser frame to the filter)]
@@ -483,6 +490,7 @@ The control row settles the mechanism question at benchmark grade: fed the raw t
     \centering
     \caption{Real-video six-mode diagnostic (the finding's discovery surface; 9 drone clips / 1{,}234 GT instances, 10 confuser clips / 1{,}250 frames, IoP@0.5). The IR-on-grayscale rows are the discovery; the raw-RGB row is the control.}
     \label{tab:realvideo_master}
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lccccccc}
         \toprule
         & \multicolumn{3}{c}{Drone (9 videos)} & \multicolumn{4}{c}{Confuser FPPI (10 videos)} \\
@@ -496,7 +504,7 @@ The control row settles the mechanism question at benchmark grade: fed the raw t
         \textbf{IR on grayscale-RGB} & 0.743 & 0.557 & 0.636 & \textbf{0.158} & \textbf{0.142} & \textbf{0.283} & \textbf{0.103} \\
         IR on raw RGB          & 0.647 & 0.191 & 0.295 & 0.150 & 0.261 & 0.158 & 0.079 \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
 \end{table}
 % [source: ledger=ir-grayscale-fallback,no-pareto-dominance-video; eval=vid_drone_*,vid_conf_*; run=eval/eval_video_tests.py; config=video_drone_iop]
 
