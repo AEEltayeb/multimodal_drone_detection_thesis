@@ -84,7 +84,7 @@ Five readings, each attributable to one element.
 
 \emph{Why the no-reject router is shipped.} Among the reject-class routers, the 32-feature \texttt{sa32} leads every in-domain cell by $0.2$--$1.8$~pp, but it needs an expensive per-frame OpenCV pass, was trained against a superseded detector's calibration, and leaks scene statistics: its features discriminate \emph{which scene} a frame came from rather than \emph{whether} its detections are trustworthy, so its in-domain lead cannot be trusted to carry to surfaces it has not seen (Section~\ref{sec:feature_selection}). \texttt{robust8} matches it within a point on eight free features at a $404\times$ cheaper decision, with \texttt{robust6} between them. On the confuser-rich Svanstr\"om flagship the reject class earns its keep (at the shipped \texttt{filt$\to$clf} order, $\texttt{robust8}$ $0.964$ vs the no-reject $0.946$, at far lower confuser fire). The shipped router is nonetheless the no-reject \texttt{robust8-nr}: a single global router must serve paired, single-modality, and degraded-channel deployments alike, and the reject class collapses recall on the latter two (Tables~\ref{tab:ablation_dut},~\ref{tab:ablation_solo}); averaged across surfaces the no-reject router leads on the \emph{composed} router$+$filter F1 the deployment actually runs ($0.850$ vs $0.744$). These are composed means, not router-only: the no-reject router suppresses no confusers on its own (that is the filter's job), so it is never deployed without the filter behind it. \texttt{robust8}/\texttt{robust6}/\texttt{sa32} are retained as ablations and the trade is detailed in Section~\ref{sec:classifier_results}.
 
-\emph{Dual-modality routing matches the better modality on every surface (RQ3).} Table~\ref{tab:rq3} scores each modality against its \emph{own} ground truth (never a union) and the routed system trust-aware on the same frames. The per-surface reversal is the point: IR dominates Svanstr\"om ($0.940$ vs RGB's $0.607$), RGB dominates Anti-UAV ($0.985$ vs IR's $0.961$); a fixed single-modality choice loses badly on whichever surface its sensor is weak. The router matches or edges the stronger modality on each \emph{without being told which it is} (Svanstr\"om $0.944$, just above IR-only's $0.940$; Anti-UAV $0.984$, level with RGB-only's $0.985$). That is routing's value: not a number a single modality could exceed on its own home surface, but the ability to serve \emph{both} regimes from one operating point, since which modality wins reverses with the conditions (night, glare, range) a deployment cannot choose in advance (Section~\ref{sec:scoring_audit}).
+\emph{Dual-modality routing matches the better modality on every surface (RQ3).} Table~\ref{tab:rq3} scores each modality against its \emph{own} ground truth (never a union) and the routed system trust-aware on the same frames. The per-surface reversal is the point: IR dominates Svanstr\"om ($0.940$ vs RGB's $0.607$), RGB dominates Anti-UAV ($0.985$ vs IR's $0.961$); a fixed single-modality choice loses badly on whichever surface its sensor is weak. The router matches or edges the stronger modality on each \emph{without being told which it is} (Svanstr\"om $0.946$, just above IR-only's $0.940$; Anti-UAV $0.984$, level with RGB-only's $0.985$). That is routing's value: not a number a single modality could exceed on its own home surface, but the ability to serve \emph{both} regimes from one operating point, since which modality wins reverses with the conditions (night, glare, range) a deployment cannot choose in advance (Section~\ref{sec:scoring_audit}).
 
 \begin{table}[htbp]
     \centering
@@ -96,7 +96,7 @@ Five readings, each attributable to one element.
         \midrule
         RGB only (\texttt{ft4}, bare)  & 0.607 [0.590--0.623] & 0.985 [0.982--0.988] \\
         IR only (\texttt{v3b}, bare)   & 0.940 [0.931--0.949] & 0.961 [0.956--0.966] \\
-        \textbf{Routed (production, \texttt{robust8-nr}, filt$\to$clf)}   & \textbf{0.944 [0.938--0.950]} & \textbf{0.984 [0.982--0.987]} \\
+        \textbf{Routed (production, \texttt{robust8-nr}, filt$\to$clf)}   & \textbf{0.946 [0.938--0.950]} & \textbf{0.984 [0.982--0.987]} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -124,10 +124,10 @@ The two surfaces above are IR-dominant (Svanstr\"om) or saturated (Anti-UAV). Th
         clf only [robust8]           & 2586 & 302 & 1301 & 0.895 & 0.665 & 0.763 [0.749--0.778] \\
         clf only [robust6]           & 2415 & 374 & 1808 & 0.866 & 0.572 & 0.689 [0.674--0.705] \\
         clf only [sa32]              & 2651 & 430 & 1480 & 0.860 & 0.642 & 0.735 [0.721--0.750] \\
-        clf$\to$filt [robust8-nr]    & 2580 & 372 & 966 & 0.873 & 0.721 & 0.790 [0.781--0.803] \\
+        clf$\to$filt [robust8-nr]    & 2558 & 372 & 988 & 0.873 & 0.721 & 0.790 [0.781--0.803] \\
         clf$\to$filt [robust8]       & 2234 & 247 & 1653 & 0.900 & 0.574 & 0.701 [0.686--0.717] \\
         clf$\to$filt [sa32]          & 2265 & 361 & 1866 & 0.863 & 0.548 & 0.670 [0.655--0.686] \\
-        \textbf{filt$\to$clf [robust8-nr]} & 2580 & 372 & 614 & \textbf{0.873} & \textbf{0.800} & \textbf{0.835 [0.827--0.849]} \\
+        \textbf{filt$\to$clf [robust8-nr]} & 2558 & 372 & 638 & \textbf{0.873} & \textbf{0.800} & \textbf{0.835 [0.827--0.849]} \\
         filt$\to$clf [robust8]       & 2182 & 237 & 1564 & 0.901 & 0.574 & 0.702 [0.691--0.725] \\
         \bottomrule
     \end{tabular}
@@ -336,15 +336,15 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
         cell & window $P$ & window $R$ & window F1 & confuser window fire (cut) \\
         \midrule
         bare (both channels)            & 0.957 & 0.753 & 0.843 & 0.350 (---) \\
-        filt only (mlp)                 & 0.954 & 0.513 & 0.665 & 0.236 ($-33\%$) \\
+        filt only (mlp)                 & 0.954 & 0.489 & 0.646 & 0.213 ($-39\%$) \\
         filt only (patch, per-frame)    & 0.957 & 0.689 & 0.801 & 0.182 ($-48\%$) \\
         clf only [robust8-nr]           & 0.957 & 0.753 & 0.843 & 0.350 ($-0\%$) \\
         clf only [robust8]              & 0.967 & 0.520 & 0.676 & 0.101 ($-71\%$) \\
         clf only [robust6]              & 0.999 & 0.584 & 0.737 & 0.081 ($-77\%$) \\
         clf only [sa32]                 & 0.967 & 0.582 & 0.727 & 0.120 ($-66\%$) \\
-        clf$\to$filt [robust8-nr]       & 0.954 & 0.513 & 0.665 & 0.236 ($-33\%$) \\
-        clf$\to$filt [robust8]          & 0.972 & 0.396 & 0.561 & 0.098 ($-72\%$) \\
-        clf$\to$filt [robust6]          & 0.998 & 0.424 & 0.593 & 0.075 ($-79\%$) \\
+        clf$\to$filt [robust8-nr]       & 0.954 & 0.489 & 0.646 & 0.213 ($-39\%$) \\
+        clf$\to$filt [robust8]          & 0.975 & 0.377 & 0.544 & 0.076 ($-78\%$) \\
+        clf$\to$filt [robust6]          & 0.998 & 0.412 & 0.583 & 0.059 ($-83\%$) \\
         clf$\to$filt patch [sa32]       & 0.969 & 0.535 & 0.689 & 0.080 ($-77\%$) \\
         \bottomrule
     \end{tabular}
@@ -352,9 +352,9 @@ The deployed system does not alert per frame: an $N$-of-$M$ smoother (Section~\r
 % [source: thesis_eval/results/temporal_results.json; run=thesis_eval/temporal_replay.py (window 2-of-3, patch_thr=0.7, mlp rgb@0.25/gray@0.25)]
 % [nr rows: thesis_eval/results_noreject/temporal_results.json — clf[robust8-nr]=bare; clf->filt[robust8-nr]=filt-only (no-reject router passes every confuser frame to the filter)]
 
-This surface is fully OOD for every component, and it is where the pipeline's costs show. Three results. \emph{First, the trade is real on operational video, and the shipped no-reject router sits on the recall side of it:} \texttt{clf$\to$filt[robust8-nr]} keeps window recall $0.513$ (F1 $0.665$, the best composed F1 here) while cutting confuser fire $33\%$, whereas the reject-class compositions (\texttt{robust8}/\texttt{robust6}) push the cut to $72$--$79\%$ but veto OOD drones aggressively (window recall $0.40$--$0.42$), the video counterpart of the filter's coverage limit on fully out-of-distribution footage (Section~\ref{sec:verifier_results}). The per-frame filter thresholds were tuned on benchmark surfaces, so on fully OOD video they over-veto, which is exactly where the deployment's alert-gate placement matters. \emph{Second, the gate position matters more than the gate:} the predecessor design consulted its filter only at the alert moment, and under that placement the same surface showed segment F1 \emph{gains} (below); a per-frame veto applies the same discrimination thousands of times more often, so every false veto compounds. The measured per-frame numbers therefore \emph{validate the GUI's alert-gate placement} for OOD video rather than contradicting the pipeline: routing per-frame (cheap, $-71$--$77\%$ fire at $10$--$17$~pp F1) plus verification at the alert gate is the operating point the deployment uses. \emph{Third, temporal voting is recall-neutral and precision-positive here} (window vs frame: $\Delta R \approx \pm 0.01$ on every cell, confuser fire consistently lower), confirming the smoother's role as a stabiliser rather than a recall recoverer when detections are already temporally consistent.
+This surface is fully OOD for every component, and it is where the pipeline's costs show. Three results. \emph{First, the trade is real on operational video, and the shipped no-reject router sits on the recall side of it:} \texttt{clf$\to$filt[robust8-nr]} keeps window recall $0.489$ (F1 $0.646$, the best composed F1 here) while cutting confuser fire $39\%$, whereas the reject-class compositions (\texttt{robust8}/\texttt{robust6}) push the cut to $78$--$83\%$ but veto OOD drones aggressively (window recall $0.38$--$0.41$), the video counterpart of the filter's coverage limit on fully out-of-distribution footage (Section~\ref{sec:verifier_results}). The per-frame filter thresholds were tuned on benchmark surfaces, so on fully OOD video they over-veto, which is exactly where the deployment's alert-gate placement matters. \emph{Second, the gate position matters more than the gate:} the predecessor design consulted its filter only at the alert moment, and under that placement the same surface showed segment F1 \emph{gains} (below); a per-frame veto applies the same discrimination thousands of times more often, so every false veto compounds. The measured per-frame numbers therefore \emph{validate the GUI's alert-gate placement} for OOD video rather than contradicting the pipeline: routing per-frame (cheap, $-71$--$77\%$ fire at $10$--$17$~pp F1) plus verification at the alert gate is the operating point the deployment uses. \emph{Third, temporal voting is recall-neutral and precision-positive here} (window vs frame: $\Delta R \approx \pm 0.01$ on every cell, confuser fire consistently lower), confirming the smoother's role as a stabiliser rather than a recall recoverer when detections are already temporally consistent.
 
-A filter-threshold sweep over the cached probabilities settles whether the veto cost is an operating-point artifact: it is not. Lowering the shared filter threshold from $0.25$ to $0.01$ recovers most of the composed cells' recall \emph{relative to router-only} (robust8: $R$ $0.396 \to 0.507$ against the router's $0.520$; robust6: $0.424 \to 0.577$ against $0.584$): at a near-zero threshold the per-frame filter costs only $\sim$1~pp recall on top of the router while still trimming window fire by $7$--$9\%$ relative. But the true drones' filter probabilities on this surface are smeared across the $[0.01, 0.25)$ interval rather than concentrated near 1, so no threshold simultaneously keeps them and rejects confusers: the video-deployment choice is a near-zero per-frame threshold (cheap, marginal benefit) or the alert gate (the predecessor's measured-gain placement). The full sweep is \texttt{thesis\_eval/results/video\_thr\_sweep.md}.
+A filter-threshold sweep over the cached probabilities settles whether the veto cost is an operating-point artifact: it is not. Lowering the shared filter threshold from $0.25$ to $0.01$ recovers most of the composed cells' recall \emph{relative to router-only} (robust8: $R$ $0.377 \to 0.507$ against the router's $0.520$; robust6: $0.412 \to 0.577$ against $0.584$): at a near-zero threshold the per-frame filter costs only $\sim$1~pp recall on top of the router while still trimming window fire by $7$--$9\%$ relative. But the true drones' filter probabilities on this surface are smeared across the $[0.01, 0.25)$ interval rather than concentrated near 1, so no threshold simultaneously keeps them and rejects confusers: the video-deployment choice is a near-zero per-frame threshold (cheap, marginal benefit) or the alert gate (the predecessor's measured-gain placement). The full sweep is \texttt{thesis\_eval/results/video\_thr\_sweep.md}.
 % [source: thesis_eval/results/video_thr_sweep.json; run=thesis_eval/video_thr_sweep.py]
 
 \paragraph{Design-evolution evidence (predecessor stack).}
@@ -586,11 +586,11 @@ The audit's verdict (every confuser bucket below the decisiveness bar, airplanes
         \cmidrule(lr){2-4} \cmidrule(lr){5-7}
         Surface & bare FT4 & + patch v2 & + \texttt{mlp\_v5} & bare & patch v2 & \texttt{mlp\_v5} \\
         \midrule
-        Svanstr\"om (IoP@0.5)      & 0.596 & 0.768 & \textbf{0.861} & 0.470 & 0.163 & \textbf{0.037} \\
-        Anti-UAV (IoU@0.5)         & 0.986 & 0.986 & 0.984          & 0.011 & 0.011 & \textbf{0.010} \\
-        SelCom CCTV (IoP@0.5)      & 0.591 & 0.591 & \textbf{0.612} & 0.071 & 0.071 & \textbf{0.019} \\
-        \texttt{rgb\_dataset} (IoU)& \textbf{0.929} & 0.904 & \textbf{0.916} & 0.028 & 0.026 & \textbf{0.010} \\
-        confuser-only              & ---   & ---   & ---            & 0.317 & 0.107 & \textbf{0.008} \\
+        Svanstr\"om (IoP@0.5)      & 0.596 & 0.768 & \textbf{0.861} & 0.470 & 0.163 & \textbf{0.044} \\
+        Anti-UAV (IoU@0.5)         & 0.986 & 0.986 & 0.984          & 0.011 & 0.011 & \textbf{0.012} \\
+        SelCom CCTV (IoP@0.5)      & 0.591 & 0.591 & \textbf{0.612} & 0.071 & 0.071 & \textbf{0.022} \\
+        \texttt{rgb\_dataset} (IoU)& \textbf{0.929} & 0.904 & \textbf{0.916} & 0.028 & 0.026 & \textbf{0.029} \\
+        confuser-only              & ---   & ---   & ---            & 0.317 & 0.107 & \textbf{0.021} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -606,10 +606,10 @@ The audit's verdict (every confuser bucket below the decisiveness bar, airplanes
 
 \paragraph{The carve-out, diagnosed and then closed.}
 \label{sec:mlp_recall_drop}
-The earlier \texttt{mlp\_v5} filter regressed on the photo-style \texttt{rgb\_dataset} split to $F1=0.792$ ($-11$~pp), driven by a drone recall collapse ($0.896 \to 0.664$). The Model MRI localised why: the falsely-vetoed drones were not low-confidence (confidence-scalar difference between vetoed and kept: $0.000$). They were \emph{smaller}, with a distinct deep-feature signature, and sat \emph{farther from the confuser distribution than the kept drones did} (centroid distance $16.5$ vs $11.1$) while being far from the filter's training-drone cluster ($15.4$). The filter rejected them because they did not resemble its training drones, not because they resembled birds: an OOD \emph{coverage} gap, not a structural overlap.
+The earlier \texttt{mlp\_v5} filter regressed on the photo-style \texttt{rgb\_dataset} split to $F1=0.792$ ($-11$~pp), driven by a drone recall collapse ($0.899 \to 0.691$). The Model MRI localised why: the falsely-vetoed drones were not low-confidence (confidence-scalar difference between vetoed and kept: $0.000$). They were \emph{smaller}, with a distinct deep-feature signature, and sat \emph{farther from the confuser distribution than the kept drones did} (centroid distance $16.5$ vs $11.1$) while being far from the filter's training-drone cluster ($15.4$). The filter rejected them because they did not resemble its training drones, not because they resembled birds: an OOD \emph{coverage} gap, not a structural overlap.
 % [source: ledger=mlp-v5-recall-drop-is-ood-coverage; run=eval/diagnose_mlp_recall_drop.py; cache=eval/results/_offline_pipeline/cache]
 
-That diagnosis prescribed its own fix, and the production filter implements it. \texttt{mlp\_v5\_v4} re-mines the filter's training corpus with the missing manifold filled in: a size$\times$source-balanced drone re-sample (small \texttt{rgb\_dataset} drones from the \texttt{train}$+$\texttt{val} splits, the cells the original stride-8 quota left empty) plus an in-distribution bird-confuser split, the same diverse-data lever that made the IR filter recall-safe. The coverage gap closes directly: \texttt{rgb\_dataset\_test} recall recovers $0.664 \to 0.874$ (held out; F1 $0.792 \to 0.916$, Table~\ref{tab:distill_verifier}) without retreating on any other RGB drone surface, and the per-size cells confirm the recovery is exactly where the gap was (Table~\ref{tab:per_size}, sub-32~px). The earlier no-retrain fail-open gate ($k$-NN distance to the confuser reference) is therefore superseded: it recovered $91$--$100\%$ of the vetoed drones at a $5$--$10\%$ confuser leak but backfired on cluttered Svanstr\"om (precision $0.887 \to 0.631$), and is retained only as design-history (Figure~\ref{fig:failopen_expanded}) for the operating point the re-mine made unnecessary.
+That diagnosis prescribed its own fix, and the production filter implements it. \texttt{mlp\_v5\_v4} re-mines the filter's training corpus with the missing manifold filled in: a size$\times$source-balanced drone re-sample (small \texttt{rgb\_dataset} drones from the \texttt{train}$+$\texttt{val} splits, the cells the original stride-8 quota left empty) plus an in-distribution bird-confuser split, the same diverse-data lever that made the IR filter recall-safe. The coverage gap closes directly: \texttt{rgb\_dataset\_test} recall recovers $0.691 \to 0.887$ (held out; F1 $0.792 \to 0.916$, Table~\ref{tab:distill_verifier}) without retreating on any other RGB drone surface, and the per-size cells confirm the recovery is exactly where the gap was (Table~\ref{tab:per_size}, sub-32~px). The earlier no-retrain fail-open gate ($k$-NN distance to the confuser reference) is therefore superseded: it recovered $91$--$100\%$ of the vetoed drones at a $5$--$10\%$ confuser leak but backfired on cluttered Svanstr\"om (precision $0.887 \to 0.631$), and is retained only as design-history (Figure~\ref{fig:failopen_expanded}) for the operating point the re-mine made unnecessary.
 % [source: ledger=filter-stack-v4-thermalonly-promoted; provenance=docs/analysis/2026-06-18_filter_provenance_train_heldout.md]
 
 \paragraph{Held-out bird suppression (TEST split).}
@@ -670,7 +670,7 @@ The instrument is described in Section~\ref{sec:model_mri}; this section reports
     \centering
     \begin{subfigure}{0.6\textwidth}\includegraphics[width=\textwidth]{fig8_mri_lda}\caption{}\end{subfigure}
     \begin{subfigure}{0.39\textwidth}\includegraphics[width=\textwidth]{fig8_mri_anova}\caption{}\end{subfigure}
-    \caption{Model MRI of the FT4 detector's fused \texttt{p3}+\texttt{p5} ROI features on the shipped $32{,}931$-detection corpus. (a) The linear-discriminant projection separates drone (blue) from confuser (red) into two cleanly-resolved peaks at $\approx 95\%$ single-threshold accuracy. (b) Per-block ANOVA $F$-statistic: \texttt{p5} is the dominant discriminative layer (max $F=42{,}346$, mean $2{,}006$), ahead of \texttt{p3} and the detection metadata; the confidence scalar ranks only 6th.}
+    \caption{Model MRI of the FT4 detector's fused \texttt{p3}+\texttt{p5} ROI features on the shipped $32{,}931$-detection corpus. (a) The linear-discriminant projection separates drone (blue) from confuser (red) into two cleanly-resolved peaks at $\approx 95\%$ single-threshold accuracy. (b) Per-block ANOVA $F$-statistic: \texttt{p5} is the dominant discriminative layer (max $F=42{,}346$, median $657$), ahead of \texttt{p3} and the detection metadata; the confidence scalar ranks only 6th.}
     % [source: ledger=mri-v5-report-regen,v5-lda-separability; eval=distill_cv_mlp; run=mri/cli.py; cache=mri/results/v5_report_regen/stats.json; config=distill_cv_5fold]
     \label{fig:mri_stats}
 \end{figure}

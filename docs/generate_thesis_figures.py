@@ -417,7 +417,7 @@ def fig_distill_verifier():
     # mlp column = the production mlp_v5_v4 build (the v5_* rows are its superseded predecessor).
     # Values match tab:distill_verifier exactly (source: offline_matrix_v4 / kb row distill_verifier_v4).
     V4_MLP_F1 = {"Svanström": 0.861, "Anti-UAV": 0.984, "SelCom": 0.612, "rgb_dataset": 0.916}
-    V4_MLP_HALLUC = {"Svanström": 0.037, "Anti-UAV": 0.010, "SelCom": 0.019, "rgb_dataset": 0.010, "confuser": 0.008}
+    V4_MLP_HALLUC = {"Svanström": 0.044, "Anti-UAV": 0.012, "SelCom": 0.022, "rgb_dataset": 0.029, "confuser": 0.021}
 
     stages = [("bare FT4", 1), ("+ patch v2", 2), ("+ mlp_v5_v4", 3)]
     colors = ["#9e9e9e", "#1f77b4", "#2ca02c"]
@@ -589,11 +589,11 @@ def fig_patch_catchbar():
     for yi, c, mp in zip(y, catch, medprob):
         ax.text(c+0.012, yi, f"{c*100:.0f}% catch  (median $p$={mp:.2f})", va="center", fontsize=9)
     ax.axvline(0.90, color="grey", linestyle="--", lw=1.3)
-    ax.text(0.905, max(y)+0.45, "0.90 decisiveness bar", color="grey", fontsize=8)
+    ax.text(0.905, max(y)+0.28, "0.90 decisiveness bar", color="grey", fontsize=8)
     ax.set_yticks(y); ax.set_yticklabels(buckets)
-    ax.set_xlabel("Confuser catch rate (patch v2, \\texttt{patch\\_thr}=0.5)")
+    ax.set_xlabel("Confuser catch rate (patch v2, patch_thr=0.5)")
     ax.set_xlim(0, 1.15)
-    ax.text(0.054, -0.05, "(drone-TP veto only 5.4\\%)", transform=ax.get_yaxis_transform(),
+    ax.text(0.054, -0.05, "(drone-TP veto only 5.4%)", transform=ax.get_yaxis_transform(),
             fontsize=8, color="#555")
     ax.set_title("Patch verifier: every bucket below the 0.90 bar; airplane is the gap")
     ax.grid(True, axis="x", alpha=0.3, linestyle=":")
