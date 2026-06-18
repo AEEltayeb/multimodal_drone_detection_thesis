@@ -80,74 +80,76 @@
 \contentsline {subsection}{\numberline {4.1.2}IR Detector: the Six-Revision HITL Case Study}{49}{subsection.4.1.2}%
 \contentsline {paragraph}{OOD bound.}{51}{paragraph*.52}%
 \contentsline {subsection}{\numberline {4.1.3}Confuser Filter}{51}{subsection.4.1.3}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{51}{paragraph*.53}%
-\contentsline {paragraph}{The feature-reuse generation.}{51}{paragraph*.54}%
-\contentsline {paragraph}{The carve-out, diagnosed and then closed.}{51}{paragraph*.56}%
-\contentsline {paragraph}{Held-out bird suppression (TEST split).}{52}{paragraph*.57}%
-\contentsline {paragraph}{The thermal-native IR filter.}{52}{paragraph*.58}%
-\contentsline {paragraph}{Operating points: the recall/false-positive dial.}{53}{paragraph*.60}%
-\contentsline {subsection}{\numberline {4.1.4}Trust Classifier}{54}{subsection.4.1.4}%
-\contentsline {paragraph}{The shipped router: dropping the reject class.}{55}{paragraph*.62}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{55}{paragraph*.63}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{56}{paragraph*.64}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{56}{paragraph*.65}%
-\contentsline {paragraph}{The surface reversal.}{56}{paragraph*.66}%
-\contentsline {section}{\numberline {4.2}Model MRI Findings}{56}{section.4.2}%
-\contentsline {paragraph}{The signal is linear, supervised, and deep.}{56}{paragraph*.68}%
-\contentsline {paragraph}{The instrument audits its own paper trail.}{57}{paragraph*.70}%
-\contentsline {section}{\numberline {4.3}Full-Pipeline Ablation}{58}{section.4.3}%
-\contentsline {paragraph}{Stack under test.}{58}{paragraph*.71}%
+\contentsline {paragraph}{The feature-reuse generation.}{51}{paragraph*.53}%
+\contentsline {paragraph}{The carve-out, diagnosed and then closed.}{51}{paragraph*.55}%
+\contentsline {paragraph}{Held-out bird suppression (TEST split).}{52}{paragraph*.56}%
+\contentsline {paragraph}{The thermal-native IR filter.}{52}{paragraph*.57}%
+\contentsline {paragraph}{Operating points: the recall/false-positive dial.}{53}{paragraph*.59}%
+\contentsline {subsection}{\numberline {4.1.4}Trust Classifier}{53}{subsection.4.1.4}%
+\contentsline {paragraph}{The shipped router: dropping the reject class.}{54}{paragraph*.61}%
+\contentsline {section}{\numberline {4.2}Model MRI Findings}{55}{section.4.2}%
+\contentsline {paragraph}{The signal is linear, supervised, and deep.}{55}{paragraph*.63}%
+\contentsline {paragraph}{The instrument audits its own paper trail.}{56}{paragraph*.65}%
+\contentsline {section}{\numberline {4.3}Full-Pipeline Ablation}{57}{section.4.3}%
+\contentsline {paragraph}{Stack under test.}{57}{paragraph*.66}%
 \contentsline {subsection}{\numberline {4.3.1}Paired Drone Benchmarks: the Cost Side}{58}{subsection.4.3.1}%
-\contentsline {paragraph}{A clean in-domain check: DUT Anti-UAV (\emph {test split}).}{62}{paragraph*.76}%
-\contentsline {paragraph}{Why the shipped router drops the reject class.}{62}{paragraph*.78}%
-\contentsline {subsection}{\numberline {4.3.2}Out-of-Distribution Confusers: the Benefit Side}{63}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Solo In-Distribution Surfaces}{64}{subsection.4.3.3}%
-\contentsline {subsection}{\numberline {4.3.4}Per-Size Attribution: Where the Resolvable Floor Bites}{66}{subsection.4.3.4}%
-\contentsline {subsection}{\numberline {4.3.5}Background Failure Profile}{67}{subsection.4.3.5}%
-\contentsline {subsection}{\numberline {4.3.6}The Filter Buys Back the Detector Floor}{67}{subsection.4.3.6}%
-\contentsline {subsection}{\numberline {4.3.7}Runtime Cost}{69}{subsection.4.3.7}%
-\contentsline {section}{\numberline {4.4}Temporal Evidence at the Segment Grain}{69}{section.4.4}%
-\contentsline {paragraph}{Design-evolution evidence (predecessor stack).}{70}{paragraph*.87}%
-\contentsline {section}{\numberline {4.5}The Grayscale Finding}{71}{section.4.5}%
-\contentsline {subsection}{\numberline {4.5.1}The Fair Three-Way Comparison}{71}{subsection.4.5.1}%
-\contentsline {subsection}{\numberline {4.5.2}Mechanism and Bounds}{72}{subsection.4.5.2}%
-\contentsline {subsection}{\numberline {4.5.3}The Fallback Value and the Honest Bound}{73}{subsection.4.5.3}%
-\contentsline {section}{\numberline {4.6}Threats to Validity}{73}{section.4.6}%
-\contentsline {paragraph}{Internal validity.}{73}{paragraph*.92}%
-\contentsline {paragraph}{Construct validity.}{74}{paragraph*.93}%
-\contentsline {paragraph}{External validity.}{74}{paragraph*.94}%
-\contentsline {paragraph}{Sampling and uncertainty.}{74}{paragraph*.95}%
-\contentsline {paragraph}{Conclusion validity.}{74}{paragraph*.96}%
-\contentsline {section}{\numberline {4.7}Limitations and Future Work}{74}{section.4.7}%
-\contentsline {paragraph}{Edge latency.}{74}{paragraph*.97}%
-\contentsline {paragraph}{GUI integration of the aligned filter.}{74}{paragraph*.98}%
-\contentsline {paragraph}{The airplane gap (largely closed).}{74}{paragraph*.99}%
-\contentsline {paragraph}{IR OOD recall.}{75}{paragraph*.100}%
-\contentsline {paragraph}{Track-level classification.}{75}{paragraph*.101}%
-\contentsline {paragraph}{Open evaluation items.}{75}{paragraph*.102}%
-\contentsline {chapter}{\numberline {5}Conclusion}{76}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Answers to the Research Questions}{76}{section.5.1}%
-\contentsline {paragraph}{RQ1 (capability).}{76}{paragraph*.103}%
-\contentsline {paragraph}{RQ2 (attribution).}{76}{paragraph*.104}%
-\contentsline {paragraph}{RQ3 (dual-modality value).}{77}{paragraph*.105}%
-\contentsline {paragraph}{The methodological thread.}{77}{paragraph*.106}%
-\contentsline {paragraph}{The findings.}{77}{paragraph*.107}%
-\contentsline {section}{\numberline {5.2}Production Stack}{78}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Future Work}{78}{section.5.3}%
-\contentsline {chapter}{\numberline {A}Datasets in Detail}{80}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{80}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{80}{section.A.2}%
-\contentsline {section}{\numberline {A.3}IR Detector Corpus}{81}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{81}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{81}{section.A.5}%
-\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{82}{section.A.6}%
-\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{82}{section.A.7}%
-\contentsline {section}{\numberline {A.8}SelCom CCTV}{82}{section.A.8}%
-\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{82}{section.A.9}%
-\contentsline {section}{\numberline {A.10}Licensing and Ethics}{84}{section.A.10}%
-\contentsline {chapter}{\numberline {B}Models Evaluated}{85}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{87}{appendix.C}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{88}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{90}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{92}{appendix.F}%
+\contentsline {paragraph}{A clean in-domain check: DUT Anti-UAV (\emph {test split}).}{60}{paragraph*.71}%
+\contentsline {paragraph}{Why the shipped router drops the reject class.}{62}{paragraph*.73}%
+\contentsline {subsection}{\numberline {4.3.2}Out-of-Distribution Confusers: the Benefit Side}{62}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Solo In-Distribution Surfaces}{63}{subsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Per-Size Attribution: Where the Resolvable Floor Bites}{64}{subsection.4.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Background Failure Profile}{65}{subsection.4.3.5}%
+\contentsline {subsection}{\numberline {4.3.6}The Filter Buys Back the Detector Floor}{66}{subsection.4.3.6}%
+\contentsline {subsection}{\numberline {4.3.7}Runtime Cost}{67}{subsection.4.3.7}%
+\contentsline {section}{\numberline {4.4}Temporal Evidence at the Segment Grain}{67}{section.4.4}%
+\contentsline {paragraph}{Design-evolution evidence (predecessor stack).}{69}{paragraph*.82}%
+\contentsline {section}{\numberline {4.5}The Grayscale Finding}{69}{section.4.5}%
+\contentsline {subsection}{\numberline {4.5.1}The Fair Three-Way Comparison}{70}{subsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Mechanism and Bounds}{71}{subsection.4.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}The Fallback Value and the Honest Bound}{71}{subsection.4.5.3}%
+\contentsline {section}{\numberline {4.6}Threats to Validity}{72}{section.4.6}%
+\contentsline {paragraph}{Internal validity.}{72}{paragraph*.87}%
+\contentsline {paragraph}{Construct validity.}{72}{paragraph*.88}%
+\contentsline {paragraph}{External validity.}{72}{paragraph*.89}%
+\contentsline {paragraph}{Sampling and uncertainty.}{72}{paragraph*.90}%
+\contentsline {paragraph}{Conclusion validity.}{73}{paragraph*.91}%
+\contentsline {section}{\numberline {4.7}Limitations and Future Work}{73}{section.4.7}%
+\contentsline {paragraph}{Edge latency.}{73}{paragraph*.92}%
+\contentsline {paragraph}{GUI integration of the aligned filter.}{73}{paragraph*.93}%
+\contentsline {paragraph}{The airplane gap (largely closed).}{73}{paragraph*.94}%
+\contentsline {paragraph}{IR OOD recall.}{73}{paragraph*.95}%
+\contentsline {paragraph}{Track-level classification.}{73}{paragraph*.96}%
+\contentsline {paragraph}{Open evaluation items.}{73}{paragraph*.97}%
+\contentsline {chapter}{\numberline {5}Conclusion}{75}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Answers to the Research Questions}{75}{section.5.1}%
+\contentsline {paragraph}{RQ1 (capability).}{75}{paragraph*.98}%
+\contentsline {paragraph}{RQ2 (attribution).}{75}{paragraph*.99}%
+\contentsline {paragraph}{RQ3 (dual-modality value).}{76}{paragraph*.100}%
+\contentsline {paragraph}{The methodological thread.}{76}{paragraph*.101}%
+\contentsline {paragraph}{The findings.}{76}{paragraph*.102}%
+\contentsline {section}{\numberline {5.2}Production Stack}{77}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Future Work}{77}{section.5.3}%
+\contentsline {chapter}{\numberline {A}Datasets in Detail}{79}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{79}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{79}{section.A.2}%
+\contentsline {section}{\numberline {A.3}IR Detector Corpus}{80}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{80}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{80}{section.A.5}%
+\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{81}{section.A.6}%
+\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{81}{section.A.7}%
+\contentsline {section}{\numberline {A.8}SelCom CCTV}{81}{section.A.8}%
+\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{81}{section.A.9}%
+\contentsline {section}{\numberline {A.10}Licensing and Ethics}{83}{section.A.10}%
+\contentsline {chapter}{\numberline {B}Models Evaluated}{84}{appendix.B}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{86}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{87}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{89}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{91}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Superseded Confuser Filter (Patch CNN)}{91}{section.F.1}%
+\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{91}{paragraph*.110}%
+\contentsline {section}{\numberline {F.2}Trust-Classifier Design History}{93}{section.F.2}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{93}{paragraph*.111}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{93}{paragraph*.112}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{94}{paragraph*.113}%
+\contentsline {paragraph}{The surface reversal.}{94}{paragraph*.114}%
 \contentsline {chapter}{Bibliography}{95}{appendix*.115}%
