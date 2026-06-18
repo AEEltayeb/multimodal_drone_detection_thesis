@@ -13,6 +13,7 @@ The evaluation uses eight labelled corpora and a 19-clip YouTube real-video set,
     \caption{Evaluation surfaces and their roles. ``Role'' distinguishes training surfaces, in-distribution evaluation surfaces, and OOD stress surfaces; no OOD surface contributes any training data. Benchmark and stress surfaces are evaluation-only and carry no split.}
     \label{tab:datasets}
     \footnotesize
+    \resizebox{\textwidth}{!}{%
     \begin{tabular}{lrllp{4.0cm}}
         \toprule
         Tag & Frames & Train / val / test & Modality & Role \\
@@ -26,18 +27,12 @@ The evaluation uses eight labelled corpora and a 19-clip YouTube real-video set,
         \texttt{selcom\_cctv} & 2,076 & 80 / 20 split (val 311 evaluated) & RGB & Deployment-partner CCTV (fine-tune surface + held-out val) \\
         YouTube real-video diagnostic & 2,609 & --- (eval-only) & RGB & Real-world clips: drone-positive (9) + confuser-only (10); consecutive frames carry the temporal evaluation \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
     \normalsize
 \end{table}
 % [source: G:/drone/dataset/dataset/dataset.yaml (137,506/17,307/17,209); G:/drone/IR_dset_final/dataset.yaml (107,809/11,709/9,612); rgb_confusers_merged/dataset_documentation.md; selcom manifest]
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=\textwidth]{fig_datasets_pie}
-    \caption{Global composition of the data used in this thesis. (a) Training corpora (327{,}619 frames; counts from Tables~\ref{tab:ds_rgb_components}--\ref{tab:ds_ir_components} and Appendix~\ref{app:datasets}). (b) Canonical evaluation surfaces by source size (151{,}695 frames); the Tier-1 protocol evaluates an even-spread subset of at most 4{,}000 frames per surface (Section~\ref{sec:canonical_configs}).}
-    \label{fig:datasets_pie}
-\end{figure}
-% [source: thesis_eval/gen_dataset_figures.py (counts from the dataset tables; eval n_source from tier1_results.json)]
+% fig:datasets_pie removed (review item: duplicates tab:datasets; panel (b) had sub-2% invisible slices).
 
 \begin{figure}[htbp]
     \centering

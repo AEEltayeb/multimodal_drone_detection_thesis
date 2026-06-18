@@ -102,13 +102,7 @@ The patch filter's operating point was set by a threshold sweep on Svanstr\"om (
 
 % tab:patch_audit removed (duplicate of fig:patch_catchbar, which shows the same per-bucket catch rates and the 5.4\% drone-TP veto).
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{fig8_patch_catchbar}
-    \caption{Patch-filter (v2) per-bucket confuser catch rate at \texttt{patch\_thr}=0.5, against the $0.90$ ``decisiveness'' bar. Helicopters ($71\%$) and birds ($64\%$) are mid; airplanes ($52\%$, median patch probability $0.540$) are the actionable gap. All three buckets sit below the bar, the motivation for the feature-reuse successor.}
-    % [source: ledger=patch-catch-below-bar; eval=patch_catch_v2_svan; config=patch_catch_svan_1280_s9]
-    \label{fig:patch_catchbar}
-\end{figure}
+% fig:patch_catchbar moved to Appendix~\ref{app:design_history} (design-history consolidation).
 
 The audit's verdict (every confuser bucket below the decisiveness bar, airplanes worst, and a hard distribution bound: on SelCom-scale crops it is bit-for-bit the bare detector) is what motivated replacing pixel re-processing with feature reuse.
 % [source: ledger=patch-catch-below-bar,patch-v2-neutral-selcom; eval=patch_catch_v2_svan,v5_selcom_patch]
@@ -148,12 +142,7 @@ That diagnosis prescribed its own fix, and the production filter implements it. 
 The RGB filter \texttt{mlp\_v5\_v4} is \emph{trained} on the v2 balanced corpus ($19{,}334$ drone / $13{,}597$ confuser: balanced \texttt{rgb\_dataset} drones from \texttt{dataset/\{train,val\}} $+$ Anti-UAV \texttt{val}/RGB; pure-SelCom mined crops with the $311$ \texttt{selcom\_val} files blocklisted; \texttt{rgb\_confusers\_merged/\{train,val\}}) \emph{plus the bird.v1i TRAIN split} ($728$ of $1{,}212$ images, $60/40$ seed-0 name split). It is \emph{evaluated} on the held-out \textbf{bird.v1i TEST split} ($484$ unseen images, $230$ bird fires): \texttt{mlp\_v5\_v4} keeps only $30/230$ ($13\%$) where the shipped \texttt{mlp\_v5} kept $91/230$ ($40\%$), so the production filter \emph{beats} its predecessor on \emph{unseen} birds (AUROC $0.981$). The four cached drone/confuser surfaces above are genuine disjoint test splits (\texttt{rgb\_dataset\_test}, \texttt{antiuav\_rgb}, \texttt{selcom\_val} by blocklist, \texttt{rgb\_confuser}); the Svanstr\"om RGB numbers are read as a shipped-vs-candidate $\Delta$. The single residual cost is $+5$ non-bird FP on the cached \texttt{rgb\_confuser} surface (Table~\ref{tab:ablation_confusers}, $29\to39$).
 % [source: provenance=docs/analysis/2026-06-18_filter_provenance_train_heldout.md; eval=eval/eval_birdtest_heldout.py]
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig8_failopen_expanded}
-    \caption{Design-history: the recall/precision frontier on Svanstr\"om for the no-retrain fail-open gate (with the original \texttt{rgb\_confusers} reference, red, versus a reference expanded with held-out Svanstr\"om clutter, green), against the full-veto operating point (star) and the bare detector (square). This gate was the candidate fix \emph{before} the bird-split re-mine closed the coverage gap directly; it is retained only as the record of why a calibration patch was inferior to fixing the training coverage. Source: \texttt{eval/failopen\_expanded\_ref.py}.}
-    \label{fig:failopen_expanded}
-\end{figure}
+% fig:failopen_expanded moved to Appendix~\ref{app:design_history} (design-history consolidation).
 
 \paragraph{The thermal-native IR filter.}
 \label{sec:grayscale_verifier}
@@ -208,12 +197,7 @@ The reject class is a liability on any surface that is not a confuser-rich paire
 \texttt{robust6} inherits one honest weakness from the four-class formulation: in the grayscale-IR fallback the thermal features go uninformative, so drone-only-in-RGB frames are routed to \texttt{reject} and grayscale recall collapses. \texttt{robust8} patched this \emph{within} the reject formulation by adding \texttt{rgb\_mean\_conf} and a per-class threshold $\tau$ on $P(\text{trust\_rgb})$: at $\tau=0.20$ it lifts Svanstr\"om-grayscale recall $0.577 \to 0.681$ (Figure~\ref{fig:robust8_operating}), at the structural cost of $7$--$10\times$ real-video-confuser fire on the grayscale slice ($0.006 \to 0.046$), because \texttt{rgb\_mean\_conf} reads as a drone on Svanstr\"om but as a confident bird on real-motion video. Dropping the reject class removes the hole at its source: a router that never rejects cannot route a grayscale drone to \texttt{reject}, so \texttt{robust8-nr} needs neither the $\tau$ dial nor the precision/recall trade the figure illustrates. The sweep is retained as the design-history record of why the reject formulation was awkward to operate.
 % [source: ledger=robust8-grayscale-router; eval=svan_gray_robust8_t20_clffilter,video_confuser_robust8_t20_clffilter; run=eval/compare_routing_pipeline.py; cache=eval/results/_routing_pipeline_cmp/comparison.md]
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig_robust8_operating_point}
-    \caption{Design-history: the grayscale \texttt{trust\_rgb} hole was a decision-rule problem inside the four-class router, not a feature-space limit. Sweeping the per-class \texttt{trust\_rgb} threshold $\tau$ trades precision for recall along a well-separated curve; the reject-class \texttt{robust8} operated at $\tau{=}0.20$. The shipped \texttt{robust8-nr} drops the reject class and removes this knob entirely (the hole cannot form without a \texttt{reject} label). Source: \texttt{eval/compare\_routing\_pipeline.py}.}
-    \label{fig:robust8_operating}
-\end{figure}
+% fig:robust8_operating moved to Appendix~\ref{app:design_history} (design-history consolidation).
 
 \paragraph{A dual-classifier extension (validated, not shipped).}
 Splitting the router into a paired model and a separate grayscale model strictly dominates single \texttt{sa32} on missing-modality cases (RGB-fallback bird-confuser drone $F1$ $0.247\to1.000$; \texttt{rgb\_dataset\_test} $0.690\to0.960$) with paired-core performance unchanged; grayscale airplane/helicopter cases remain weak ($F1\approx0.50$). It is recorded as a validated extension rather than the shipped default; \texttt{robust8}'s two extra features close most of the same gap without a second model.
@@ -225,13 +209,7 @@ The first quantitative router comparison ran the predecessor cascade (baseline R
 
 % tab:classifiers removed (design-evolution; the surface reversal is shown in fig:classifier_reversal and described in the surrounding paragraphs).
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig8_classifier_reversal}
-    \caption{No trust classifier wins both surfaces. On the OOD confuser zoo \texttt{fusion\_no\_fn\_v1.1} is far the safest (S2 fire $0.016$) but on real video it collapses drone $F1$ to $0.219$; \texttt{sa32} inverts the ranking, dominating real-video drone $F1$ ($0.826$) at a higher zoo fire ($0.205$). This surface reversal motivated the \texttt{sa32} working pick, later superseded by the statistically-derived \texttt{robust6}/\texttt{robust8} (Section~\ref{sec:feature_selection}) and the shipped no-reject \texttt{robust8-nr} (Section~\ref{sec:classifier_results}); \texttt{sa32}'s scene-statistic leakage is why even its wins here are not trusted to generalise.}
-    % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn,clfzoo_fnfn; config=pipe_video_drone_iop]
-    \label{fig:classifier_reversal}
-\end{figure}
+% fig:classifier_reversal moved to Appendix~\ref{app:design_history} (design-history consolidation).
 
 \paragraph{The surface reversal.}
 On real video the ranking inverted: \texttt{sa32} dominated segment drone $F1$ ($0.826$ baseline RGB) while \texttt{fusion\_no\_fn\_v1.1} accepted only about one in eight of the correct RGB drone TPs (segment $R=0.128$; seven of eight drone events missed) and \texttt{control\_v3more\_40feat} trailed \texttt{sa32} by 18~pp with no compensating win anywhere. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where missed drones cost less than false alarms. This reversal is what discredited hand-ranking classifiers on single benchmarks and motivated the statistical selection that produced \texttt{robust6}/\texttt{robust8} above. Even \texttt{sa32}'s real-video win is not bankable: its scene-statistic leakage (Section~\ref{sec:feature_selection}) lets it score partly by memorising surface identity, so its lead is not trusted to generalise beyond the surfaces measured.

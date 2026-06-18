@@ -17,39 +17,6 @@
 \endgroup
 
 \datalist[entry]{none/global//global/global/global}
-  \entry{svanstrom2021real}{inproceedings}{}{}
-    \name{author}{3}{}{%
-      {{hash=SF}{%
-         family={Svanstr{\"o}m},
-         familyi={S\bibinitperiod},
-         given={Fredrik},
-         giveni={F\bibinitperiod},
-      }}%
-      {{hash=AFF}{%
-         family={Alonso-Fernandez},
-         familyi={A\bibinithyphendelim F\bibinitperiod},
-         given={Fernando},
-         giveni={F\bibinitperiod},
-      }}%
-      {{hash=EC}{%
-         family={Englund},
-         familyi={E\bibinitperiod},
-         given={Cristofer},
-         giveni={C\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{SF+1}
-    \strng{fullhash}{SFAFFEC1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{booktitle}{Proceedings of the 25th International Conference on
-  Pattern Recognition (ICPR)}
-    \field{pages}{7265\bibrangedash 7272}
-    \field{title}{Real-Time Drone Detection and Tracking With Visible, Thermal
-  and Acoustic Sensors}
-    \field{year}{2021}
-  \endentry
-
   \entry{shi2018counteruas}{article}{}{}
     \name{author}{6}{}{%
       {{hash=SX}{%
@@ -301,7 +268,7 @@
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
     \field{note}{Accessed: 2025}
-    \field{title}{YOLOv8 Documentation}
+    \field{title}{Ultralytics YOLO Documentation}
     \verb{url}
     \verb https://docs.ultralytics.com/
     \endverb
@@ -696,6 +663,39 @@
   Results from a Grand Challenge}
     \field{volume}{21}
     \field{journaltitle}{Sensors}
+    \field{year}{2021}
+  \endentry
+
+  \entry{svanstrom2021real}{inproceedings}{}{}
+    \name{author}{3}{}{%
+      {{hash=SF}{%
+         family={Svanstr{\"o}m},
+         familyi={S\bibinitperiod},
+         given={Fredrik},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=AFF}{%
+         family={Alonso-Fernandez},
+         familyi={A\bibinithyphendelim F\bibinitperiod},
+         given={Fernando},
+         giveni={F\bibinitperiod},
+      }}%
+      {{hash=EC}{%
+         family={Englund},
+         familyi={E\bibinitperiod},
+         given={Cristofer},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{SF+1}
+    \strng{fullhash}{SFAFFEC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{booktitle}{Proceedings of the 25th International Conference on
+  Pattern Recognition (ICPR)}
+    \field{pages}{7265\bibrangedash 7272}
+    \field{title}{Real-Time Drone Detection and Tracking With Visible, Thermal
+  and Acoustic Sensors}
     \field{year}{2021}
   \endentry
 
