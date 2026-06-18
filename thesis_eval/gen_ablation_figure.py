@@ -18,7 +18,7 @@ CELLS_A = [("bare", "bare"), ("clf[robust8]", "+ router"), ("clf->filt[robust8]"
 SURF_A = [("svanstrom", "Svanström (IoP@0.5)"), ("antiuav", "Anti-UAV (IoU@0.5)")]
 CELLS_B = [("bare", "bare"), ("filt_patch", "patch"), ("filt_mlp", "mlp_v5"),
            ("clf[robust8]", "router"), ("clf->filt[robust8]", "composed")]
-SURF_B = [("rgb_confuser", "RGB confusers"), ("ir_confusers", "IR confusers"), ("gray_confuser", "grayscale confusers")]
+SURF_B = [("rgb_confuser", "RGB confusers"), ("ir_confusers", "IR confusers")]
 C = {"bare": "#9e9e9e", "patch": "#7fa8d9", "mlp_v5": "#2e7d32", "router": "#f0a050", "composed": "#1a4e8a",
      "+ router": "#f0a050", "+ filter\n(production)": "#1a4e8a"}
 

@@ -55,7 +55,7 @@
       {{hash=SX}{%
          family={Shi},
          familyi={S\bibinitperiod},
-         given={Xiaojuan},
+         given={Xiufang},
          giveni={X\bibinitperiod},
       }}%
       {{hash=YC}{%
@@ -326,38 +326,6 @@
     \field{note}{Anti-UAV RGBT benchmark dataset}
     \field{title}{Anti-UAV: A Large Multi-Modal Benchmark for UAV Tracking}
     \field{year}{2021}
-  \endentry
-
-  \entry{sun2016return}{inproceedings}{}{}
-    \name{author}{3}{}{%
-      {{hash=SB}{%
-         family={Sun},
-         familyi={S\bibinitperiod},
-         given={Baochen},
-         giveni={B\bibinitperiod},
-      }}%
-      {{hash=FJ}{%
-         family={Feng},
-         familyi={F\bibinitperiod},
-         given={Jiashi},
-         giveni={J\bibinitperiod},
-      }}%
-      {{hash=SK}{%
-         family={Saenko},
-         familyi={S\bibinitperiod},
-         given={Kate},
-         giveni={K\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{SB+1}
-    \strng{fullhash}{SBFJSK1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{booktitle}{Proceedings of the AAAI Conference on Artificial
-  Intelligence}
-    \field{title}{Return of frustratingly easy domain adaptation}
-    \field{volume}{30}
-    \field{year}{2016}
   \endentry
 
   \entry{ren2015fasterrcnn}{inproceedings}{}{}
@@ -674,7 +642,7 @@
     \field{year}{2017}
   \endentry
 
-  \entry{coluccia2021dronevsbird}{inproceedings}{}{}
+  \entry{coluccia2021dronevsbird}{article}{}{}
     \true{moreauthor}
     \true{morelabelname}
     \name{author}{6}{}{%
@@ -719,10 +687,15 @@
     \strng{fullhash}{CAFASASLDAZD+1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{booktitle}{Proceedings of the IEEE International Conference on
-  Advanced Video and Signal Based Surveillance (AVSS)}
+    \verb{doi}
+    \verb 10.3390/s21082824
+    \endverb
+    \field{number}{8}
+    \field{pages}{2824}
     \field{title}{Drone vs.\ Bird Detection: Deep Learning Algorithms and
   Results from a Grand Challenge}
+    \field{volume}{21}
+    \field{journaltitle}{Sensors}
     \field{year}{2021}
   \endentry
 
@@ -762,11 +735,11 @@
 
   \entry{zhao2023antiuav}{inproceedings}{}{}
     \name{author}{7}{}{%
-      {{hash=ZB}{%
+      {{hash=ZJ}{%
          family={Zhao},
          familyi={Z\bibinitperiod},
-         given={Bo},
-         giveni={B\bibinitperiod},
+         given={Jian},
+         giveni={J\bibinitperiod},
       }}%
       {{hash=LL}{%
          family={Lan},
@@ -805,8 +778,8 @@
          giveni={B\bibinitperiod},
       }}%
     }
-    \strng{namehash}{ZB+1}
-    \strng{fullhash}{ZBLLWJHXLZLYHB1}
+    \strng{namehash}{ZJ+1}
+    \strng{fullhash}{ZJLLWJHXLZLYHB1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
     \field{booktitle}{Proceedings of the IEEE/CVF Conference on Computer Vision
@@ -1289,6 +1262,27 @@
     \field{year}{2021}
   \endentry
 
+  \entry{ng2021datacentric}{misc}{}{}
+    \name{author}{1}{}{%
+      {{hash=NA}{%
+         family={Ng},
+         familyi={N\bibinitperiod},
+         given={Andrew},
+         giveni={A\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{NA1}
+    \strng{fullhash}{NA1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{title}{A Chat with Andrew on MLOps: From Model-centric to
+  Data-centric AI}
+    \verb{url}
+    \verb https://www.youtube.com/watch?v=06-AZXmwHjo
+    \endverb
+    \field{year}{2021}
+  \endentry
+
   \entry{sambasivan2021data}{inproceedings}{}{}
     \name{author}{6}{}{%
       {{hash=SN}{%
@@ -1532,7 +1526,7 @@
          giveni={D\bibinitperiod},
       }}%
     }
-    \strng{namehash}{ZJ+1}
+    \strng{namehash}{ZJ+2}
     \strng{fullhash}{ZJZJLDWD1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}

@@ -1,7 +1,7 @@
 """
 Filter operating-point sweep (thesis figure `fig_filter_operating`). ZERO-GPU.
 
-For each confuser filter (RGB mlp_v5 / IR-thermal aligned / grayscale aligned_gray) sweep the P(drone)
+For each confuser filter (RGB mlp_v5 / IR-thermal aligned) sweep the P(drone)
 threshold and plot, on one axis pair, the drone DETECTION recall (fraction of GT-matched true-drone
 detections retained, pooled over that filter's drone surfaces) and the confuser FIRE-RATE (frame-level,
 the matching confuser surface). The shipped operating point is marked. Reads the unified caches and
@@ -33,7 +33,6 @@ GRID = np.round(np.arange(0.02, 0.951, 0.01), 3)
 FILTERS = [
     ("RGB mlp_v5",        "mlp_v5",       "rgb", ["svanstrom", "antiuav", "dut_antiuav_960"], "rgb_confuser",  0.25),
     ("IR-thermal aligned","aligned",      "ir",  ["svanstrom", "antiuav", "ir_dset_final"],   "ir_confusers",  0.05),
-    ("grayscale aligned", "aligned_gray", "ir",  ["svanstrom_gray", "dut_antiuav_960"],       "gray_confuser", 0.25),
 ]
 
 
@@ -76,7 +75,7 @@ def main():
     figdir, outjson = Path(a.fig_dir), Path(a.json)
     verifs = U.load_verifiers("cpu")
     figdir.mkdir(parents=True, exist_ok=True); outjson.parent.mkdir(parents=True, exist_ok=True)
-    fig, axes = plt.subplots(1, 3, figsize=(13.5, 4.0))
+    fig, axes = plt.subplots(1, 2, figsize=(9.5, 4.0))
     summary = {}
     for ax, (name, vk, slot, dsurf, csurf, shipped) in zip(axes, FILTERS):
         pos = drone_pos_probs(verifs[vk], slot, dsurf)

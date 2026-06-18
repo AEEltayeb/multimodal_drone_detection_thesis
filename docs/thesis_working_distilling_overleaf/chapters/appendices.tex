@@ -160,8 +160,7 @@ Model & Role & Note \\
 \multicolumn{3}{l}{\textbf{Confuser filters}} \\
 \midrule
 \texttt{mlp\_v5} (\texttt{v4} build) & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} ROI features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.809\to0.922$, recall $0.691\to0.887$). \\
-\texttt{mlp\_aligned\_thermalonly} & \textbf{production} & Thermal-native head of the two-head IR filter (CBAM-trained, @0.05); held-out CBAM recall recovered $0.717\to0.967$ at FP $6$, with $94\%$ of held-out thermal confusers removed. \\
-\texttt{mlp\_aligned\_gray\_balanced} & \textbf{production} & Grayscale-aligned head of the two-head IR filter (@0.25); cuts held-out grayscale confuser FPs by ${\sim}97.7\%$ ($656\to15$). \\
+\texttt{mlp\_aligned\_thermalonly} & \textbf{production} & Thermal-native IR confuser filter (CBAM-trained, @0.05); held-out CBAM recall recovered $0.717\to0.967$ at FP $6$, with $94\%$ of held-out thermal confusers removed. \\
 \texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch filter; audited predecessor, the \texttt{v4} RGB filter removes its last fallback role. \\
 \bottomrule
 \caption{Models referenced in this thesis: the production pick at each cascade stage and the comparison or ablation variants discussed in the main text. The complete experimental registry is retained in the project repository.}
@@ -266,7 +265,7 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
     \item[v2 (patch filter)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
     \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
-    \item[IR filter (two heads)] The cross-modal IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}), now two heads selected per modality: a thermal-native head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) for thermal deployment and a grayscale-aligned head (\texttt{mlp\_aligned\_gray\_balanced}, @0.25) for the grayscale-fallback path.
+    \item[IR filter] The thermal-native IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}): a single head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) trained directly on thermal confuser crops.
     \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
     \item[\texttt{imgsz}] Ultralytics short for input letterbox size. Drives small-object recall (Section~\ref{sec:resolution_arch}).

@@ -15,13 +15,11 @@ relational evidence store) holds the same numbers as queryable rows (`evals.csv`
 
 | Thesis number (where) | Value | File (cell) | Reproduce |
 |---|---|---|---|
-| Svanström composed F1 (abstract, §1.4, §4.1) | 0.742 → 0.949 (R 0.948→0.958, P 0.609→0.939) | `tier1_results.json` → `svanstrom.B_pipeline.{bare, clf->filt[robust8]}` | `py -u thesis_eval/pipeline_eval_unified.py --only svanstrom` |
-| OOD confuser fire (abstract, §1.4, §4.1) | 30.4% → 4.9% (router) → 1.1% (filter) → 0.15% (composed) | `tier1_results.json` → `rgb_confuser.C_confuser` | `py -u thesis_eval/pipeline_eval_unified.py --only rgb_confuser` |
+| Svanström composed F1 (abstract, §1.4, §4.1) | 0.742 → 0.946 (R 0.948→0.991, P 0.609→0.905) | `tier1_results.json` → `svanstrom.B_pipeline.{bare, filt->clf[robust8_nr_drop]}` | `py -u thesis_eval/pipeline_eval_unified.py --only svanstrom` |
+| OOD confuser fire (abstract, §1.4, §4.1) | 30.4% → 1.4% (per-frame filter, shipped) → 0.11% (reject-class robust8 ablation) | `tier1_results.json` → `rgb_confuser.C_confuser.{filt_mlp, clf->filt[robust8]}` | `py -u thesis_eval/pipeline_eval_unified.py --only rgb_confuser` |
 | Anti-UAV no-harm (abstract, §4.1) | 0.973 → 0.984 | `tier1_results.json` → `antiuav.B_pipeline` | `py -u thesis_eval/pipeline_eval_unified.py --only antiuav` |
 | Anti-UAV bare detector (§1.1) | P 0.989 / R 0.982, 41 FP / 4,000 | `tier1_results.json` → `antiuav.A_bare.ft4/rgb` | same as above |
-| Grayscale 3-way (§4.5) | RGB 0.607 / IR-on-rawRGB 0.187 / IR-on-gray 0.580 | `tier1_results.json` → D table (svanstrom, svanstrom_rawrgb, svanstrom_gray) | `py -u thesis_eval/pipeline_eval_unified.py` |
-| Gray-confuser filter cut (§4.5) | 656 → 21 FP (grayscale scaler) | `tier1_results.json` → `gray_confuser.C_confuser` | `--only gray_confuser` |
-| Temporal 2-of-3 windows (§4.2) | bare 0.843 @ 0.350 fire; router/composed arms | `temporal_results.json` | `py -u thesis_eval/temporal_replay.py` |
+| Grayscale 3-way (§4.5) | RGB 0.607 / IR-on-rawRGB 0.187 / IR-on-gray 0.580 | `tier1_results.json` → D table (svanstrom, svanstrom_rawrgb, svanstrom_gray) | `py -u thesis_eval/pipeline_eval_unified.py` || Temporal 2-of-3 windows (§4.2) | bare 0.843 @ 0.350 fire; router/composed arms | `temporal_results.json` | `py -u thesis_eval/temporal_replay.py` |
 | Filter-threshold sweep on video (§4.2) | drone probs smeared [0.01, 0.25) | `video_thr_sweep.json` | `py -u thesis_eval/video_thr_sweep.py` |
 | Modality A/B, coverage-scored (§4.1, tab:modality_ab) | RGB-only 0.458 / IR-only 0.632 / routed+filt 0.921 | `notes_round1_results.json` → `svanstrom.M_modality_ab` | `py -u thesis_eval/notes_round1_replays.py --only svanstrom,antiuav` |
 | Per-size buckets (§4.1, tab:per_size) | rgb_test carve-out small-drone concentrated; svan medians 29.8/14.8 px | `notes_round1_results.json` → `*.SZ_per_size` | `py -u thesis_eval/notes_round1_replays.py` |

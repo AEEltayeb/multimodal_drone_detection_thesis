@@ -414,7 +414,12 @@ def fig_distill_verifier():
         v = rows[eid].get(col, "")
         return float(v) if v not in ("", None) else None
 
-    stages = [("bare FT4", 1), ("+ patch v2", 2), ("+ mlp_v5", 3)]
+    # mlp column = the production mlp_v5_v4 build (the v5_* rows are its superseded predecessor).
+    # Values match tab:distill_verifier exactly (source: offline_matrix_v4 / kb row distill_verifier_v4).
+    V4_MLP_F1 = {"Svanström": 0.861, "Anti-UAV": 0.984, "SelCom": 0.612, "rgb_dataset": 0.916}
+    V4_MLP_HALLUC = {"Svanström": 0.037, "Anti-UAV": 0.010, "SelCom": 0.019, "rgb_dataset": 0.010, "confuser": 0.008}
+
+    stages = [("bare FT4", 1), ("+ patch v2", 2), ("+ mlp_v5_v4", 3)]
     colors = ["#9e9e9e", "#1f77b4", "#2ca02c"]
     w = 0.26
 
@@ -424,7 +429,7 @@ def fig_distill_verifier():
     fsurf = [s for s in surf if s[0] != "confuser"]
     xF = np.arange(len(fsurf))
     for j, (lbl, col) in enumerate(zip([s[0] for s in stages], colors)):
-        ys = [val(s[1 + j], "f1") for s in fsurf]
+        ys = [(V4_MLP_F1[s[0]] if j == 2 else val(s[1 + j], "f1")) for s in fsurf]
         ys = [y if y is not None else 0 for y in ys]
         off = (j - 1) * w
         bars = axF.bar(xF + off, ys, w, label=lbl, color=col, edgecolor="white")
@@ -440,7 +445,7 @@ def fig_distill_verifier():
     # Panel B — hallucination rate (all surfaces incl. confuser)
     xH = np.arange(len(surf))
     for j, (lbl, col) in enumerate(zip([s[0] for s in stages], colors)):
-        ys = [val(s[1 + j], "halluc_rate") for s in surf]
+        ys = [(V4_MLP_HALLUC[s[0]] if j == 2 else val(s[1 + j], "halluc_rate")) for s in surf]
         ys = [y if y is not None else 0 for y in ys]
         off = (j - 1) * w
         bars = axH.bar(xH + off, ys, w, label=lbl, color=col, edgecolor="white")
@@ -454,7 +459,7 @@ def fig_distill_verifier():
     for ax in (axF, axH):
         ax.spines['top'].set_visible(False); ax.spines['right'].set_visible(False)
 
-    fig.suptitle("Distilled feature-space verifier (mlp_v5) vs MobileNetV3 patch v2, on FT4", fontsize=12)
+    fig.suptitle("Distilled feature-space verifier (mlp_v5_v4) vs MobileNetV3 patch v2, on FT4", fontsize=12)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     fig.savefig(OUT_DIR / "fig8_distill_verifier.pdf")
     fig.savefig(OUT_DIR / "fig8_distill_verifier.png")

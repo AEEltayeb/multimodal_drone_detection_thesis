@@ -39,9 +39,6 @@ CHECKS = [
     ("irconf bare fire", 0.2943, T["ir_confusers"]["C_confuser"]["bare"]["fire_rate"]),
     ("irconf composed r8 fire", 0.0243, T["ir_confusers"]["C_confuser"]["clf->filt[robust8]"]["fire_rate"]),
     ("irconf composed r6 fire", 0.0192, T["ir_confusers"]["C_confuser"]["clf->filt[robust6]"]["fire_rate"]),
-    ("grayconf bare fire", 0.2378, T["gray_confuser"]["C_confuser"]["bare"]["fire_rate"]),
-    ("grayconf mlp fire", 0.0053, T["gray_confuser"]["C_confuser"]["filt_mlp"]["fire_rate"]),
-    ("grayconf mlp FP", 15, T["gray_confuser"]["C_confuser"]["filt_mlp"]["FP"]),
     ("3way RGB F1", 0.6067, T["svanstrom"]["A_bare"]["ft4/rgb"]["f1"]),
     ("3way rawrgb F1", 0.1874, T["svanstrom_rawrgb"]["A_bare"]["v3b/ir"]["f1"]),
     ("3way gray F1", 0.5796, T["svanstrom_gray"]["A_bare"]["v3b/ir"]["f1"]),
@@ -236,12 +233,8 @@ CHECKS += [
 # session-8c: filter operating-point figure (fig:filter_operating) caption numbers vs the sweep JSON
 FS = json.load(open(REPO / "eval/results/filter_operating_sweep.json"))
 CHECKS += [
-    ("FIG rgb recall@0.25",  0.949, round(FS["RGB mlp_v5"]["shipped"][0], 3)),
-    ("FIG rgb fire@0.25",    0.014, round(FS["RGB mlp_v5"]["shipped"][1], 3)),
-    ("FIG gray recall@0.25", 0.476, round(FS["grayscale aligned"]["shipped"][0], 3)),
-    ("FIG gray recall@0.05", 0.633, round(FS["grayscale aligned"]["t0.05"][0], 3)),
-    ("FIG gray fire@0.25",   0.005, round(FS["grayscale aligned"]["shipped"][1], 3)),
-    ("FIG gray fire@0.05",   0.033, round(FS["grayscale aligned"]["t0.05"][1], 3)),
+    ("FIG rgb recall@0.25",  0.956, round(FS["RGB mlp_v5"]["shipped"][0], 3)),
+    ("FIG rgb fire@0.25",    0.011, round(FS["RGB mlp_v5"]["shipped"][1], 3)),
 ]
 
 # Validate ALL numeric cells in one pass (must run AFTER every `CHECKS +=` block above; a loop
