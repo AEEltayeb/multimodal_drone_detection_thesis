@@ -125,7 +125,7 @@
 \contentsline {paragraph}{Open evaluation items.}{71}{paragraph*.88}%
 \contentsline {chapter}{\numberline {7}Conclusion}{73}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Production Stack}{73}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Future Work}{74}{section.7.2}%
+\contentsline {section}{\numberline {7.2}Outlook}{74}{section.7.2}%
 \contentsline {chapter}{\numberline {A}Datasets in Detail}{75}{appendix.A}%
 \contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{75}{section.A.1}%
 \contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{75}{section.A.2}%
