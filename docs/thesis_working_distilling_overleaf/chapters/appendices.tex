@@ -159,7 +159,7 @@ Model & Role & Note \\
 \midrule
 \multicolumn{3}{l}{\textbf{Confuser filters}} \\
 \midrule
-\texttt{mlp\_v5} (\texttt{v4} build) & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} ROI features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.809\to0.922$, recall $0.691\to0.887$). \\
+\texttt{mlp\_v5} (\texttt{v4} build) & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.792\to0.916$, recall $0.691\to0.887$). \\
 \texttt{mlp\_aligned\_thermalonly} & \textbf{production} & Thermal-native IR confuser filter (CBAM-trained, @0.05); held-out CBAM recall recovered $0.717\to0.967$ at FP $6$, with $94\%$ of held-out thermal confusers removed. \\
 \texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch filter; audited predecessor, the \texttt{v4} RGB filter removes its last fallback role. \\
 \bottomrule
@@ -173,32 +173,7 @@ Model & Role & Note \\
 \chapter{Model MRI Sample Report}
 \label{app:mri_report}
 
-The Model MRI renders a human-readable report for every run (Section~\ref{sec:model_mri}). Reproduced below, lightly typeset but textually verbatim, is the report for the production RGB filter's corpus (\texttt{mri/results/v5\_report\_regen/report.md}); the excerpt in Figure~\ref{fig:mri_report} is its verdict block.
-
-\begin{quote}\small\ttfamily
-\textbf{Model MRI --- Yolo26n\_selcom\_confuser\_ft4\_1280}\\[2pt]
-Detector: \texttt{RGB model/Yolo26n\_selcom\_confuser\_ft4\_1280/weights/best.pt}\\
-Corpus: resumed feature corpus --- 19{,}334 drone / 13{,}597 confuser detections\\[6pt]
-\textbf{Verdict:} Classifier strongly recommended --- large FP cut at low recall cost.\\[2pt]
-Evidence: 19{,}334 drones / 13{,}597 confusers; LDA separability 0.952 (thr 0.90); recall cost 1.1\% (thr 10\%); projected FP cut 97\%.\\[6pt]
-\textbf{Diagnostic signals}\\[2pt]
-\begin{tabular}{@{}lll@{}}
-Signal & Value & Meaning \\
-\midrule
-Raw hallucination rate & 54.4\% & FP per confuser image (bare FT4 on \texttt{rgb\_confusers} @1280) \\
-LDA separability & 0.952 & train-set linear split of drone vs confuser \\
-Silhouette & 0.067 & feature-space cluster separation (unsupervised) \\
-Max ANOVA $F$ & 42{,}346 & strongest single discriminative feature \\
-Meta-only max AUROC & 0.811 & best metadata feature alone \\
-YOLO-feat max AUROC & 0.844 & best learned feature alone \\
-Projected FP cut & 97.4\% & confusers the classifier would reject \\
-Recall retention & 98.9\% & true drones the classifier keeps \\
-Projected FP rate & 1.4\% & hallucination after classifier \\
-\end{tabular}\\[6pt]
-\textbf{Top discriminative features (ANOVA $F$):} p5 ch=154; p3 ch=31 cell=0; p5 ch=79; p3 ch=31 cell=1; p5 ch=113; meta:conf; p5 ch=240; p5 ch=85; p3 ch=31 cell=2; p5 ch=43.
-\end{quote}
-
-The report's projection (97.4\% FP cut at 98.9\% recall retention) is the pre-training estimate; the shipped filter's measured behaviour on the canonical surfaces is in Section~\ref{sec:verifier_results} and Table~\ref{tab:ablation_confusers}. The agreement between projection and measurement is itself part of the instrument's validation.
+The Model MRI renders a full human-readable report for every run (Section~\ref{sec:model_mri}); the report for the production RGB filter's corpus is at \texttt{mri/results/v5\_report\_regen/report.md}, and Figure~\ref{fig:mri_report} reproduces its verdict block. For that corpus ($19{,}334$ drone / $13{,}597$ confuser detections, bare-detector hallucination $54.4\%$, LDA separability $0.952$) the instrument projected, \emph{before any training}, a $97.4\%$ confuser false-positive cut at $98.9\%$ drone-recall retention, and recommended the filter on that basis. The shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches that projection; the agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
 
 \chapter{Number Provenance and Reproducibility}
 \label{app:provenance}
@@ -206,7 +181,7 @@ The report's projection (97.4\% FP cut at 98.9\% recall retention) is the pre-tr
 Every headline number in this thesis is the value of a named cell in a canonical results file, and every such file is reproducible by a stated command. The map lives in the project repository as \texttt{runs/README.md}; this appendix reproduces it. Three layers make the chain auditable:
 
 \begin{enumerate}
-    \item \textbf{Unified detection cache.} \texttt{thesis\_eval/pipeline\_cache\_unified.py} runs the production detectors \emph{once} per evaluation surface and stores, per frame, every detection (box, confidence, the 517-D ROI feature vector, patch-classifier probability), the trust classifier's input features, and the per-modality ground truth. Caches are tagged with the detector weight identity.
+    \item \textbf{Unified detection cache.} \texttt{thesis\_eval/pipeline\_cache\_unified.py} runs the production detectors \emph{once} per evaluation surface and stores, per frame, every detection (box, confidence, the 517-D feature vector, patch-classifier probability), the trust classifier's input features, and the per-modality ground truth. Caches are tagged with the detector weight identity.
     \item \textbf{Deterministic replays.} Every evaluation in Chapter~\ref{ch:hitl} is a CPU re-score of that cache (no detector forward pass), so any reader with the repository can re-derive any table in about a minute per surface. The replay scripts and their outputs are listed in Table~\ref{tab:provenance}.
     \item \textbf{Automated audit.} \texttt{thesis\_eval/\_audit\_headline\_numbers.py} asserts, cell by cell, that the numbers printed in this document equal the values in the canonical results files; the submission build of this thesis passes that audit.
 \end{enumerate}
@@ -264,7 +239,7 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[control40] \texttt{control\_v3more\_40feat}. A previous-candidate 40-feature trust classifier; deprecated.
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
     \item[v2 (patch filter)] \texttt{confuser\_filter4\_\{rgb,ir\}\_v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
-    \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} ROI features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
+    \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
     \item[IR filter] The thermal-native IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}): a single head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) trained directly on thermal confuser crops.
     \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_selcom\_mixed\_ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).

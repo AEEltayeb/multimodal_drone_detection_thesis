@@ -14,7 +14,7 @@
       \node[det] (ry)   at (2.8,1.0) {RGB YOLO};
       \node[det] (iy)   at (2.8,-1.0){IR YOLO};
       \node[box] (clf)  at (5.9,0)   {XGBoost trust\\classifier\\(4-way, \texttt{robust8})};
-      \node[ver] (ver)  at (9.3,0)   {confuser filter\\(MLP; \textbf{per-frame};\\ROI-feature reuse)};
+      \node[ver] (ver)  at (9.3,0)   {confuser filter\\(MLP; \textbf{per-frame};\\feature reuse)};
       \node[box] (temp) at (12.6,0)  {Temporal\\smoother\\($N$-of-$M$)};
       \node[box, fill=red!10] (alert) at (15.6,0) {ALERT};
       \node[old] (patch) at (9.3,-2.5) {patch filter\\(predecessor; alert-gated)};
