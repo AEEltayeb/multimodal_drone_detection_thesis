@@ -14,40 +14,38 @@
 \newlabel{sec:design_rationale}{{3.2}{17}{Design Rationale: Deferred Suppression}{section.3.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.3}Trust-Aware Fusion}{18}{section.3.3}\protected@file@percent }
 \newlabel{sec:trust_fusion}{{3.3}{18}{Trust-Aware Fusion}{section.3.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.4}Alert-Gate Cascade (superseded patch path)}{18}{section.3.4}\protected@file@percent }
-\newlabel{sec:alert_gate}{{3.4}{18}{Alert-Gate Cascade (superseded patch path)}{section.3.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Temporal Smoother}{19}{section.3.5}\protected@file@percent }
-\newlabel{sec:temporal}{{3.5}{19}{Temporal Smoother}{section.3.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Temporal Smoother}{18}{section.3.4}\protected@file@percent }
+\newlabel{sec:temporal}{{3.4}{18}{Temporal Smoother}{section.3.4}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator.}}{19}{figure.caption.10}\protected@file@percent }
 \newlabel{fig:pyside_gui}{{3.3}{19}{PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator}{figure.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}Resolution Dependency}{20}{section.3.6}\protected@file@percent }
-\newlabel{sec:resolution_arch}{{3.6}{20}{Resolution Dependency}{section.3.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Resolution Dependency}{19}{section.3.5}\protected@file@percent }
+\newlabel{sec:resolution_arch}{{3.5}{19}{Resolution Dependency}{section.3.5}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph  {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt  {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt  {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt  {retrained\_v2} is unusable on Svanstr\"om at either size.}}{20}{figure.caption.11}\protected@file@percent }
 \newlabel{fig:resolution}{{3.4}{20}{Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt {retrained\_v2} is unusable on Svanstr\"om at either size}{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}RGB Drone Detector}{20}{section.3.7}\protected@file@percent }
-\newlabel{sec:rgb_detector}{{3.7}{20}{RGB Drone Detector}{section.3.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}Three Training Stances}{21}{subsection.3.7.1}\protected@file@percent }
-\newlabel{sec:rgb_three_variants}{{3.7.1}{21}{Three Training Stances}{subsection.3.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}SelCom CCTV Fine-Tune}{21}{subsection.3.7.2}\protected@file@percent }
-\newlabel{sec:selcom_finetune}{{3.7.2}{21}{SelCom CCTV Fine-Tune}{subsection.3.7.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.8}IR Drone Detector}{22}{section.3.8}\protected@file@percent }
-\newlabel{sec:ir_detector}{{3.8}{22}{IR Drone Detector}{section.3.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.1}Grayscale-RGB Operating Mode}{22}{subsection.3.8.1}\protected@file@percent }
-\newlabel{sec:ir_grayscale_mode}{{3.8.1}{22}{Grayscale-RGB Operating Mode}{subsection.3.8.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{22}{subsection.3.8.2}\protected@file@percent }
-\newlabel{sec:ir_xmodal_verifier}{{3.8.2}{22}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.8.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Model MRI of the \texttt  {v3b} IR detector's fused \texttt  {p3}+\texttt  {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover.}}{23}{table.caption.12}\protected@file@percent }
-\newlabel{tab:ir_mri_sep}{{3.1}{23}{Model MRI of the \texttt {v3b} IR detector's fused \texttt {p3}+\texttt {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover}{table.caption.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.9}Trust Classifier}{23}{section.3.9}\protected@file@percent }
-\newlabel{sec:trust_classifier}{{3.9}{23}{Trust Classifier}{section.3.9}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.9.1}Feature Set}{23}{subsection.3.9.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.9.2}Hand-Engineered Variants (the comparison set)}{24}{subsection.3.9.2}\protected@file@percent }
-\newlabel{sec:classifier_variants}{{3.9.2}{24}{Hand-Engineered Variants (the comparison set)}{subsection.3.9.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}RGB Drone Detector}{20}{section.3.6}\protected@file@percent }
+\newlabel{sec:rgb_detector}{{3.6}{20}{RGB Drone Detector}{section.3.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}Three Training Stances}{20}{subsection.3.6.1}\protected@file@percent }
+\newlabel{sec:rgb_three_variants}{{3.6.1}{20}{Three Training Stances}{subsection.3.6.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{21}{subsection.3.6.2}\protected@file@percent }
+\newlabel{sec:selcom_finetune}{{3.6.2}{21}{SelCom CCTV Fine-Tune}{subsection.3.6.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}IR Drone Detector}{21}{section.3.7}\protected@file@percent }
+\newlabel{sec:ir_detector}{{3.7}{21}{IR Drone Detector}{section.3.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{21}{subsection.3.7.1}\protected@file@percent }
+\newlabel{sec:ir_grayscale_mode}{{3.7.1}{21}{Grayscale-RGB Operating Mode}{subsection.3.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{22}{subsection.3.7.2}\protected@file@percent }
+\newlabel{sec:ir_xmodal_verifier}{{3.7.2}{22}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.7.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Model MRI of the \texttt  {v3b} IR detector's fused \texttt  {p3}+\texttt  {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover.}}{22}{table.caption.12}\protected@file@percent }
+\newlabel{tab:ir_mri_sep}{{3.1}{22}{Model MRI of the \texttt {v3b} IR detector's fused \texttt {p3}+\texttt {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover}{table.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.8}Trust Classifier}{23}{section.3.8}\protected@file@percent }
+\newlabel{sec:trust_classifier}{{3.8}{23}{Trust Classifier}{section.3.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.1}Feature Set}{23}{subsection.3.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.2}Hand-Engineered Variants (the comparison set)}{23}{subsection.3.8.2}\protected@file@percent }
+\newlabel{sec:classifier_variants}{{3.8.2}{23}{Hand-Engineered Variants (the comparison set)}{subsection.3.8.2}{}}
 \@writefile{toc}{\contentsline {paragraph}{Scene-fingerprint over-fitting.}{24}{paragraph*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.9.3}Statistical Feature Selection for the Router}{25}{subsection.3.9.3}\protected@file@percent }
-\newlabel{sec:feature_selection}{{3.9.3}{25}{Statistical Feature Selection for the Router}{subsection.3.9.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{Method.}{25}{paragraph*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{25}{paragraph*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.3}Statistical Feature Selection for the Router}{24}{subsection.3.8.3}\protected@file@percent }
+\newlabel{sec:feature_selection}{{3.8.3}{24}{Statistical Feature Selection for the Router}{subsection.3.8.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Method.}{24}{paragraph*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{24}{paragraph*.15}\protected@file@percent }
 \newlabel{eq:leakage}{{3.1}{25}{A leakage statistic}{equation.3.1}{}}
 \newlabel{fig:fusion_lda}{{3.5a}{25}{\relax }{figure.caption.16}{}}
 \newlabel{sub@fig:fusion_lda}{{a}{25}{\relax }{figure.caption.16}{}}
@@ -57,17 +55,15 @@
 \newlabel{sub@fig:fusion_leakage}{{c}{25}{\relax }{figure.caption.16}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt  {classifier/fusion\_feature\_stats.py}.}}{25}{figure.caption.16}\protected@file@percent }
 \newlabel{fig:fusion_stats}{{3.5}{25}{Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt {classifier/fusion\_feature\_stats.py}}{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{26}{paragraph*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{25}{paragraph*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{25}{paragraph*.19}\protected@file@percent }
 \@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{26}{table.caption.18}\protected@file@percent }
 \newlabel{tab:leakage}{{3.2}{26}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.18}{}}
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{26}{paragraph*.19}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{A further free lever.}{27}{paragraph*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.10}Patch Filter (Superseded Predecessor)}{27}{section.3.10}\protected@file@percent }
-\newlabel{sec:patch_verifier_arch}{{3.10}{27}{Patch Filter (Superseded Predecessor)}{section.3.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.11}The Confuser Filter}{28}{section.3.11}\protected@file@percent }
-\newlabel{sec:distill_verifier}{{3.11}{28}{The Confuser Filter}{section.3.11}{}}
+\@writefile{toc}{\contentsline {paragraph}{A further free lever.}{26}{paragraph*.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.9}The Confuser Filter}{26}{section.3.9}\protected@file@percent }
+\newlabel{sec:distill_verifier}{{3.9}{26}{The Confuser Filter}{section.3.9}{}}
 \@setckpt{chapters/system_design}{
-\setcounter{page}{29}
+\setcounter{page}{28}
 \setcounter{equation}{1}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -77,7 +73,7 @@
 \setcounter{mpfootnote}{0}
 \setcounter{part}{0}
 \setcounter{chapter}{3}
-\setcounter{section}{11}
+\setcounter{section}{9}
 \setcounter{subsection}{0}
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
@@ -98,7 +94,7 @@
 \setcounter{citetotal}{0}
 \setcounter{multicitecount}{0}
 \setcounter{multicitetotal}{0}
-\setcounter{instcount}{55}
+\setcounter{instcount}{54}
 \setcounter{maxnames}{2}
 \setcounter{minnames}{1}
 \setcounter{maxitems}{3}
@@ -206,7 +202,7 @@
 \setcounter{section@level}{0}
 \setcounter{Item}{11}
 \setcounter{Hfootnote}{1}
-\setcounter{bookmark@seq@number}{38}
+\setcounter{bookmark@seq@number}{36}
 \setcounter{LT@tables}{0}
 \setcounter{LT@chunks}{0}
 \setcounter{parentequation}{0}
