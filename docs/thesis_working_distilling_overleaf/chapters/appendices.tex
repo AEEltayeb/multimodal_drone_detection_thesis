@@ -175,7 +175,33 @@ Model & Role & Note \\
 \chapter{Model MRI Sample Report}
 \label{app:mri_report}
 
-The Model MRI renders a full human-readable report for every run (Section~\ref{sec:model_mri}); the report for the production RGB filter's corpus is at \texttt{mri/results/\allowbreak v5\_report\_regen/\allowbreak report.md}, and Figure~\ref{fig:mri_report} reproduces its verdict block. For that corpus ($19{,}334$ drone / $13{,}597$ confuser detections, bare-detector hallucination $54.4\%$, LDA separability $0.952$) the instrument projected, \emph{before any training}, a $97.4\%$ confuser false-positive cut at $98.9\%$ drone-recall retention, and recommended the filter on that basis. The shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches that projection; the agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
+This appendix reproduces the Model MRI's human-readable report for the production RGB filter's corpus (Section~\ref{sec:model_mri}): the statistics-before-training diagnosis that licensed training the filter. The detector is \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280} and the corpus is the feature-only embedding set of $19{,}334$ drone and $13{,}597$ confuser detections. The verdict, the headline diagnostic signals, and the most discriminative features are reproduced below; the same run also writes \texttt{stats.json}, the trained MLP, and nine diagnostic figures (PCA and LDA projections, per-neuron KDEs, AUROC-by-layer, the verifier ROC, and the FP-reduction curve) under \texttt{mri/results/\allowbreak v5\_report\_regen/} in the repository. Figure~\ref{fig:mri_report} reproduces the verdict block in the main text.
+
+\paragraph{Verdict.} \emph{Classifier strongly recommended: a large false-positive cut at low recall cost.} The recommendation rests on a train-set LDA separability of $0.952$ for a projected $97\%$ false-positive cut at a $1.1\%$ recall cost. The instrument issued this verdict \emph{before any training}; the shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches the projection, and that agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Model MRI diagnostic signals for the production RGB filter's corpus ($19{,}334$ drone / $13{,}597$ confuser detections). The ``projected'' rows are the instrument's pre-training estimates of the trained filter's behaviour.}
+    \label{tab:mri_signals}
+    \begin{tabular}{l c p{0.5\textwidth}}
+        \toprule
+        Signal & Value & Meaning \\
+        \midrule
+        Raw hallucination rate & $54.4\%$ & bare-detector FP per confuser image (\texttt{ft4} @1280, $n{=}2{,}633$) \\
+        LDA separability & $0.952$ & train-set linear split of drone vs.\ confuser \\
+        Silhouette & $0.067$ & unsupervised feature-space cluster separation \\
+        Max ANOVA $F$ & $42{,}346$ & strongest single discriminative feature \\
+        Meta-only max AUROC & $0.811$ & best detection-metadata feature alone \\
+        YOLO-feature max AUROC & $0.844$ & best learned pyramid feature alone \\
+        Projected FP cut & $97.4\%$ & confusers the trained filter would reject \\
+        Recall retention & $98.9\%$ & true drones the trained filter keeps \\
+        Projected FP rate & $1.4\%$ & hallucination remaining after the filter \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: mri/results/v5_report_regen/report.md (+ stats.json); run=mri/cli.py]
+
+\paragraph{Top discriminative features (by ANOVA $F$).} \texttt{p5} channel~154; \texttt{p3} channel~31 (spatial cells 0--2); \texttt{p5} channels 79, 113, 240, 85, and 43; and the detection-metadata confidence scalar. A single \texttt{p3} channel firing across three spatial cells, alongside the high-$F$ \texttt{p5} channels, is the near-binary drone/not-drone switch the filter reads; the cross-validated F1 of the MLP trained on these features is reported in Section~\ref{sec:distill_verifier}.
 
 \chapter{Number Provenance and Reproducibility}
 \label{app:provenance}
@@ -231,22 +257,18 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[FPR] False Positive Rate. In this thesis: the frame-level fraction of confuser-only frames with at least one detection.
     \item[IoU] Intersection over Union. The standard detection-matching rule; used for Anti-UAV scoring.
     \item[IoP] Intersection over Prediction. The matching rule used for Svanstr\"om RGB scoring (Section~\ref{sec:metrics}); $\text{IoP} = |B_\text{pred} \cap B_\text{gt}| / |B_\text{pred}|$.
-    \item[S1 / S2 / S3] Cascade stages: S1 = RGB detector alone; S2 = + trust classifier; S3 = + patch filter alert gate.
     \item[ft4] \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280}. The production RGB detector (SelCom$+$confuser fine-tune); the only confuser-injection config that passed every drone-recall regression gate (Section~\ref{sec:training_recipes}).
     \item[robust6] The six-feature trust classifier (per-modality detection confidence $+$ box geometry), its features screened by the scene-fingerprint ratio (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
     \item[robust8] The four-class trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features and a tuned per-class decision threshold; retained as the reject-class ablation and recommended on confuser-rich paired streams.
     \item[robust8-nr] The shipped production trust router (Section~\ref{sec:classifier_results}): the eight \texttt{robust8} features with the \texttt{reject} class dropped, so it always routes RGB/IR/both and the per-frame filter owns false-positive rejection.
     \item[sa32] \texttt{scene\_aware\_\allowbreak v3more\_\allowbreak 32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
     \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
-    \item[control40] \texttt{control\_\allowbreak v3more\_\allowbreak 40feat}. A previous-candidate 40-feature trust classifier; deprecated.
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
-    \item[v2 (patch filter)] \texttt{confuser\_filter4\_\allowbreak \{rgb,ir\}\_\allowbreak v2\_backup.pt}. The MobileNetV3 patch filter; the audited predecessor, superseded in production by \texttt{mlp\_v5}.
     \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
     \item[IR filter] The thermal-native IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}): a single head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) trained directly on thermal confuser crops.
     \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_\allowbreak selcom\_\allowbreak mixed\_\allowbreak ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
     \item[\texttt{imgsz}] Ultralytics short for input letterbox size. Drives small-object recall (Section~\ref{sec:resolution_arch}).
-    \item[\texttt{patch\_thr}] The decision threshold on $p_\text{confuser}$ at the patch-filter alert gate. Production: 0.9 on Svanstr\"om-like inputs, 0.7 on real-video.
 \end{description}
 
 \chapter{Superseded Components and Design History}
@@ -259,22 +281,6 @@ This appendix collects the figures \emph{and narratives} documenting components 
     \includegraphics[width=0.7\textwidth]{fig_robust8_operating_point}
     \caption{Design-history: the grayscale \texttt{trust\_rgb} hole was a decision-rule problem inside the four-class router, not a feature-space limit. Sweeping the per-class \texttt{trust\_rgb} threshold $\tau$ trades precision for recall along a well-separated curve; the reject-class \texttt{robust8} operated at $\tau{=}0.20$. The shipped \texttt{robust8-nr} drops the reject class and removes this knob entirely (the hole cannot form without a \texttt{reject} label). Source: \texttt{eval/compare\_routing\_pipeline.py}.}
     \label{fig:robust8_operating}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.7\textwidth]{fig8_classifier_reversal}
-    \caption{No trust classifier wins both surfaces. On the OOD confuser zoo \texttt{fusion\_no\_fn\_v1.1} is far the safest (S2 fire $0.016$) but on real video it collapses drone $F1$ to $0.219$; \texttt{sa32} inverts the ranking, dominating real-video drone $F1$ ($0.826$) at a higher zoo fire ($0.205$). This surface reversal motivated the \texttt{sa32} working pick, later superseded by the statistically-derived \texttt{robust6}/\texttt{robust8} (Section~\ref{sec:feature_selection}) and the shipped no-reject \texttt{robust8-nr} (Section~\ref{sec:classifier_results}); \texttt{sa32}'s scene-statistic leakage is why even its wins here are not trusted to generalise.}
-    % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn,clfzoo_fnfn; config=pipe_video_drone_iop]
-    \label{fig:classifier_reversal}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.8\textwidth]{fig8_patch_catchbar}
-    \caption{Patch-filter (v2) per-bucket confuser catch rate at \texttt{patch\_thr}=0.5, against the $0.90$ ``decisiveness'' bar. Helicopters ($71\%$) and birds ($64\%$) are mid; airplanes ($52\%$, median patch probability $0.540$) are the actionable gap. All three buckets sit below the bar, the motivation for the feature-reuse successor.}
-    % [source: ledger=patch-catch-below-bar; eval=patch_catch_v2_svan; config=patch_catch_svan_1280_s9]
-    \label{fig:patch_catchbar}
 \end{figure}
 
 \begin{figure}[htbp]
