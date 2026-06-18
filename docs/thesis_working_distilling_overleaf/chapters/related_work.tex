@@ -75,7 +75,8 @@ Direct numerical comparison to other systems is unusually difficult: papers vary
     \centering
     \caption{Architectural map of representative drone-detection systems. ``Modality'' covers what the system consumes; ``Discrimination'' covers how confusers are rejected. The cascade in this thesis is, to our knowledge, the only one that combines learned modality-trust fusion with a downstream per-frame distilled confuser filter.}
     \label{tab:related_systems}
-    \begin{tabular}{p{4.0cm}lll}
+    \footnotesize
+    \begin{tabular}{p{2.8cm}p{2.4cm}p{4.2cm}p{3.2cm}}
         \toprule
         System / paper & Modality & Discrimination & Notes \\
         \midrule
@@ -96,7 +97,8 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
     \centering
     \caption{Numerical comparison on public benchmarks. \textbf{All comparisons require the caveats below the table.} ``Scoring'' indicates the matching rule used in the cited paper where it can be determined; where it cannot, the cell is marked \texttt{ND} (not disclosed).}
     \label{tab:numerical_comparison}
-    \begin{tabular}{lllccc}
+    \footnotesize
+    \begin{tabular}{p{2.3cm}p{4.0cm}p{3.0cm}ccc}
         \toprule
         Dataset & System & Scoring & $P$ & $R$ & F1 \\
         \midrule
