@@ -36,7 +36,7 @@
 \contentsline {subsection}{\numberline {3.2.3}Canonical Configurations and Frame Budgets}{25}{subsection.3.2.3}%
 \contentsline {subsection}{\numberline {3.2.4}Unified Detection Cache}{27}{subsection.3.2.4}%
 \contentsline {section}{\numberline {3.3}Training--Evaluation Overlap Audit}{27}{section.3.3}%
-\contentsline {paragraph}{The held-out clean split.}{27}{paragraph*.17}%
+\contentsline {paragraph}{The held-out clean split.}{28}{paragraph*.17}%
 \contentsline {section}{\numberline {3.4}Training Recipes}{29}{section.3.4}%
 \contentsline {paragraph}{Backbone-freeze depth in confuser-injection fine-tuning.}{29}{paragraph*.20}%
 \contentsline {section}{\numberline {3.5}Human-in-the-Loop Data Engine}{30}{section.3.5}%
