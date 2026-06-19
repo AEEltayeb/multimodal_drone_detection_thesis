@@ -1,0 +1,42 @@
+{
+  "rgb_filter": {
+    "model": "mlp_v5_v4",
+    "thr": 0.25,
+    "conf_gate": 0.25,
+    "drone_rgb_dataset_test": {
+      "rule": "iou",
+      "conf_gate": 0.25,
+      "gt_drone_dets": 3452,
+      "kept_TP": 3063,
+      "vetoed_FN": 41,
+      "missed_bare_FN": 348,
+      "recall_filtered": 0.8873
+    },
+    "confuser_rgb_confuser": {
+      "confuser_dets": 835,
+      "kept_FP": 39,
+      "vetoed_TN": 796,
+      "veto_rate": 0.9533
+    }
+  },
+  "ir_filter": {
+    "model": "mlp_aligned_thermalonly",
+    "thr": 0.05,
+    "conf_gate": 0.4,
+    "drone_ir_dset_final": {
+      "rule": "iou",
+      "conf_gate": 0.4,
+      "gt_drone_dets": 2615,
+      "kept_TP": 2412,
+      "vetoed_FN": 104,
+      "missed_bare_FN": 99,
+      "recall_filtered": 0.9224
+    },
+    "confuser_ir_confusers": {
+      "confuser_dets": 1051,
+      "kept_FP": 95,
+      "vetoed_TN": 956,
+      "veto_rate": 0.9096
+    }
+  }
+}

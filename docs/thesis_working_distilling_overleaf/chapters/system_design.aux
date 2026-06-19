@@ -7,63 +7,69 @@
 \@writefile{toc}{\contentsline {section}{\numberline {3.1}Overview}{15}{section.3.1}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {3.1}{\ignorespaces Multi-stage drone detection pipeline in the production composition: detectors, then the confuser filter, then the trust classifier. The order itself was ablated (Section~\ref {sec:pipeline_ablation}): filter-first ships because it edges classifier-first on Svanstr\"om ($F1=0.946$ vs $0.931$), and the two are within about a point on the paired benchmarks. The production confuser filter is the distilled \texttt  {mlp\_v5\_v4} (RGB) with its paired thermal-native IR head, which runs \textbf  {per frame} because it reuses the detectors' already-computed internal features rather than re-processing crops (Section~\ref {sec:distill_verifier}). It supersedes the MobileNetV3 patch filter (greyed), which was expensive enough that it had to be \emph  {alert-gated}: consulted only when the temporal smoother was about to fire (Section~\ref {sec:alert_gate}).}}{16}{figure.caption.7}\protected@file@percent }
 \newlabel{fig:pipeline}{{3.1}{16}{Multi-stage drone detection pipeline in the production composition: detectors, then the confuser filter, then the trust classifier. The order itself was ablated (Section~\ref {sec:pipeline_ablation}): filter-first ships because it edges classifier-first on Svanstr\"om ($F1=0.946$ vs $0.931$), and the two are within about a point on the paired benchmarks. The production confuser filter is the distilled \texttt {mlp\_v5\_v4} (RGB) with its paired thermal-native IR head, which runs \textbf {per frame} because it reuses the detectors' already-computed internal features rather than re-processing crops (Section~\ref {sec:distill_verifier}). It supersedes the MobileNetV3 patch filter (greyed), which was expensive enough that it had to be \emph {alert-gated}: consulted only when the temporal smoother was about to fire (Section~\ref {sec:alert_gate})}{figure.caption.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces The confuser problem, and why a downstream filter solves it. \emph  {Left}: the production RGB detector (\texttt  {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph  {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own internal features and assigns $P(\text  {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides.}}{16}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:confuser_problem}{{3.2}{16}{The confuser problem, and why a downstream filter solves it. \emph {Left}: the production RGB detector (\texttt {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own internal features and assigns $P(\text {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {paragraph}{Two-filter fusion (filter-first).}{17}{paragraph*.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Production models at a glance: training data and held-out test result. Detectors report detection $F1$; the trust router and confuser filters report held-out classification (Figures~\ref {fig:cm_router}, \ref {fig:cm_filters}).}}{16}{table.caption.8}\protected@file@percent }
+\newlabel{tab:model_overview}{{3.1}{16}{Production models at a glance: training data and held-out test result. Detectors report detection $F1$; the trust router and confuser filters report held-out classification (Figures~\ref {fig:cm_router}, \ref {fig:cm_filters})}{table.caption.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces The confuser problem, and why a downstream filter solves it. \emph  {Left}: the production RGB detector (\texttt  {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph  {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own internal features and assigns $P(\text  {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides.}}{17}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:confuser_problem}{{3.2}{17}{The confuser problem, and why a downstream filter solves it. \emph {Left}: the production RGB detector (\texttt {ft4}) fires on a bird amid its flock (red box, detector confidence $0.46$). \emph {Right}: it fires on a drone (confidence $0.85$). The detector cannot tell them apart, but the feature-reuse filter reads the detector's own internal features and assigns $P(\text {drone})=0.00$ to the bird (vetoed) and $0.96$ to the drone (kept). This separation, not a better detector, is what the cascade provides}{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {paragraph}{Two-filter fusion (filter-first).}{17}{paragraph*.10}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3.2}Design Rationale: Deferred Suppression}{17}{section.3.2}\protected@file@percent }
 \newlabel{sec:design_rationale}{{3.2}{17}{Design Rationale: Deferred Suppression}{section.3.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.3}Trust-Aware Fusion}{17}{section.3.3}\protected@file@percent }
-\newlabel{sec:trust_fusion}{{3.3}{17}{Trust-Aware Fusion}{section.3.3}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.4}Temporal Smoother}{18}{section.3.4}\protected@file@percent }
-\newlabel{sec:temporal}{{3.4}{18}{Temporal Smoother}{section.3.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator.}}{19}{figure.caption.10}\protected@file@percent }
-\newlabel{fig:pyside_gui}{{3.3}{19}{PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator}{figure.caption.10}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Resolution Dependency}{19}{section.3.5}\protected@file@percent }
-\newlabel{sec:resolution_arch}{{3.5}{19}{Resolution Dependency}{section.3.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}RGB Drone Detector}{19}{section.3.6}\protected@file@percent }
-\newlabel{sec:rgb_detector}{{3.6}{19}{RGB Drone Detector}{section.3.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph  {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt  {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt  {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt  {retrained\_v2} is unusable on Svanstr\"om at either size.}}{20}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:resolution}{{3.4}{20}{Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt {retrained\_v2} is unusable on Svanstr\"om at either size}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Trust-Aware Fusion}{18}{section.3.3}\protected@file@percent }
+\newlabel{sec:trust_fusion}{{3.3}{18}{Trust-Aware Fusion}{section.3.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces Trust router (\texttt  {robust8-nr}) held-out classification, on a grouped split (by sequence) of its corpus, shipped model not retrained: macro-$F1$ $0.941$, accuracy $0.981$. The dominant off-diagonal (\texttt  {rgb}$\to $\texttt  {both}) is recall-safe.}}{19}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:cm_router}{{3.3}{19}{Trust router (\texttt {robust8-nr}) held-out classification, on a grouped split (by sequence) of its corpus, shipped model not retrained: macro-$F1$ $0.941$, accuracy $0.981$. The dominant off-diagonal (\texttt {rgb}$\to $\texttt {both}) is recall-safe}{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Temporal Smoother}{19}{section.3.4}\protected@file@percent }
+\newlabel{sec:temporal}{{3.4}{19}{Temporal Smoother}{section.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator.}}{20}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:pyside_gui}{{3.4}{20}{PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator}{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Resolution Dependency}{20}{section.3.5}\protected@file@percent }
+\newlabel{sec:resolution_arch}{{3.5}{20}{Resolution Dependency}{section.3.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}RGB Drone Detector}{20}{section.3.6}\protected@file@percent }
+\newlabel{sec:rgb_detector}{{3.6}{20}{RGB Drone Detector}{section.3.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}Three Training Stances}{20}{subsection.3.6.1}\protected@file@percent }
 \newlabel{sec:rgb_three_variants}{{3.6.1}{20}{Three Training Stances}{subsection.3.6.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{21}{subsection.3.6.2}\protected@file@percent }
-\newlabel{sec:selcom_finetune}{{3.6.2}{21}{SelCom CCTV Fine-Tune}{subsection.3.6.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}IR Drone Detector}{21}{section.3.7}\protected@file@percent }
-\newlabel{sec:ir_detector}{{3.7}{21}{IR Drone Detector}{section.3.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{21}{subsection.3.7.1}\protected@file@percent }
-\newlabel{sec:ir_grayscale_mode}{{3.7.1}{21}{Grayscale-RGB Operating Mode}{subsection.3.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{22}{subsection.3.7.2}\protected@file@percent }
-\newlabel{sec:ir_xmodal_verifier}{{3.7.2}{22}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.7.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Model MRI of the \texttt  {v3b} IR detector's fused \texttt  {p3}+\texttt  {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover.}}{22}{table.caption.12}\protected@file@percent }
-\newlabel{tab:ir_mri_sep}{{3.1}{22}{Model MRI of the \texttt {v3b} IR detector's fused \texttt {p3}+\texttt {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover}{table.caption.12}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.8}Trust Classifier}{23}{section.3.8}\protected@file@percent }
-\newlabel{sec:trust_classifier}{{3.8}{23}{Trust Classifier}{section.3.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.1}Feature Set}{23}{subsection.3.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.2}Hand-Engineered Variants (the comparison set)}{23}{subsection.3.8.2}\protected@file@percent }
-\newlabel{sec:classifier_variants}{{3.8.2}{23}{Hand-Engineered Variants (the comparison set)}{subsection.3.8.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{Scene-fingerprint over-fitting.}{24}{paragraph*.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.3}Statistical Feature Selection for the Router}{24}{subsection.3.8.3}\protected@file@percent }
-\newlabel{sec:feature_selection}{{3.8.3}{24}{Statistical Feature Selection for the Router}{subsection.3.8.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{Method.}{24}{paragraph*.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{24}{paragraph*.15}\protected@file@percent }
-\newlabel{eq:leakage}{{3.1}{24}{A leakage statistic}{equation.3.1}{}}
-\newlabel{fig:fusion_lda}{{3.5a}{25}{\relax }{figure.caption.16}{}}
-\newlabel{sub@fig:fusion_lda}{{a}{25}{\relax }{figure.caption.16}{}}
-\newlabel{fig:fusion_auroc}{{3.5b}{25}{\relax }{figure.caption.16}{}}
-\newlabel{sub@fig:fusion_auroc}{{b}{25}{\relax }{figure.caption.16}{}}
-\newlabel{fig:fusion_leakage}{{3.5c}{25}{\relax }{figure.caption.16}{}}
-\newlabel{sub@fig:fusion_leakage}{{c}{25}{\relax }{figure.caption.16}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt  {classifier/fusion\_feature\_stats.py}.}}{25}{figure.caption.16}\protected@file@percent }
-\newlabel{fig:fusion_stats}{{3.5}{25}{Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt {classifier/fusion\_feature\_stats.py}}{figure.caption.16}{}}
-\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{25}{paragraph*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{25}{paragraph*.19}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{26}{table.caption.18}\protected@file@percent }
-\newlabel{tab:leakage}{{3.2}{26}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.18}{}}
-\@writefile{toc}{\contentsline {paragraph}{A further free lever.}{26}{paragraph*.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3.9}The Confuser Filter}{26}{section.3.9}\protected@file@percent }
-\newlabel{sec:distill_verifier}{{3.9}{26}{The Confuser Filter}{section.3.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph  {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt  {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt  {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt  {retrained\_v2} is unusable on Svanstr\"om at either size.}}{21}{figure.caption.13}\protected@file@percent }
+\newlabel{fig:resolution}{{3.5}{21}{Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt {retrained\_v2} is unusable on Svanstr\"om at either size}{figure.caption.13}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{22}{subsection.3.6.2}\protected@file@percent }
+\newlabel{sec:selcom_finetune}{{3.6.2}{22}{SelCom CCTV Fine-Tune}{subsection.3.6.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}IR Drone Detector}{22}{section.3.7}\protected@file@percent }
+\newlabel{sec:ir_detector}{{3.7}{22}{IR Drone Detector}{section.3.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{22}{subsection.3.7.1}\protected@file@percent }
+\newlabel{sec:ir_grayscale_mode}{{3.7.1}{22}{Grayscale-RGB Operating Mode}{subsection.3.7.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{23}{subsection.3.7.2}\protected@file@percent }
+\newlabel{sec:ir_xmodal_verifier}{{3.7.2}{23}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.7.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Model MRI of the \texttt  {v3b} IR detector's fused \texttt  {p3}+\texttt  {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover.}}{23}{table.caption.14}\protected@file@percent }
+\newlabel{tab:ir_mri_sep}{{3.2}{23}{Model MRI of the \texttt {v3b} IR detector's fused \texttt {p3}+\texttt {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover}{table.caption.14}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.8}Trust Classifier}{24}{section.3.8}\protected@file@percent }
+\newlabel{sec:trust_classifier}{{3.8}{24}{Trust Classifier}{section.3.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.1}Feature Set}{24}{subsection.3.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.2}Hand-Engineered Variants (the comparison set)}{24}{subsection.3.8.2}\protected@file@percent }
+\newlabel{sec:classifier_variants}{{3.8.2}{24}{Hand-Engineered Variants (the comparison set)}{subsection.3.8.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{Scene-fingerprint over-fitting.}{25}{paragraph*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.8.3}Statistical Feature Selection for the Router}{25}{subsection.3.8.3}\protected@file@percent }
+\newlabel{sec:feature_selection}{{3.8.3}{25}{Statistical Feature Selection for the Router}{subsection.3.8.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{Method.}{25}{paragraph*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{25}{paragraph*.17}\protected@file@percent }
+\newlabel{eq:leakage}{{3.1}{25}{A leakage statistic}{equation.3.1}{}}
+\newlabel{fig:fusion_lda}{{3.6a}{26}{\relax }{figure.caption.18}{}}
+\newlabel{sub@fig:fusion_lda}{{a}{26}{\relax }{figure.caption.18}{}}
+\newlabel{fig:fusion_auroc}{{3.6b}{26}{\relax }{figure.caption.18}{}}
+\newlabel{sub@fig:fusion_auroc}{{b}{26}{\relax }{figure.caption.18}{}}
+\newlabel{fig:fusion_leakage}{{3.6c}{26}{\relax }{figure.caption.18}{}}
+\newlabel{sub@fig:fusion_leakage}{{c}{26}{\relax }{figure.caption.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt  {classifier/fusion\_feature\_stats.py}.}}{26}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:fusion_stats}{{3.6}{26}{Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt {classifier/fusion\_feature\_stats.py}}{figure.caption.18}{}}
+\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{26}{paragraph*.19}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{26}{paragraph*.21}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{27}{table.caption.20}\protected@file@percent }
+\newlabel{tab:leakage}{{3.3}{27}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.20}{}}
+\@writefile{toc}{\contentsline {paragraph}{A further free lever.}{27}{paragraph*.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.9}The Confuser Filter}{27}{section.3.9}\protected@file@percent }
+\newlabel{sec:distill_verifier}{{3.9}{27}{The Confuser Filter}{section.3.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces Confuser filters, detection-level held-out confusion (a detection is kept iff $P(\text  {drone})\geq $ threshold). Drone side is a clean held-out test split (\texttt  {rgb\_dataset}/\texttt  {ir\_dset}); confuser side is out-of-distribution confuser detections. Both keep nearly all true drones while vetoing most confusers.}}{29}{figure.caption.23}\protected@file@percent }
+\newlabel{fig:cm_filters}{{3.7}{29}{Confuser filters, detection-level held-out confusion (a detection is kept iff $P(\text {drone})\geq $ threshold). Drone side is a clean held-out test split (\texttt {rgb\_dataset}/\texttt {ir\_dset}); confuser side is out-of-distribution confuser detections. Both keep nearly all true drones while vetoing most confusers}{figure.caption.23}{}}
 \@setckpt{chapters/system_design}{
-\setcounter{page}{28}
+\setcounter{page}{30}
 \setcounter{equation}{1}
 \setcounter{enumi}{3}
 \setcounter{enumii}{0}
@@ -78,12 +84,12 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{5}
-\setcounter{table}{2}
+\setcounter{figure}{7}
+\setcounter{table}{3}
 \setcounter{float@type}{4}
 \setcounter{caption@flags}{2}
 \setcounter{continuedfloat}{0}
-\setcounter{subfigure}{3}
+\setcounter{subfigure}{0}
 \setcounter{subtable}{0}
 \setcounter{tabx@nest}{0}
 \setcounter{listtotal}{0}

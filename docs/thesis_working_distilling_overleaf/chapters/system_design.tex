@@ -24,6 +24,31 @@ A temporal smoother sits on top of the cascade: it raises an alert only when the
     \label{fig:pipeline}
 \end{figure}
 
+Table~\ref{tab:model_overview} summarises each production model, what it was trained on, and its held-out test result; the trust router and the two confuser filters each classify well in isolation (Figures~\ref{fig:cm_router} and~\ref{fig:cm_filters}), before any pipeline composition.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Production models at a glance: training data and held-out test result. Detectors report detection $F1$; the trust router and confuser filters report held-out classification (Figures~\ref{fig:cm_router}, \ref{fig:cm_filters}).}
+    \label{tab:model_overview}
+    \footnotesize
+    \begin{tabular}{@{}p{2.9cm} l p{3.9cm} p{4.4cm}@{}}
+        \toprule
+        Model & Type & Trained on & Held-out test result \\
+        \midrule
+        RGB detector (\texttt{ft4}) & YOLO26n & $172{,}022$-frame RGB corpus $+$ SelCom/confuser fine-tune & \texttt{rgb\_dataset} test $F1$ $0.926$ \\
+        \addlinespace
+        IR detector (\texttt{v3b}) & YOLO26n & $129{,}130$-frame thermal corpus (6-revision HITL) & \texttt{ir\_dset} test $F1$ $0.967$ \\
+        \addlinespace
+        Trust router (\texttt{robust8-nr}) & XGBoost & $37{,}488$ routing-labelled detections ($160$ sequences) & held-out fold ($11{,}318$ dets): macro-$F1$ $0.941$, accuracy $0.981$ \\
+        \addlinespace
+        RGB filter (\texttt{mlp\_v5\_v4}) & MLP & $33{,}272$ \texttt{ft4} features ($19{,}334$ drone / $13{,}938$ confuser) & \texttt{rgb\_dataset} test drone recall $0.887$; held-out bird $30/230$ kept \\
+        \addlinespace
+        IR filter (\texttt{mlp\_aligned\_\allowbreak thermalonly}) & MLP & $10{,}157$ \texttt{v3b} features ($8{,}112$ drone / $2{,}045$ confuser) & \texttt{ir\_dset} test drone recall $0.928$; CBAM FP $48\to6$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: RGB det F1 0.926 = conf_sweep_results.json rgb_dataset_test peak (sec:design_rationale); IR det F1 0.967 = tab:ir_evolution; router macro-F1 0.941/acc 0.981 = thesis_eval/eval_router_heldout.py -> results/per_model_heldout/router_heldout.json; RGB filter recall 0.887 = sec:distill_verifier, bird 30/230 = eval/eval_birdtest_heldout.py; IR filter recall 0.928 + CBAM 48->6 = tab:ir_aligned; trained-on counts = model cards + _v5_balanced_v4/training_data.npz + fusion_dataset_full56]
+
 The downstream stages contribute the majority of confuser suppression without retraining the detectors; Figure~\ref{fig:confuser_problem} shows the failure mode this addresses and the per-detection separation that fixes it. Three architectural choices make this possible: \emph{deferred suppression} at the detectors (the detectors hold standard operating points and are never made stricter to fight confusers; precision is owned downstream, Section~\ref{sec:design_rationale}), trust-aware fusion (Section~\ref{sec:trust_fusion}), and a downstream per-frame confuser filter. The production filter is a confidence-gated veto: a detection survives only if the MLP assigns it $P(\text{drone})$ at or above the production threshold (RGB $0.25$, IR-thermal $0.05$). A fail-open filter variant that releases uncertain detections was evaluated and rejected, because the detections it releases on cluttered surfaces are exactly the false positives the filter exists to remove.
 % [source: docs/analysis/2026-06-01_mlp_v5_recall_drop_mri.md (fail-open conditional: recovers rgb_dataset_test recall but craters svanstrom precision 0.887->0.631)]
 
@@ -60,6 +85,14 @@ The 4-way formulation captures \emph{when} each modality is reliable. The asymme
 
 The production router always routes; it never abstains. A reject-capable variant, which can also veto a whole frame, is kept as an ablation and analysed in Section~\ref{sec:classifier_results}. The router's eight features were screened by the leakage statistic of Section~\ref{sec:model_mri}, which drops any feature that discriminates \emph{which scene} a frame came from rather than \emph{whether the detections are trustworthy}, so the router cannot pass its evaluation by memorising surface identity. The strongest hand-built comparison, a 32-feature classifier, leaks exactly those scene statistics, so its in-domain lead is read as an upper bound rather than a deployable target.
 % [source: classifier/train_routing_robust.py ROBUST6 + rgb_mean_conf + is_grayscale; knowledge/models.csv robust8 ("8 free conf+geometry feats")]
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.52\textwidth]{cm_router}
+    \caption{Trust router (\texttt{robust8-nr}) held-out classification, on a grouped split (by sequence) of its corpus, shipped model not retrained: macro-$F1$ $0.941$, accuracy $0.981$. The dominant off-diagonal (\texttt{rgb}$\to$\texttt{both}) is recall-safe.}
+    % [source: thesis_eval/eval_router_heldout.py -> thesis_eval/results/per_model_heldout/router_heldout.json]
+    \label{fig:cm_router}
+\end{figure}
 
 \section{Temporal Smoother}
 \label{sec:temporal}
@@ -272,3 +305,11 @@ The two layers are chosen for complementary scale coverage, not convenience. The
 
 Feature reuse makes the filter $46$--$72\times$ faster per detection than the patch CNN ($1.3$--$2.1$~ms vs $59$--$112$~ms; $1$--$4\%$ pipeline overhead), which is what makes \emph{per-frame} verification affordable and removes the alert-gate coupling of the predecessor design. On the shipped corpus the MLP reaches 5-fold CV $F1$ of $0.9857\pm0.0004$, rejecting $97\%$ of confuser detections while retaining $98.9\%$ of true drones. Its IR counterpart is the thermal-native \texttt{mlp\_aligned\_thermalonly} (Section~\ref{sec:ir_xmodal_verifier}).
 % [source: ledger=v5-ship-per-frame,embedding-distillation-cv; run=eval/bench_speed.py]
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=\textwidth]{cm_filters}
+    \caption{Confuser filters, detection-level held-out confusion (a detection is kept iff $P(\text{drone})\geq$ threshold). Drone side is a clean held-out test split (\texttt{rgb\_dataset}/\texttt{ir\_dset}); confuser side is out-of-distribution confuser detections. Both keep nearly all true drones while vetoing most confusers.}
+    % [source: thesis_eval/eval_filter_heldout_cm.py -> thesis_eval/results/per_model_heldout/filter_heldout_cm.json (RGB mlp_v5_v4 @0.25; IR mlp_aligned_thermalonly @0.05, deploy conf 0.40)]
+    \label{fig:cm_filters}
+\end{figure}

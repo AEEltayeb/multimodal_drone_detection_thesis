@@ -1,0 +1,56 @@
+{
+  "model": "robust8-nr",
+  "labels": [
+    "trust_rgb",
+    "trust_ir",
+    "both"
+  ],
+  "n_train": 37488,
+  "n_test": 11318,
+  "train_seq": 160,
+  "test_seq": 54,
+  "confusion_matrix": [
+    [
+      573,
+      0,
+      179
+    ],
+    [
+      0,
+      407,
+      17
+    ],
+    [
+      17,
+      0,
+      10125
+    ]
+  ],
+  "per_class": {
+    "trust_rgb": {
+      "P": 0.9712,
+      "R": 0.762,
+      "F1": 0.8539,
+      "n": 752
+    },
+    "trust_ir": {
+      "P": 1.0,
+      "R": 0.9599,
+      "F1": 0.9795,
+      "n": 424
+    },
+    "both": {
+      "P": 0.981,
+      "R": 0.9983,
+      "F1": 0.9896,
+      "n": 10142
+    }
+  },
+  "macro_f1": 0.941,
+  "accuracy": 0.9812,
+  "pick_freq": {
+    "trust_rgb": 590,
+    "trust_ir": 407,
+    "both": 10321
+  }
+}
