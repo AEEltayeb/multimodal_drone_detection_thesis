@@ -119,42 +119,41 @@
 \contentsline {paragraph}{Conclusion validity.}{73}{paragraph*.87}%
 \contentsline {section}{\numberline {6.3}Limitations and Future Work}{74}{section.6.3}%
 \contentsline {paragraph}{Edge latency.}{74}{paragraph*.88}%
-\contentsline {paragraph}{GUI integration of the aligned filter.}{74}{paragraph*.89}%
-\contentsline {paragraph}{The airplane gap (largely closed).}{74}{paragraph*.90}%
-\contentsline {paragraph}{IR OOD recall.}{74}{paragraph*.91}%
-\contentsline {paragraph}{Track-level classification.}{74}{paragraph*.92}%
-\contentsline {paragraph}{Open evaluation items.}{74}{paragraph*.93}%
-\contentsline {chapter}{\numberline {7}Conclusion}{76}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Production Stack}{76}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Outlook}{77}{section.7.2}%
-\contentsline {chapter}{\numberline {A}Datasets in Detail}{78}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{78}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{78}{section.A.2}%
-\contentsline {section}{\numberline {A.3}IR Detector Corpus}{79}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{79}{section.A.4}%
-\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{79}{section.A.5}%
-\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{80}{section.A.6}%
-\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{80}{section.A.7}%
-\contentsline {section}{\numberline {A.8}SelCom CCTV}{80}{section.A.8}%
-\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{80}{section.A.9}%
-\contentsline {section}{\numberline {A.10}Licensing and Ethics}{81}{section.A.10}%
-\contentsline {chapter}{\numberline {B}Models Evaluated}{82}{appendix.B}%
-\contentsline {paragraph}{Detector confusion matrices.}{83}{paragraph*.96}%
-\contentsline {paragraph}{Detector training curves.}{84}{paragraph*.98}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{85}{appendix.C}%
-\contentsline {paragraph}{Verdict.}{85}{paragraph*.100}%
-\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{86}{paragraph*.102}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{87}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{89}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{91}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{91}{section.F.1}%
-\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{92}{section.F.2}%
-\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{93}{section.F.3}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{93}{paragraph*.106}%
-\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{93}{section.F.4}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{93}{paragraph*.107}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{93}{paragraph*.108}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{94}{paragraph*.109}%
-\contentsline {paragraph}{The surface reversal.}{94}{paragraph*.110}%
-\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{95}{appendix.G}%
-\contentsline {chapter}{Bibliography}{98}{appendix*.116}%
+\contentsline {paragraph}{The airplane gap (largely closed).}{74}{paragraph*.89}%
+\contentsline {paragraph}{IR OOD recall.}{74}{paragraph*.90}%
+\contentsline {paragraph}{Track-level classification.}{74}{paragraph*.91}%
+\contentsline {paragraph}{Open evaluation items.}{74}{paragraph*.92}%
+\contentsline {chapter}{\numberline {7}Conclusion}{75}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Production Stack}{75}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Outlook}{76}{section.7.2}%
+\contentsline {chapter}{\numberline {A}Datasets in Detail}{77}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{77}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{77}{section.A.2}%
+\contentsline {section}{\numberline {A.3}IR Detector Corpus}{78}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{78}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{78}{section.A.5}%
+\contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{79}{section.A.6}%
+\contentsline {section}{\numberline {A.7}DUT Anti-UAV}{79}{section.A.7}%
+\contentsline {section}{\numberline {A.8}SelCom CCTV}{79}{section.A.8}%
+\contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{79}{section.A.9}%
+\contentsline {section}{\numberline {A.10}Licensing and Ethics}{80}{section.A.10}%
+\contentsline {chapter}{\numberline {B}Models Evaluated}{81}{appendix.B}%
+\contentsline {paragraph}{Detector confusion matrices.}{82}{paragraph*.95}%
+\contentsline {paragraph}{Detector training curves.}{83}{paragraph*.97}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{84}{appendix.C}%
+\contentsline {paragraph}{Verdict.}{84}{paragraph*.99}%
+\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{85}{paragraph*.101}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{86}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{88}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{90}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{90}{section.F.1}%
+\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{91}{section.F.2}%
+\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{92}{section.F.3}%
+\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{92}{paragraph*.105}%
+\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{92}{section.F.4}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{92}{paragraph*.106}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{92}{paragraph*.107}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{93}{paragraph*.108}%
+\contentsline {paragraph}{The surface reversal.}{93}{paragraph*.109}%
+\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{94}{appendix.G}%
+\contentsline {chapter}{Bibliography}{97}{appendix*.115}%

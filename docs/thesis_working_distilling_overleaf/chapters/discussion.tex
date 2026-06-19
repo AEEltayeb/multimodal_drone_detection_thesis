@@ -48,8 +48,6 @@ Single-run point estimates are never compared at sub-CI granularity; the product
 
 \paragraph{Edge latency.} All evaluation ran on a GTX 1050~Ti; the cascade is interactive there, but Jetson-class edge latency is unmeasured. The per-stage budget (Table~\ref{tab:speed}) makes the port plausible; it remains future work.
 
-\paragraph{GUI integration of the aligned filter.} The production design runs \texttt{mlp\_aligned\_thermalonly} per-frame on the IR branch; it is validated in the evaluation engine, while its operator-GUI wiring is an open engineering item at the time of writing.
-
 \paragraph{The airplane gap (largely closed).} Airplanes were every earlier filter generation's weakest category (patch: $52\%$ catch on Svanstr\"om airplanes, below the decisiveness bar; the grayscale-harvested thermal filter left the thermal-confuser surface airplane-dominated). The production thermal-native head (Section~\ref{sec:grayscale_verifier}) closes most of this: thermal-confuser fire falls $29.4\% \to 2.8\%$ on-cache and $94\%$ of held-out IR confusers are removed, by training on thermal airplane crops directly. The residual is no longer an untrained-confuser hole but an in-distribution recall trade ($-3.7$~pp on genuinely airplane-like \texttt{ir\_dset} thermal drones no threshold separates from airplanes); choosing that operating point, and reducing it with more diverse thermal airplane-vs-drone data, is the remaining future-work item.
 
 \paragraph{IR OOD recall.} The IR detector's recall on independent, verified thermal drone footage outside its corpus families is unmeasured (the available community thermal sets could not be quality-verified and are not used); this is the evaluation gap the RGB parallel channel hedges against.
