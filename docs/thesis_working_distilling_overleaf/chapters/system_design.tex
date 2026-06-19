@@ -11,7 +11,7 @@ The pipeline processes paired RGB and thermal-IR streams through a four-stage ca
 \begin{enumerate}
     \item \textbf{RGB detector}: a YOLO26-class single-stage detector trained on the $172{,}022$-frame composite RGB corpus of Table~\ref{tab:ds_rgb_components} (drone positives, plus bird confuser negatives from the AirBird, FBD-SV, and WosDetC sources, and surveillance, traffic, and driving frames as background negatives); the production detector (\texttt{ft4}) adds the SelCom and $300$-hard-negative confuser fine-tune of Section~\ref{sec:selcom_finetune}. It is strong on drones, and residually hallucinates on small bird-on-sky frames.
     \item \textbf{IR detector}: a YOLO26-class detector trained on iteratively curated thermal imagery (Section~\ref{sec:hitl_method}), with bird, airplane, and helicopter frames as hard negatives. Strong and selective on in-distribution thermal; on the OOD thermal-confuser corpus its residual fire is airplane-dominated, and on the paired benchmarks it is the stronger single-modality detector on Svanstr\"om and the weaker one on Anti-UAV, the asymmetry the trust classifier exploits. Also operates as a \emph{grayscale-RGB fallback} when no thermal camera is available (Section~\ref{sec:ir_grayscale_mode}).
-    \item \textbf{Trust classifier}: an XGBoost model that maps a frame's detection and scene features to a 4-way modality decision (\texttt{reject\_both}, \texttt{trust\_rgb}, \texttt{trust\_ir}, \texttt{trust\_both}).
+    \item \textbf{Trust classifier}: an XGBoost model that maps a frame's detection and scene features to a 4-way modality decision (\texttt{reject\_both}, \texttt{trust\_rgb}, \texttt{trust\_ir}, \texttt{trust\_both}); the shipped router drops the \texttt{reject\_both} class and always routes (Section~\ref{sec:classifier_results}).
     \item \textbf{Confuser filter}: in production, an RGB filter that reuses the detector's own internal features, with a thermal-native IR counterpart (Section~\ref{sec:distill_verifier}). Because it reuses features already computed for each detection rather than re-processing crops, it is cheap enough to run \emph{per frame}. It supersedes an earlier patch filter, a separate CNN over crop pixels that was expensive enough to require alert-gating (Section~\ref{sec:patch_verifier_arch}).
 \end{enumerate}
 
@@ -39,7 +39,7 @@ Table~\ref{tab:model_overview} summarises each production model, what it was tra
         \addlinespace
         IR detector (\texttt{v3b}) & YOLO26n & $129{,}130$-frame thermal corpus (6-revision HITL) & \texttt{ir\_dset} test $F1$ $0.967$ \\
         \addlinespace
-        Trust router (\texttt{robust8-nr}) & XGBoost & $37{,}488$ routing-labelled detections ($160$ sequences) & held-out fold ($11{,}318$ dets): macro-$F1$ $0.941$, accuracy $0.981$ \\
+        Trust router (\texttt{robust8-nr}) & XGBoost & $37{,}488$ routing-labelled detections & held-out fold ($11{,}318$ dets): macro-$F1$ $0.941$, accuracy $0.981$ \\
         \addlinespace
         RGB filter (\texttt{mlp\_v5\_v4}) & MLP & $33{,}272$ \texttt{ft4} features ($19{,}334$ drone / $13{,}938$ confuser) & \texttt{rgb\_dataset} test drone recall $0.887$; held-out bird $30/230$ kept \\
         \addlinespace
