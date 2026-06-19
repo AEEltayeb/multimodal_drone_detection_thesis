@@ -27,18 +27,9 @@ CH_DIR  = RESULTS / "_cumulative_halluc"
 OUT_DIR = Path(__file__).resolve().parent / "figures"
 OUT_DIR.mkdir(exist_ok=True)
 
-plt.rcParams.update({
-    'font.size': 11,
-    'font.family': 'serif',
-    'axes.labelsize': 12,
-    'axes.titlesize': 13,
-    'xtick.labelsize': 10,
-    'ytick.labelsize': 10,
-    'legend.fontsize': 10,
-    'figure.dpi': 150,
-    'savefig.dpi': 300,
-    'savefig.bbox': 'tight',
-})
+sys.path.insert(0, str(REPO))  # for the shared thesis plot theme
+from thesis_style import apply_theme, GOOD, SECOND, THIRD, CONTRAST, PALETTE
+apply_theme()
 
 
 def load_summary(run_name):
@@ -231,16 +222,16 @@ def fig_ir_evolution():
     x = np.arange(len(stages))
 
     fig, ax = plt.subplots(figsize=(8, 4.4))
-    ax.plot(x, prec, 'o-', color="#1f77b4", linewidth=2, markersize=8, label="Precision", zorder=5)
-    ax.plot(x, rec,  's-', color="#2ca02c", linewidth=2, markersize=8, label="Recall", zorder=5)
+    ax.plot(x, prec, 'o-', color=SECOND, markersize=8, label="Precision", zorder=5)
+    ax.plot(x, rec,  's-', color=GOOD, markersize=8, label="Recall", zorder=5)
     # mark the V5 precision regression
     v5 = stages.index("V5")
     ax.annotate("V5 regression\n(bulk-ingest, bypassed review)", (v5, prec[v5]),
                 textcoords="offset points", xytext=(0, -42), ha="center", fontsize=8,
-                color="#d62728", arrowprops=dict(arrowstyle="->", color="#d62728", alpha=0.7))
-    ax.plot(v5, prec[v5], 'o', color="#d62728", markersize=11, zorder=6)
+                color=CONTRAST, arrowprops=dict(arrowstyle="->", color=CONTRAST, alpha=0.7))
+    ax.plot(v5, prec[v5], 'o', color=CONTRAST, markersize=11, zorder=6)
     for xi, p in zip(x, prec):
-        ax.text(xi, p + 0.012, f"{p:.3f}", ha='center', fontsize=7.5, color="#1f77b4")
+        ax.text(xi, p + 0.012, f"{p:.3f}", ha='center', fontsize=7.5, color=SECOND)
 
     ax.set_xticks(x); ax.set_xticklabels(stages)
     ax.set_ylabel("Precision / Recall")
@@ -261,7 +252,7 @@ def fig_resolution():
     """Grouped bars: Svanström drone recall, 2 models x 2 imgsz, ONE harness (round-5 sweep:
     stride-7 n=4102, IoP@0.5, conf 0.25). Reads eval/results/svan_resolution_sweep.json."""
     sweep = json.load(open(RESULTS / "svan_resolution_sweep.json"))
-    models = [("baseline", "#27ae60"), ("retrained_v2", "#e74c3c")]
+    models = [("baseline", GOOD), ("retrained_v2", CONTRAST)]
     sizes = [640, 1280]
 
     x = np.arange(len(sizes)); w = 0.32
@@ -517,9 +508,9 @@ def fig_cascade_segment():
     for yi, a, b in zip(y, rgb_f1, casc_f1):
         axF.plot([a, b], [yi, yi], "-", color="#bbbbbb", zorder=1, linewidth=2)
     axF.scatter(rgb_f1, y, color="#9e9e9e", s=90, label="Stage-1 RGB", zorder=3, edgecolor="white")
-    axF.scatter(casc_f1, y, color="#2ca02c", s=90, label="Full cascade", zorder=3, edgecolor="white")
+    axF.scatter(casc_f1, y, color=GOOD, s=90, label="Full cascade", zorder=3, edgecolor="white")
     for yi, b in zip(y, casc_f1):
-        axF.annotate(f"{b:.3f}", (b, yi), textcoords="offset points", xytext=(6, 6), fontsize=8, color="#2ca02c")
+        axF.annotate(f"{b:.3f}", (b, yi), textcoords="offset points", xytext=(6, 6), fontsize=8, color=GOOD)
     axF.set_yticks(y); axF.set_yticklabels(models)
     axF.set_xlabel("Segment-level drone $F1$"); axF.set_xlim(0.55, 0.9)
     axF.set_title("(a) Drone $F1$: cascade lifts every variant")
@@ -529,10 +520,10 @@ def fig_cascade_segment():
     for yi, a, b in zip(y, rgb_fpr, casc_fpr):
         axR.plot([b, a], [yi, yi], "-", color="#bbbbbb", zorder=1, linewidth=2)
     axR.scatter(rgb_fpr, y, color="#9e9e9e", s=90, label="Stage-1 RGB", zorder=3, edgecolor="white")
-    axR.scatter(casc_fpr, y, color="#1f77b4", s=90, label="Full cascade", zorder=3, edgecolor="white")
+    axR.scatter(casc_fpr, y, color=GOOD, s=90, label="Full cascade", zorder=3, edgecolor="white")
     for yi, a, b in zip(y, rgb_fpr, casc_fpr):
         axR.annotate(f"-{(1-b/a)*100:.0f}%", ((a+b)/2, yi), textcoords="offset points",
-                     xytext=(0, 7), ha="center", fontsize=8, color="#1f77b4")
+                     xytext=(0, 7), ha="center", fontsize=8, color=GOOD)
     axR.set_yticks(y); axR.set_yticklabels([])
     axR.set_xlabel("Segment-level confuser FPR"); axR.set_xlim(0, 0.78)
     axR.set_title("(b) Confuser FPR: cascade cuts every variant")
@@ -655,20 +646,17 @@ if __name__ == "__main__":
     print(f"Data:   {CH_DIR}")
     print()
 
-    fig_cumulative_confuser()
-    fig_svanstrom_by_category()
-    fig_threshold_sweep()
-    fig_ood_classifier()
-    fig_ir_evolution()
-    fig_resolution()
-    fig_realvideo_pareto()
-    fig_cascade_percategory()
-    fig_distill_verifier()
-    fig_rgb_threestance()
-    fig_cascade_segment()
-    fig_surface_exchange()
-    fig_patch_catchbar()
-    fig_perframe_segment()
-    fig_classifier_reversal()
+    _figs = [
+        fig_cumulative_confuser, fig_svanstrom_by_category, fig_threshold_sweep,
+        fig_ood_classifier, fig_ir_evolution, fig_resolution, fig_realvideo_pareto,
+        fig_cascade_percategory, fig_distill_verifier, fig_rgb_threestance,
+        fig_cascade_segment, fig_surface_exchange, fig_patch_catchbar,
+        fig_perframe_segment, fig_classifier_reversal,
+    ]
+    for _f in _figs:
+        try:
+            _f()
+        except Exception as _e:
+            print(f"  SKIP {_f.__name__}: {_e}")
 
     print(f"\nAll figures saved to {OUT_DIR}")
