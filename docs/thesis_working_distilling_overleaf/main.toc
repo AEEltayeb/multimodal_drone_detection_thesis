@@ -139,11 +139,11 @@
 \contentsline {section}{\numberline {A.10}Licensing and Ethics}{78}{section.A.10}%
 \contentsline {chapter}{\numberline {B}Models Evaluated}{79}{appendix.B}%
 \contentsline {paragraph}{Detector confusion matrices.}{80}{paragraph*.91}%
+\contentsline {paragraph}{Detector training curves.}{81}{paragraph*.93}%
 \contentsline {chapter}{\numberline {C}Model MRI Sample Report}{82}{appendix.C}%
-\contentsline {paragraph}{Verdict.}{82}{paragraph*.93}%
-\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{83}{paragraph*.95}%
+\contentsline {paragraph}{Verdict.}{82}{paragraph*.95}%
+\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{83}{paragraph*.97}%
 \contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{84}{appendix.D}%
-\contentsline {paragraph}{Detector training curves.}{84}{paragraph*.97}%
 \contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{86}{appendix.E}%
 \contentsline {chapter}{\numberline {F}Superseded Components and Design History}{88}{appendix.F}%
 \contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{88}{section.F.1}%

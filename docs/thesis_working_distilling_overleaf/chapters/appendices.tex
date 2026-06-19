@@ -60,7 +60,7 @@ Single-camera source: fixed perimeter installation, $1920{\times}1080$, 25~fps. 
 
 \begin{table}[htbp]
     \centering
-    \caption{Drone-positive YouTube clips. ``Extracted'' is the frame count used in evaluation after stride sampling; total native frame count is shown for context. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
+    \caption{Drone-positive YouTube clips. ``Extracted'' is the frame count used in evaluation: the subset the author manually labelled by hand, drawing each ground-truth drone box frame by frame (after any stride sampling), which is why it falls below the native total shown for context. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
     \label{tab:youtube_drone_clips}
     \footnotesize
     \resizebox{\textwidth}{!}{%
@@ -185,6 +185,19 @@ The Ultralytics validation confusion matrices for the full-training detector run
     \label{fig:detector_confusion}
 \end{figure}
 
+\paragraph{Detector training curves.}
+The validation precision--recall curves for the two full-training detector runs (the baseline RGB detector and the full IR retrain) are shown in Figure~\ref{fig:detector_pr}; the full per-epoch loss and mAP dashboards ship with every training run in the repository.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{pr_rgb_baseline}\caption{Baseline RGB detector}\end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{pr_ir_final}\caption{IR detector (\texttt{Final})}\end{subfigure}
+    \caption{Validation precision--recall curves (Ultralytics, all-class at IoU@0.5) for the full-training detector runs. As with the confusion matrices, these are training-time validation curves, not thesis-evaluation surfaces.}
+    % [source: figures/pr_rgb_baseline.png (RGB baseline Yolo26n_trained BoxPR_curve.png); figures/pr_ir_final.png (IR Final / IR_final_cleaned BoxPR_curve.png)]
+    \label{fig:detector_pr}
+\end{figure}
+
 \chapter{Model MRI Sample Report}
 \label{app:mri_report}
 
@@ -255,19 +268,6 @@ Every headline number in this thesis is the value of a named cell in a canonical
 
 The \texttt{runs/} directory additionally holds the production IR detector's complete Ultralytics training record (\texttt{runs/corrective\_finetune/}: training arguments, loss and PR curves, confusion matrices, and acceptance reports for the \texttt{v3b} fine-tune), so the training side of the production stack is documented alongside the evaluation side. The relational evidence store \texttt{knowledge/} (CSV tables with generated views) records every evaluation and finding as a row carrying its source path and reproduction command.
 % [source: runs/README.md (this appendix mirrors it)]
-
-\paragraph{Detector training curves.}
-The validation precision--recall curves for the two full-training detector runs (the baseline RGB detector and the full IR retrain) are shown in Figure~\ref{fig:detector_pr}; the full per-epoch loss and mAP dashboards ship with every training run in the repository.
-
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{pr_rgb_baseline}\caption{Baseline RGB detector}\end{subfigure}
-    \hfill
-    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{pr_ir_final}\caption{IR detector (\texttt{Final})}\end{subfigure}
-    \caption{Validation precision--recall curves (Ultralytics, all-class at IoU@0.5) for the full-training detector runs. As with the confusion matrices, these are training-time validation curves, not thesis-evaluation surfaces.}
-    % [source: figures/pr_rgb_baseline.png (RGB baseline Yolo26n_trained BoxPR_curve.png); figures/pr_ir_final.png (IR Final / IR_final_cleaned BoxPR_curve.png)]
-    \label{fig:detector_pr}
-\end{figure}
 
 \chapter{Glossary of Abbreviations and Shorthand}
 \label{app:glossary}
