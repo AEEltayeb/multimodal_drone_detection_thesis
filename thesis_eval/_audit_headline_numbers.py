@@ -233,8 +233,8 @@ CHECKS += [
 # session-8c: filter operating-point figure (fig:filter_operating) caption numbers vs the sweep JSON
 FS = json.load(open(REPO / "eval/results/filter_operating_sweep.json"))
 CHECKS += [
-    ("FIG rgb recall@0.25",  0.956, round(FS["RGB mlp_v5"]["shipped"][0], 3)),
-    ("FIG rgb fire@0.25",    0.011, round(FS["RGB mlp_v5"]["shipped"][1], 3)),
+    ("FIG rgb recall@0.25",  0.949, round(FS["RGB mlp_v5_v4"]["shipped"][0], 3)),
+    ("FIG rgb fire@0.25",    0.014, round(FS["RGB mlp_v5_v4"]["shipped"][1], 3)),
 ]
 
 # session-9: trust router held-out classification (tab:model_overview, fig:cm_router) vs frozen JSON

@@ -31,7 +31,7 @@ GRID = np.round(np.arange(0.02, 0.951, 0.01), 3)
 
 # label -> (verifier key, slot, [drone surfaces], confuser surface, shipped thr, panel title)
 FILTERS = [
-    ("RGB mlp_v5",        "mlp_v5",       "rgb", ["svanstrom", "antiuav", "dut_antiuav_960"], "rgb_confuser",  0.25),
+    ("RGB mlp_v5_v4",     "mlp_v5",       "rgb", ["svanstrom", "antiuav", "dut_antiuav_960"], "rgb_confuser",  0.25),
     ("IR-thermal aligned","aligned",      "ir",  ["svanstrom", "antiuav", "ir_dset_final"],   "ir_confusers",  0.05),
 ]
 

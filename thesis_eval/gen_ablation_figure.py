@@ -16,10 +16,10 @@ FIGDIR = REPO / "docs/thesis_working_distilling_overleaf/figures"
 
 CELLS_A = [("bare", "bare"), ("clf[robust8]", "+ router"), ("clf->filt[robust8]", "+ filter\n(production)")]
 SURF_A = [("svanstrom", "Svanström (IoP@0.5)"), ("antiuav", "Anti-UAV (IoU@0.5)")]
-CELLS_B = [("bare", "bare"), ("filt_patch", "patch"), ("filt_mlp", "mlp_v5"),
+CELLS_B = [("bare", "bare"), ("filt_patch", "patch"), ("filt_mlp", "mlp_v5_v4"),
            ("clf[robust8]", "router"), ("clf->filt[robust8]", "composed")]
 SURF_B = [("rgb_confuser", "RGB confusers"), ("ir_confusers", "IR confusers")]
-C = {"bare": "#9e9e9e", "patch": "#7fa8d9", "mlp_v5": "#2e7d32", "router": "#f0a050", "composed": "#1a4e8a",
+C = {"bare": "#9e9e9e", "patch": "#7fa8d9", "mlp_v5_v4": "#2e7d32", "router": "#f0a050", "composed": "#1a4e8a",
      "+ router": "#f0a050", "+ filter\n(production)": "#1a4e8a"}
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11.5, 4.0), gridspec_kw={"width_ratios": [1, 1.35]})
