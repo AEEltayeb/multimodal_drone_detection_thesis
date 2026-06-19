@@ -49,10 +49,12 @@ ROBUST6_JBL  = REPO / "models/routers/lean_ft4/trust_ft4_robust6.joblib"  # 6-fe
 SA32_JBL     = REPO / "models/routers/scene_aware_v3more_32feat/model.joblib"  # sad 32-feat router
 NR_DROP_JBL  = REPO / "models/routers/robust8_noreject_drop/model.joblib"   # no-reject 3-class (reject rows dropped)
 NR_BOTH_JBL  = REPO / "models/routers/robust8_noreject_both/model.joblib"   # no-reject 3-class (reject -> both)
-# Weights/thresholds are env-overridable (defaults = SHIPPED, so committed numbers are unchanged).
+# Weights/thresholds are env-overridable; defaults = the PRODUCTION stack the frozen thesis JSONs used
+# (RGB mlp_v5_v4, IR thermal-only), so the committed numbers reproduce out of the box. Verified 2026-06-20:
+# ir_confusers filt_mlp 0.0278 reproduces with mlp_aligned_thermalonly, not the old mlp_aligned (0.237).
 # Filter A/B harness sets THESIS_* to repoint at candidate filters WITHOUT clobbering the committed stack.
-MLP_V5       = Path(os.environ.get("THESIS_MLP_V5",       REPO / "models/verifiers/rgb_v5/mlp_v5.pt"))   # RGB verifier
-ALIGNED      = Path(os.environ.get("THESIS_ALIGNED",      REPO / "models/verifiers/ir_aligned/mlp_aligned.pt"))        # IR verifier (thermal scaler)
+MLP_V5       = Path(os.environ.get("THESIS_MLP_V5",       REPO / "models/verifiers/rgb_v5/mlp_v5_v4.pt"))   # RGB verifier (production v4)
+ALIGNED      = Path(os.environ.get("THESIS_ALIGNED",      REPO / "models/verifiers/ir_aligned/mlp_aligned_thermalonly.pt"))  # IR verifier (production thermal-only)
 ALIGNED_GRAY = Path(os.environ.get("THESIS_ALIGNED_GRAY", REPO / "models/verifiers/ir_aligned/mlp_aligned_gray.pt"))   # same net, GRAYSCALE scaler
 CACHE_DIR    = REPO / "thesis_eval" / "cache"
 OUT_DIR      = REPO / "thesis_eval" / "results"
