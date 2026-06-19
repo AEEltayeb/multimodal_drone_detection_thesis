@@ -29,10 +29,10 @@
 \contentsline {section}{\numberline {3.5}Resolution Dependency}{20}{section.3.5}%
 \contentsline {section}{\numberline {3.6}RGB Drone Detector}{20}{section.3.6}%
 \contentsline {subsection}{\numberline {3.6.1}Three Training Stances}{20}{subsection.3.6.1}%
-\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{21}{subsection.3.6.2}%
+\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{22}{subsection.3.6.2}%
 \contentsline {section}{\numberline {3.7}IR Drone Detector}{22}{section.3.7}%
 \contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{22}{subsection.3.7.1}%
-\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{22}{subsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{23}{subsection.3.7.2}%
 \contentsline {section}{\numberline {3.8}Trust Classifier}{24}{section.3.8}%
 \contentsline {subsection}{\numberline {3.8.1}Feature Set}{24}{subsection.3.8.1}%
 \contentsline {subsection}{\numberline {3.8.2}Hand-Engineered Variants (the comparison set)}{24}{subsection.3.8.2}%
@@ -40,7 +40,7 @@
 \contentsline {subsection}{\numberline {3.8.3}Statistical Feature Selection for the Router}{25}{subsection.3.8.3}%
 \contentsline {paragraph}{Method.}{25}{paragraph*.16}%
 \contentsline {paragraph}{A leakage statistic.}{25}{paragraph*.17}%
-\contentsline {paragraph}{What the statistic finds.}{25}{paragraph*.19}%
+\contentsline {paragraph}{What the statistic finds.}{26}{paragraph*.19}%
 \contentsline {paragraph}{\texttt {robust6}.}{26}{paragraph*.21}%
 \contentsline {paragraph}{A further free lever.}{27}{paragraph*.22}%
 \contentsline {section}{\numberline {3.9}The Confuser Filter}{27}{section.3.9}%

@@ -30,14 +30,14 @@
 \newlabel{sec:rgb_three_variants}{{3.6.1}{20}{Three Training Stances}{subsection.3.6.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph  {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt  {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt  {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt  {retrained\_v2} is unusable on Svanstr\"om at either size.}}{21}{figure.caption.13}\protected@file@percent }
 \newlabel{fig:resolution}{{3.5}{21}{Inference-resolution dependency of Svanstr\"om drone recall, isolated \emph {within} each model (one harness: stride-7 sample, $n=4{,}102$, IoP@0.5, conf $0.25$). Doubling \texttt {imgsz} buys both variants a similar recall increment ($+28$~pp baseline, $+25$~pp \texttt {retrained\_v2}); the absolute level is set by the training stance. The confuser-suppressing \texttt {retrained\_v2} is unusable on Svanstr\"om at either size}{figure.caption.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{21}{subsection.3.6.2}\protected@file@percent }
-\newlabel{sec:selcom_finetune}{{3.6.2}{21}{SelCom CCTV Fine-Tune}{subsection.3.6.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{22}{subsection.3.6.2}\protected@file@percent }
+\newlabel{sec:selcom_finetune}{{3.6.2}{22}{SelCom CCTV Fine-Tune}{subsection.3.6.2}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.7}IR Drone Detector}{22}{section.3.7}\protected@file@percent }
 \newlabel{sec:ir_detector}{{3.7}{22}{IR Drone Detector}{section.3.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{22}{subsection.3.7.1}\protected@file@percent }
 \newlabel{sec:ir_grayscale_mode}{{3.7.1}{22}{Grayscale-RGB Operating Mode}{subsection.3.7.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{22}{subsection.3.7.2}\protected@file@percent }
-\newlabel{sec:ir_xmodal_verifier}{{3.7.2}{22}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.7.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{23}{subsection.3.7.2}\protected@file@percent }
+\newlabel{sec:ir_xmodal_verifier}{{3.7.2}{23}{Cross-Modal Feature Alignment: a Thermal-Native Confuser Filter}{subsection.3.7.2}{}}
 \@writefile{lot}{\contentsline {table}{\numberline {3.2}{\ignorespaces Model MRI of the \texttt  {v3b} IR detector's fused \texttt  {p3}+\texttt  {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover.}}{23}{table.caption.14}\protected@file@percent }
 \newlabel{tab:ir_mri_sep}{{3.2}{23}{Model MRI of the \texttt {v3b} IR detector's fused \texttt {p3}+\texttt {p5} features ($14{,}697$ drone / $1{,}386$ confuser detections): the confuser-rejection signal is already linearly present in the detector's own features. The projected columns are in-pool $5$-fold estimates of what a reader of those features could recover}{table.caption.14}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.8}Trust Classifier}{24}{section.3.8}\protected@file@percent }
@@ -51,7 +51,6 @@
 \@writefile{toc}{\contentsline {paragraph}{Method.}{25}{paragraph*.16}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{A leakage statistic.}{25}{paragraph*.17}\protected@file@percent }
 \newlabel{eq:leakage}{{3.1}{25}{A leakage statistic}{equation.3.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{25}{paragraph*.19}\protected@file@percent }
 \newlabel{fig:fusion_lda}{{3.6a}{26}{\relax }{figure.caption.18}{}}
 \newlabel{sub@fig:fusion_lda}{{a}{26}{\relax }{figure.caption.18}{}}
 \newlabel{fig:fusion_auroc}{{3.6b}{26}{\relax }{figure.caption.18}{}}
@@ -60,9 +59,10 @@
 \newlabel{sub@fig:fusion_leakage}{{c}{26}{\relax }{figure.caption.18}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt  {classifier/fusion\_feature\_stats.py}.}}{26}{figure.caption.18}\protected@file@percent }
 \newlabel{fig:fusion_stats}{{3.6}{26}{Statistical anatomy of the $56$-feature fusion space. (a) Linear discriminant: the trust signal is linearly separable ($98.2\%$ train accuracy). (b) Per-feature single-feature AUROC. (c) Leakage map (Eq.~\ref {eq:leakage}): the lower-right region is robust signal (high AUROC, near-zero leakage); the upper-left is scene fingerprint (chance-level AUROC, leakage in the hundreds). Source: \texttt {classifier/fusion\_feature\_stats.py}}{figure.caption.18}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{26}{table.caption.20}\protected@file@percent }
-\newlabel{tab:leakage}{{3.3}{26}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.20}{}}
+\@writefile{toc}{\contentsline {paragraph}{What the statistic finds.}{26}{paragraph*.19}\protected@file@percent }
 \@writefile{toc}{\contentsline {paragraph}{\texttt  {robust6}.}{26}{paragraph*.21}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.3}{\ignorespaces Leakage analysis splits the feature space. \emph  {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph  {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt  {feature\_stats\_ranked.csv}.}}{27}{table.caption.20}\protected@file@percent }
+\newlabel{tab:leakage}{{3.3}{27}{Leakage analysis splits the feature space. \emph {Top}: scene fingerprints, chance-level class AUROC but very high leakage; drop. \emph {Bottom}: the robust core, high AUROC, near-zero leakage; keep. Source: \texttt {feature\_stats\_ranked.csv}}{table.caption.20}{}}
 \@writefile{toc}{\contentsline {paragraph}{A further free lever.}{27}{paragraph*.22}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3.9}The Confuser Filter}{27}{section.3.9}\protected@file@percent }
 \newlabel{sec:distill_verifier}{{3.9}{27}{The Confuser Filter}{section.3.9}{}}
