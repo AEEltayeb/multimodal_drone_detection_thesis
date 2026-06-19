@@ -242,7 +242,7 @@ On the 19-clip diagnostic (per-clip table in Appendix~\ref{app:datasets}), the t
 \subsection{IR Detector: the Six-Revision HITL Case Study}
 \label{sec:ir_evolution}
 
-The IR detector was developed across five numbered revisions (V2 through V6) plus a \texttt{Final} retrain and a \texttt{v3b} corrective fine-tune, by the loop of Section~\ref{sec:hitl_method}. Earlier per-version best-epoch mAP50 numbers are not directly comparable because the val split changed with the dataset. Every version was therefore re-evaluated on the same fixed \texttt{IR\_dset\_final} test split at \texttt{imgsz=640} (script: \texttt{eval/eval\_ir\_versions.py}).
+The IR detector was developed across five numbered revisions (V2 through V6) plus a \texttt{Final} retrain and a \texttt{v3b} corrective fine-tune, by the loop of Section~\ref{sec:hitl_method}. Earlier per-version best-epoch mAP50 numbers are not directly comparable because the val split changed with the dataset. Every version was therefore re-evaluated on the same fixed \texttt{IR\_dset\_final} test split at \texttt{imgsz=640} (script: \texttt{eval/eval\_ir\_versions.py}); Figure~\ref{fig:ir_evolution} plots the resulting precision/recall trajectory.
 
 \begin{table}[htbp]
     \centering
@@ -389,7 +389,7 @@ The instrument is described in Section~\ref{sec:model_mri}; this section reports
 \end{figure}
 
 \paragraph{The signal is linear, supervised, and deep.}
-On the RGB detector, a single Fisher axis separates drone from confuser at $\approx$95\% threshold accuracy while unsupervised PCA finds near-zero cluster structure (silhouette $0.067$): the signal is real but invisible to distance-based methods, which is why a small trained MLP is the right reader. The strongest single discriminator is a \texttt{p5} semantic channel ($F=42{,}346$), $4\times$ stronger than the detection-confidence scalar: the filter reads \emph{what the detector saw}, not \emph{how sure it was}. The IR detector is the thermal twin: LDA $0.981$ over $14{,}697$ drone / $1{,}386$ confuser detections, strongest neuron $F=5{,}370$, top discriminators again \texttt{p5} channels with \texttt{meta:conf} far down the ranking.
+On the RGB detector, a single Fisher axis separates drone from confuser at $\approx$95\% threshold accuracy (Figure~\ref{fig:mri_stats}) while unsupervised PCA finds near-zero cluster structure (silhouette $0.067$): the signal is real but invisible to distance-based methods, which is why a small trained MLP is the right reader. The strongest single discriminator is a \texttt{p5} semantic channel ($F=42{,}346$), $4\times$ stronger than the detection-confidence scalar: the filter reads \emph{what the detector saw}, not \emph{how sure it was} (Figure~\ref{fig:mri_activation}). The IR detector is the thermal twin: LDA $0.981$ over $14{,}697$ drone / $1{,}386$ confuser detections, strongest neuron $F=5{,}370$, top discriminators again \texttt{p5} channels with \texttt{meta:conf} far down the ranking.
 % [source: ledger=v5-lda-separability,ir-features-separable; run=mri/cli.py; cache=mri/results/v5_report_regen/stats.json,mri/results/ir_v3b_report]
 
 \begin{figure}[htbp]
@@ -443,7 +443,7 @@ A filter-threshold sweep over the cached probabilities settles whether the veto 
 % [source: thesis_eval/results/video_thr_sweep.json; run=thesis_eval/video_thr_sweep.py]
 
 \paragraph{Design-evolution evidence (predecessor stack).}
-The temporal smoother's value was first established on this surface with the predecessor stack (baseline RGB, the 32-feature hand-built router, alert-gated patch filter); those numbers are retained as the design-evolution record. At the segment grain that cascade \emph{gained} drone $F1$ for all four RGB variants tested ($+6.6$ to $+16.5$~pp; baseline RGB $0.760 \to 0.826$) while cutting confuser FPR $39$--$81\%$ (baseline: $0.512 \to 0.162$), and it compressed the spread between detector variants from $15.5$ to $5.6$~pp F1: the cascade absorbs detector variance. Per-frame metrics on the same runs \emph{fell} for three of four variants, which is the wrong-unit-of-analysis lesson: the per-frame grain counts every wrong box, the deployed system counts alerts.
+The temporal smoother's value was first established on this surface with the predecessor stack (baseline RGB, the 32-feature hand-built router, alert-gated patch filter); those numbers are retained as the design-evolution record. At the segment grain that cascade \emph{gained} drone $F1$ for all four RGB variants tested ($+6.6$ to $+16.5$~pp; baseline RGB $0.760 \to 0.826$) while cutting confuser FPR $39$--$81\%$ (baseline: $0.512 \to 0.162$), and it compressed the spread between detector variants from $15.5$ to $5.6$~pp F1: the cascade absorbs detector variance (Figure~\ref{fig:cascade_segment_fig}). Per-frame metrics on the same runs \emph{fell} for three of four variants, which is the wrong-unit-of-analysis lesson: the per-frame grain counts every wrong box, the deployed system counts alerts.
 % [source: ledger=cascade-segment-recovers,cascade-tightens-variance,cascade-perframe-misleading; eval=pipe_vid_baseline_seg,pipe_vid_baseline_pf; config=pipe_video_drone_iop (predecessor configuration: baseline RGB + sa32 + alert-gated patch @0.7)]
 
 \begin{figure}[htbp]

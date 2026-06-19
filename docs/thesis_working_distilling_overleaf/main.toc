@@ -138,20 +138,22 @@
 \contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{77}{section.A.9}%
 \contentsline {section}{\numberline {A.10}Licensing and Ethics}{78}{section.A.10}%
 \contentsline {chapter}{\numberline {B}Models Evaluated}{79}{appendix.B}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{81}{appendix.C}%
-\contentsline {paragraph}{Verdict.}{81}{paragraph*.91}%
-\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{82}{paragraph*.93}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{83}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{85}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{87}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{87}{section.F.1}%
-\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{88}{section.F.2}%
-\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{89}{section.F.3}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{89}{paragraph*.97}%
-\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{89}{section.F.4}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{89}{paragraph*.98}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{89}{paragraph*.99}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{90}{paragraph*.100}%
-\contentsline {paragraph}{The surface reversal.}{90}{paragraph*.101}%
-\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{91}{appendix.G}%
-\contentsline {chapter}{Bibliography}{94}{appendix*.107}%
+\contentsline {paragraph}{Detector confusion matrices.}{80}{paragraph*.91}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{82}{appendix.C}%
+\contentsline {paragraph}{Verdict.}{82}{paragraph*.93}%
+\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{83}{paragraph*.95}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{84}{appendix.D}%
+\contentsline {paragraph}{Detector training curves.}{84}{paragraph*.97}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{86}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{88}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{88}{section.F.1}%
+\contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{89}{section.F.2}%
+\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{90}{section.F.3}%
+\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{90}{paragraph*.101}%
+\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{90}{section.F.4}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{90}{paragraph*.102}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{90}{paragraph*.103}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{91}{paragraph*.104}%
+\contentsline {paragraph}{The surface reversal.}{91}{paragraph*.105}%
+\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{92}{appendix.G}%
+\contentsline {chapter}{Bibliography}{95}{appendix*.111}%
