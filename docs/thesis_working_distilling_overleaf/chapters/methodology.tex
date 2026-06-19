@@ -379,6 +379,27 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
 \end{table}
 % [source: docs/analysis/2026-05-26_classifier_ft4_analysis.md §2.2 (R1 0.898/-19.4pp halluc, R2 selcom F1 -0.023, R3 0.919/45.0% halluc vs 61% bare = -16pp, A1 0.897, A2 selcom fail); ledger=ft4-backbone-freeze]
 
+\paragraph{Downstream learned models.} The two detectors above are YOLO26n; the three learned downstream models, the trust router and the two confuser filters, are configured as in Table~\ref{tab:downstream_configs}. The two filters share one MLP architecture and are trained on cached per-detection features (positives are drone detections, negatives are confuser detections; Section~\ref{sec:distill_verifier}), differing only in training corpus, base detector, and operating threshold.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Downstream learned-model configurations: the trust router and the two confuser filters. All three are trained on cached per-detection features rather than on images. The RGB and IR filters share one MLP architecture (\texttt{mri/classifier.py}); they differ in training corpus, base detector, and deploy threshold.}
+    \label{tab:downstream_configs}
+    \footnotesize
+    \begin{tabular}{@{}p{3.1cm} l p{8.8cm}@{}}
+        \toprule
+        Model & Type & Configuration \\
+        \midrule
+        Trust router (\texttt{robust8-nr}) & XGBoost & $8$ detection-evidence features $\to$ $3$ classes (\texttt{trust\_rgb} / \texttt{trust\_ir} / \texttt{trust\_both}); $400$ trees, \texttt{max\_depth}~$6$, learning rate $0.05$, subsample $0.8$, \texttt{colsample\_bytree}~$0.8$, \texttt{multi:softprob}, \texttt{tree\_method=hist}, seed $42$; argmax, no reject. \\
+        \addlinespace
+        RGB confuser filter (\texttt{mlp\_v5\_v4}) & MLP & $517$-D per detection ($5$ metadata $+$ \texttt{p3} $2{\times}2$ pool, $256$ $+$ \texttt{p5} $1{\times}1$, $256$) on the FT4 detector's features; layers $512$-$256$-$128$-$64$-$1$ with BatchNorm1d, ReLU, dropout $0.3$; focal loss ($\alpha{=}0.75$, $\gamma{=}2.0$) with label smoothing $0.1$; AdamW (weight decay $10^{-4}$), cosine LR $10^{-3}\to 10^{-5}$, $120$ epochs, batch $128$; $5$-fold CV selection; deploy threshold $P(\text{drone})\geq 0.25$. \\
+        \addlinespace
+        IR confuser filter (\texttt{mlp\_aligned\_\allowbreak thermalonly}) & MLP & Same architecture and training recipe on the \texttt{v3b} thermal detector's \texttt{p3}+\texttt{p5} features (per-modality $z$-aligned), trained directly on thermal confuser crops; deploy threshold $P(\text{drone})\geq 0.05$. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+% [source: classifier/train_robust8_noreject.py (XGBClassifier n_estimators=400, max_depth=6, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, objective=multi:softprob, tree_method=hist, random_state=42); mri/classifier.py MLPWrapper + eval/distill_v5_balanced_remine.py (hidden_dims (512,256,128,64), BatchNorm1d, dropout 0.3, focal alpha=0.75 gamma=2.0, label_smoothing 0.1, AdamW wd 1e-4, cosine LR, 120 epochs, batch 128, 5-fold CV); mri/train_aligned.py (mlp_aligned_thermalonly @0.05)]
+
 \section{Human-in-the-Loop Data Engine}
 \label{sec:hitl_method}
 
