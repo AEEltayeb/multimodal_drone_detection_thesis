@@ -428,20 +428,11 @@ Batch operations correct a contiguous segment in one step (range deletion, page-
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.9\textwidth}{\centering\vspace{1.8cm}
-        \textbf{[PLACEHOLDER: Label reviewer setup window screenshot]} The Tkinter setup window: review-mode selector (Review / Review$+$Model / Compare Labels / Auto-Label), dataset paths, confidence and \texttt{imgsz} fields, disagreement filter, and the Launch and Export-to-Dataset actions.
-    \vspace{1.8cm}}}
-    \caption{Label reviewer, setup window: the session is configured here (what to review, against which model, under which disagreement filter) before the review canvas is launched.}
-    \label{fig:label_reviewer_home}
-\end{figure}
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\parbox{0.9\textwidth}{\centering\vspace{1.8cm}
-        \textbf{[PLACEHOLDER: Label reviewer review-canvas screenshot]} The OpenCV review window on a Svanstr\"om frame: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / delete-image / range-delete / save).
-    \vspace{1.8cm}}}
-    \caption{Label reviewer, review canvas, with a Svanstr\"om frame on which V3 fires and the existing GT is missing. The reviewer's resolution path turns the disagreement into either a corrected label (positive ingest) or a hard negative (negative-mining branch).}
-    \label{fig:label_reviewer_launch}
+    \begin{subfigure}[b]{0.36\textwidth}\includegraphics[width=\textwidth]{label_reviewer_home}\caption{Setup window}\label{fig:label_reviewer_home}\end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.60\textwidth}\includegraphics[width=\textwidth]{label_reviewer_add}\caption{Review canvas}\label{fig:label_reviewer_launch}\end{subfigure}
+    \caption{The label reviewer. (a) The Tkinter setup window configures the session---what to review, against which model, under which disagreement filter---before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}
+    \label{fig:label_reviewer}
 \end{figure}
 
 \subsection{The Co-Evolution Loop}

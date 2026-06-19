@@ -103,10 +103,10 @@ The same temporal state drives a \emph{ROI fallback} in the PySide engine (\text
 
 \begin{figure}[htbp]
     \centering
-    \fbox{\parbox{0.9\textwidth}{\centering\vspace{2cm}
-        \textbf{[PLACEHOLDER: PySide6 deployment GUI]} Annotated screenshot of the deployed GUI: dual-modality view (RGB + IR side by side), per-frame trust-label readout, sliding temporal window indicator, alert banner, ROI fallback crop inset, drone-path overlay across recent frames, threshold sliders for RGB / IR / filter.
-    \vspace{2cm}}}
-    \caption{PySide6 operator GUI. The temporal smoother's state, the trust classifier's per-frame decision, and the ROI fallback crop are all surfaced for the human operator.}
+    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{gui_grayscale}\caption{Grayscale fusion}\end{subfigure}
+    \hfill
+    \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{gui_paired_thermal}\caption{Paired RGB$+$thermal fusion}\end{subfigure}
+    \caption{PySide6 operator GUI (\texttt{TALOS}) on real-video footage. The per-frame trust decision (\textsc{trust both}/RGB/IR), the confuser-filter verdict, the alert counters, and the temporal-window progress are surfaced for the operator: (a) grayscale fusion and (b) paired RGB$+$thermal fusion.}
     \label{fig:pyside_gui}
 \end{figure}
 

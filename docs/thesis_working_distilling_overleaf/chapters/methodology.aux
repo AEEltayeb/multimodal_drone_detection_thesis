@@ -73,24 +73,26 @@
 \newlabel{sec:coevolution}{{4.5.1}{43}{The Co-Evolution Problem}{subsection.4.5.1}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.5.2}Label Reviewer GUI}{44}{subsection.4.5.2}\protected@file@percent }
 \newlabel{sec:label_reviewer}{{4.5.2}{44}{Label Reviewer GUI}{subsection.4.5.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces Label reviewer, setup window: the session is configured here (what to review, against which model, under which disagreement filter) before the review canvas is launched.}}{45}{figure.caption.41}\protected@file@percent }
-\newlabel{fig:label_reviewer_home}{{4.5}{45}{Label reviewer, setup window: the session is configured here (what to review, against which model, under which disagreement filter) before the review canvas is launched}{figure.caption.41}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces Label reviewer, review canvas, with a Svanstr\"om frame on which V3 fires and the existing GT is missing. The reviewer's resolution path turns the disagreement into either a corrected label (positive ingest) or a hard negative (negative-mining branch).}}{45}{figure.caption.42}\protected@file@percent }
-\newlabel{fig:label_reviewer_launch}{{4.6}{45}{Label reviewer, review canvas, with a Svanstr\"om frame on which V3 fires and the existing GT is missing. The reviewer's resolution path turns the disagreement into either a corrected label (positive ingest) or a hard negative (negative-mining branch)}{figure.caption.42}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.3}The Co-Evolution Loop}{46}{subsection.4.5.3}\protected@file@percent }
-\newlabel{sec:hitl_ir}{{4.5.3}{46}{The Co-Evolution Loop}{subsection.4.5.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives.}}{46}{figure.caption.43}\protected@file@percent }
-\newlabel{fig:hitl_loop}{{4.7}{46}{The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives}{figure.caption.43}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.6}Reproducibility Infrastructure}{47}{section.4.6}\protected@file@percent }
-\newlabel{sec:reproducibility}{{4.6}{47}{Reproducibility Infrastructure}{section.4.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {4.7}Model MRI: Feature-Space Analysis}{47}{section.4.7}\protected@file@percent }
-\newlabel{sec:model_mri}{{4.7}{47}{Model MRI: Feature-Space Analysis}{section.4.7}{}}
+\newlabel{fig:label_reviewer_home}{{4.5a}{45}{Setup window}{figure.caption.41}{}}
+\newlabel{sub@fig:label_reviewer_home}{{a}{45}{Setup window}{figure.caption.41}{}}
+\newlabel{fig:label_reviewer_launch}{{4.5b}{45}{Review canvas}{figure.caption.41}{}}
+\newlabel{sub@fig:label_reviewer_launch}{{b}{45}{Review canvas}{figure.caption.41}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.5}{\ignorespaces The label reviewer. (a) The Tkinter setup window configures the session---what to review, against which model, under which disagreement filter---before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}}{45}{figure.caption.41}\protected@file@percent }
+\newlabel{fig:label_reviewer}{{4.5}{45}{The label reviewer. (a) The Tkinter setup window configures the session---what to review, against which model, under which disagreement filter---before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch)}{figure.caption.41}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5.3}The Co-Evolution Loop}{45}{subsection.4.5.3}\protected@file@percent }
+\newlabel{sec:hitl_ir}{{4.5.3}{45}{The Co-Evolution Loop}{subsection.4.5.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.6}{\ignorespaces The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives.}}{46}{figure.caption.42}\protected@file@percent }
+\newlabel{fig:hitl_loop}{{4.6}{46}{The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow $Review before it is augmented into the next dataset. The V5 regression (Section~\ref {sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives}{figure.caption.42}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.6}Reproducibility Infrastructure}{46}{section.4.6}\protected@file@percent }
+\newlabel{sec:reproducibility}{{4.6}{46}{Reproducibility Infrastructure}{section.4.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.7}Model MRI: Feature-Space Analysis}{46}{section.4.7}\protected@file@percent }
+\newlabel{sec:model_mri}{{4.7}{46}{Model MRI: Feature-Space Analysis}{section.4.7}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.7.1}What the Instrument Does}{47}{subsection.4.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.2}From Statistics to a Trained Filter}{48}{subsection.4.7.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4.8}{\ignorespaces Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt  {mri/results/v5\_report\_regen/report.md}.}}{48}{figure.caption.44}\protected@file@percent }
-\newlabel{fig:mri_report}{{4.8}{48}{Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt {mri/results/v5\_report\_regen/report.md}}{figure.caption.44}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.7.2}From Statistics to a Trained Filter}{47}{subsection.4.7.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4.7}{\ignorespaces Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt  {mri/results/v5\_report\_regen/report.md}.}}{48}{figure.caption.43}\protected@file@percent }
+\newlabel{fig:mri_report}{{4.7}{48}{Excerpt (verbatim) from the Model MRI's auto-generated report for the production RGB detector: the instrument states a verdict, the evidence for it, and the projected operating point of the filter it then trains. Source: \texttt {mri/results/v5\_report\_regen/report.md}}{figure.caption.43}{}}
 \@setckpt{chapters/methodology}{
-\setcounter{page}{50}
+\setcounter{page}{49}
 \setcounter{equation}{0}
 \setcounter{enumi}{6}
 \setcounter{enumii}{0}
@@ -105,7 +107,7 @@
 \setcounter{subsubsection}{0}
 \setcounter{paragraph}{0}
 \setcounter{subparagraph}{0}
-\setcounter{figure}{8}
+\setcounter{figure}{7}
 \setcounter{table}{10}
 \setcounter{float@type}{4}
 \setcounter{caption@flags}{2}
