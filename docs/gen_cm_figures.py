@@ -58,6 +58,6 @@ fig, axes = plt.subplots(1, 2, figsize=(7.4, 3.5))
 heat(axes[0], fcm(f["rgb_filter"]["drone_rgb_dataset_test"], f["rgb_filter"]["confuser_rgb_confuser"]),
      ["kept", "vetoed"], ["drone", "confuser"], "RGB filter (v4) @0.25")
 heat(axes[1], fcm(f["ir_filter"]["drone_ir_dset_final"], f["ir_filter"]["confuser_ir_confusers"]),
-     ["kept", "vetoed"], ["drone", "confuser"], "IR filter (aligned) @0.05")
+     ["kept", "vetoed"], ["drone", "confuser"], "IR filter (thermal-only) @0.05")
 fig.tight_layout(); fig.savefig(FIGS / "cm_filters.png", dpi=300); plt.close(fig)
 print("wrote cm_router.png + cm_filters.png to", FIGS)
