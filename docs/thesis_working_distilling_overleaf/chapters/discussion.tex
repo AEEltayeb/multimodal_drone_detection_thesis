@@ -22,7 +22,7 @@ Both contributions behind the components delivered measurable value. The \emph{M
 % [source: ledger=ir-version-progression,mri-v5-report-regen]
 
 \paragraph{The findings.}
-The grayscale result stands as measured: a thermal-only-trained detector, run zero-shot on grayscale-converted RGB, still detects drones when the visible channel fails, landing within $2.7$~pp F1 of the dedicated RGB detector at matched configuration ($0.580$ vs $0.607$), with higher precision and lower recall, and tying it on the hardest bird-cluttered clip. Its raw-RGB control collapses on both surfaces ($F1=0.187$ on Svanstr\"om, $0.295$ on video), isolating the single-channel conversion as the load-bearing step (Section~\ref{sec:grayscale}). Its practical payoff is a recall-preserving fallback when thermal hardware is unavailable.
+The grayscale result stands as measured: a thermal-only-trained detector, run zero-shot on grayscale-converted RGB, still detects drones when no thermal camera is available, landing within $2.7$~pp F1 of the dedicated RGB detector at matched configuration ($0.580$ vs $0.607$), with higher precision and lower recall, and tying it on the hardest bird-cluttered clip. Its raw-RGB control collapses on both surfaces ($F1=0.187$ on Svanstr\"om, $0.295$ on video), isolating the single-channel conversion as the load-bearing step (Section~\ref{sec:grayscale}). Its practical payoff is a recall-preserving fallback when thermal hardware is unavailable.
 
 \section{Threats to Validity}
 \label{sec:threats}
