@@ -220,7 +220,7 @@ The size of the difference is the reason this is protocol rather than a footnote
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\textwidth]{fig_drone_size_hist}
-    \caption{Drone size by dataset: the distribution of ground-truth \emph{box} sizes ($\sqrt{\text{area}}$ in native pixels; a sample of up to $9{,}000$ label files per dataset, $n$ in the legend counts boxes, not frames; each histogram shows the fraction of that dataset's boxes per bin). Svanstr\"om drones (median $28$~px) sit close above the YOLOv26n \texttt{imgsz=640} resolvable floor ($\sqrt{\text{area}}\approx 8$~px), with a visible sub-floor tail; small targets near the floor are where detection degrades long before the hard limit, which is why Svanstr\"om recall degrades sharply at \texttt{imgsz=640} (baseline $0.964 \to 0.684$) and resolves at \texttt{imgsz=1280} (floor $\approx 4$~px; Section~\ref{sec:resolution_arch}). Anti-UAV drones (median $93$~px) are an order of magnitude larger and supra-floor at either resolution.}
+    \caption{Drone size by dataset: the distribution of ground-truth \emph{box} sizes ($\sqrt{\text{area}}$ in native pixels; a sample of up to $9{,}000$ label files per dataset, $n$ in the legend counts boxes, not frames; each histogram shows the fraction of that dataset's boxes per bin). Svanstr\"om drones (median $28$~px) sit close above the YOLO26n \texttt{imgsz=640} resolvable floor ($\sqrt{\text{area}}\approx 8$~px), with a visible sub-floor tail; small targets near the floor are where detection degrades long before the hard limit, which is why Svanstr\"om recall degrades sharply at \texttt{imgsz=640} (baseline $0.964 \to 0.684$) and resolves at \texttt{imgsz=1280} (floor $\approx 4$~px; Section~\ref{sec:resolution_arch}). Anti-UAV drones (median $93$~px) are an order of magnitude larger and supra-floor at either resolution.}
     \label{fig:drone_size_hist}
 \end{figure}
 
@@ -324,7 +324,7 @@ Three conclusions follow. First, \emph{Anti-UAV shows no inflation at all}: ever
 \section{Training Recipes}
 \label{sec:training_recipes}
 
-All detectors are YOLOv26n (nano) single-class drone detectors; the IR detector's per-revision configuration is in Section~\ref{sec:hitl_method}.
+All detectors are YOLO26n (nano) single-class drone detectors; the IR detector's per-revision configuration is in Section~\ref{sec:hitl_method}.
 
 \begin{table}[htbp]
     \centering

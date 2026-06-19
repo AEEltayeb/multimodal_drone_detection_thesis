@@ -137,7 +137,7 @@ This appendix lists the models the thesis actually discusses: the production pic
 Model & Role & Note \\
 \midrule
 \endhead
-\multicolumn{3}{l}{\textbf{RGB detectors (YOLOv26n)}} \\
+\multicolumn{3}{l}{\textbf{RGB detectors (YOLO26n)}} \\
 \midrule
 \texttt{ft4} & \textbf{production} & SelCom-plus-confuser fine-tune; the only confuser-injection recipe that passed every drone-recall regression gate. \\
 \texttt{baseline} & comparison & Stage-1 reference; best small-drone recall at \texttt{imgsz=1280}; base for the SelCom fine-tunes. \\
@@ -145,7 +145,7 @@ Model & Role & Note \\
 \texttt{retrained\_v2} & comparison & Aggressive confuser retrain; suppresses birds but collapses Svanstr\"om drone recall to $R=0.306$. \\
 \texttt{selcom\_mixed\_ft2\_1280} & comparison & CCTV (SelCom) fine-tune weights at \texttt{imgsz=1280}. \\
 \midrule
-\multicolumn{3}{l}{\textbf{IR detectors (YOLOv26n, thermal)}} \\
+\multicolumn{3}{l}{\textbf{IR detectors (YOLO26n, thermal)}} \\
 \midrule
 \texttt{ir\_v3b} & \textbf{production} & Production IR detector; $F1=0.967$ on the fixed IR test split; two-epoch corrective fine-tune of \texttt{Final}. \\
 \texttt{Final} & comparison & Immediate parent of \texttt{v3b}; the full V2--V6 / \texttt{Final} trajectory is in Table~\ref{tab:ir_evolution}. \\
@@ -161,7 +161,7 @@ Model & Role & Note \\
 \midrule
 \multicolumn{3}{l}{\textbf{Confuser filters}} \\
 \midrule
-\texttt{mlp\_v5} (\texttt{v4} build) & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.792\to0.916$, recall $0.691\to0.887$). \\
+\texttt{mlp\_v5\_v4} & \textbf{production} & Production RGB filter: a distilled MLP on the detector's own \texttt{p3}+\texttt{p5} features, run per-frame; the \texttt{v4} bird-split build closes the \texttt{rgb\_dataset\_test} coverage gap ($F1\;0.792\to0.916$, recall $0.691\to0.887$). \\
 \texttt{mlp\_aligned\_thermalonly} & \textbf{production} & Thermal-native IR confuser filter (CBAM-trained, @0.05); held-out CBAM recall recovered $0.717\to0.967$ at FP $6$, with $94\%$ of held-out thermal confusers removed. \\
 \texttt{patch\_v2} & comparison & Superseded MobileNetV3 patch filter; audited predecessor, the \texttt{v4} RGB filter removes its last fallback role. \\
 \bottomrule
@@ -275,7 +275,7 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
 \begin{description}
     \item[C-UAS] Counter-Unmanned Aerial Systems. The defensive use-case context for this thesis.
     \item[UAV] Unmanned Aerial Vehicle, used interchangeably with ``drone'' for consumer-class quadcopters in this thesis.
-    \item[YOLO] You Only Look Once. The single-stage object-detection family~\cite{redmon2016yolo}; this thesis uses YOLOv26n via the Ultralytics framework~\cite{ultralytics2024}.
+    \item[YOLO] You Only Look Once. The single-stage object-detection family~\cite{redmon2016yolo}; this thesis uses YOLO26n via the Ultralytics framework~\cite{ultralytics2024}.
     \item[CNN] Convolutional Neural Network. The patch filter is a MobileNetV3-class CNN~\cite{howard2019mobilenetv3}.
     \item[HITL] Human-in-the-Loop. The dataset / model co-development protocol of Section~\ref{sec:hitl_ir}.
     \item[OOD] Out-Of-Distribution. Imagery drawn from a different population than the model's training distribution.
@@ -290,7 +290,8 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[sa32] \texttt{scene\_aware\_\allowbreak v3more\_\allowbreak 32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
     \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
-    \item[\texttt{mlp\_v5}] The distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; production is the \texttt{v4} bird-split build.
+    \item[\texttt{mlp\_v5\_v4}] The production distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; the \texttt{v4} bird-split re-mine closes the \texttt{rgb\_dataset\_test} coverage gap.
+    \item[\texttt{mlp\_v5\_base}] The pre-bird-split predecessor of \texttt{mlp\_v5\_v4} (Section~\ref{sec:distill_verifier}); retained only as the held-out-bird comparison baseline.
     \item[IR filter] The thermal-native IR confuser filter (Section~\ref{sec:ir_xmodal_verifier}): a single head (\texttt{mlp\_aligned\_thermalonly}, CBAM-trained, @0.05) trained directly on thermal confuser crops.
     \item[selcom\_1280] The SelCom CCTV RGB fine-tune \texttt{Yolo26n\_\allowbreak selcom\_\allowbreak mixed\_\allowbreak ft2\_1280} evaluated at \texttt{imgsz=1280}; a comparison/ablation detector (the production RGB detector is \texttt{ft4}, Section~\ref{sec:production_stack}).
     \item[selcom\_640] The same SelCom weights evaluated at \texttt{imgsz=640} (resolution-ablation variant).
@@ -389,7 +390,7 @@ The body reports the production pipeline in aggregate (Table~\ref{tab:ablation_o
         IR only (\texttt{v3b}, vs IR GT)     & 1610 &  174 &  31 & 0.903 & 0.981 & 0.940 [0.931--0.949] \\
         \midrule
         bare (both detectors)        & 3142 & 2019 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
-        filt only (\texttt{mlp\_v5}, RGB)    & 3043 &  337 & 271 & 0.900 & 0.915 & 0.908 [0.900--0.914] \\
+        filt only (\texttt{mlp\_v5\_v4}, RGB)    & 3043 &  337 & 271 & 0.900 & 0.915 & 0.908 [0.900--0.914] \\
         filt only (\texttt{aligned}, IR)     & 3142 & 2018 & 172 & 0.609 & 0.948 & 0.742 [0.730--0.754] \\
         filt only (patch)            & 3004 &  782 & 310 & 0.793 & 0.907 & 0.846 [0.836--0.855] \\
         clf only [robust8-nr]        & 3136 & 1997 &  27 & 0.611 & 0.992 & 0.756 [0.745--0.768] \\
@@ -419,7 +420,7 @@ The body reports the production pipeline in aggregate (Table~\ref{tab:ablation_o
         IR only (\texttt{v3b}, vs IR GT)     & 3775 & 133 & 173 & 0.966 & 0.956 & 0.961 [0.956--0.966] \\
         \midrule
         bare (both detectors)        & 7432 & 174 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
-        filt only (\texttt{mlp\_v5}, RGB)    & 7430 & 172 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
+        filt only (\texttt{mlp\_v5\_v4}, RGB)    & 7430 & 172 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
         filt only (\texttt{aligned}, IR)     & 7432 & 173 & 241 & 0.977 & 0.969 & 0.973 [0.970--0.976] \\
         filt only (patch)            & 7430 & 174 & 243 & 0.977 & 0.968 & 0.973 [0.970--0.976] \\
         clf only [robust8-nr]        & 7430 & 160 &  81 & 0.979 & 0.989 & 0.984 [0.981--0.986] \\
@@ -449,7 +450,7 @@ The body reports the production pipeline in aggregate (Table~\ref{tab:ablation_o
         grayscale-IR only (\texttt{v3b}, vs IR GT)    & 1113 & 375 & 1132 & 0.748 & 0.496 & 0.596 [0.576--0.616] \\
         \midrule
         RGB \texttt{ft4} $+$ grayscale-IR \texttt{v3b} & 3030 & 479 & 1460 & 0.864 & 0.675 & 0.758 [0.747--0.769] \\
-        filt only (\texttt{mlp\_v5}, RGB)        & 2820 & 443 & 1670 & 0.863 & 0.620 & 0.722 [0.715--0.739] \\
+        filt only (\texttt{mlp\_v5\_v4}, RGB)        & 2820 & 443 & 1670 & 0.863 & 0.620 & 0.722 [0.715--0.739] \\
         filt only (\texttt{aligned}, IR)         & 2796 & 418 & 1694 & 0.871 & 0.626 & 0.728 [0.715--0.736] \\
         filt only (patch)            & 2931 & 470 & 1559 & 0.862 & 0.653 & 0.743 [0.732--0.754] \\
         clf only [robust8-nr]        & 3024 & 464 &  522 & 0.867 & 0.853 & 0.860 [0.850--0.869] \\

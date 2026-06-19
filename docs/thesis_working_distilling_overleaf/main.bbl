@@ -218,7 +218,7 @@
     \field{year}{2025}
   \endentry
 
-  \entry{jiang2021antiuav}{inproceedings}{}{}
+  \entry{jiang2021antiuav}{article}{}{}
     \true{moreauthor}
     \true{morelabelname}
     \name{author}{1}{}{%
@@ -233,9 +233,12 @@
     \strng{fullhash}{JN+1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{note}{Anti-UAV RGBT benchmark dataset}
-    \field{title}{Anti-UAV: A Large Multi-Modal Benchmark for UAV Tracking}
-    \field{year}{2021}
+    \field{pages}{486\bibrangedash 500}
+    \field{title}{Anti-UAV: A Large-Scale Benchmark for Vision-Based UAV
+  Tracking}
+    \field{volume}{25}
+    \field{journaltitle}{IEEE Transactions on Multimedia}
+    \field{year}{2023}
   \endentry
 
   \entry{redmon2016yolo}{inproceedings}{}{}
@@ -287,7 +290,7 @@
     \strng{fullhash}{U1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{note}{Accessed: 2025}
+    \field{note}{Accessed: 2024}
     \field{title}{Ultralytics YOLO Documentation}
     \verb{url}
     \verb https://docs.ultralytics.com/

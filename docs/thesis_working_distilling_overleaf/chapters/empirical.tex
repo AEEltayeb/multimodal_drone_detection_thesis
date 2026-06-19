@@ -84,7 +84,7 @@ On confuser-only surfaces no drone is present; every surviving detection is a fa
 
 % tab:ablation_confusers moved to Appendix~\ref{app:full_ablation} (production-only body; full ablation in appendix).
 
-Three observations, drawn together in Figure~\ref{fig:pipeline_ablation}. First, the \emph{filter} is the decisive stage on RGB confusers: the per-frame \texttt{mlp\_v5} cuts FP detections $835 \to 39$ where the patch CNN manages only $835 \to 282$, so the feature-reuse filter is both $37$--$72\times$ faster than the CNN it replaced and ${\sim}10\times$ stronger on the surface that matters. Second, the reject class compounds with the filter, and the shipped stack trades part of that away: the reject-capable router stacks reject on top of the filter to reach $0.11\%$ ($3$ of $2{,}633$ frames), whereas the shipped always-routing router leaves that work to the filter alone at $1.4\%$ ($39$ of $2{,}633$): from nearly one frame in three at the bare detector to roughly one in seventy, the deliberate cost of the recall it recovers on clean and single-modality surfaces.
+Three observations, drawn together in Figure~\ref{fig:pipeline_ablation}. First, the \emph{filter} is the decisive stage on RGB confusers: the per-frame \texttt{mlp\_v5\_v4} cuts FP detections $835 \to 39$ where the patch CNN manages only $835 \to 282$, so the feature-reuse filter is both $37$--$72\times$ faster than the CNN it replaced and ${\sim}10\times$ stronger on the surface that matters. Second, the reject class compounds with the filter, and the shipped stack trades part of that away: the reject-capable router stacks reject on top of the filter to reach $0.11\%$ ($3$ of $2{,}633$ frames), whereas the shipped always-routing router leaves that work to the filter alone at $1.4\%$ ($39$ of $2{,}633$): from nearly one frame in three at the bare detector to roughly one in seventy, the deliberate cost of the recall it recovers on clean and single-modality surfaces.
 % [source: thesis_eval/results/tier1_results.json (rgb_confuser C_confuser)]
 
 Third, the thermal-airplane gap is now \emph{largely closed} by thermal-native filter training (Section~\ref{sec:grayscale_verifier}): on the \texttt{IR\_confusers} surface the shipped no-reject cell suppresses thermal-confuser fire from the bare $0.294$ to $0.028$ ($-90\%$). The surface is still airplane-dominated and airplanes remain every filter generation's weakest category \emph{relatively}, but they no longer ``resist'': the residual fire is the genuinely-ambiguous fraction no threshold separates from drones, not an untrained-confuser-class gap. The remaining cost is an in-distribution recall trade on airplane-like thermal drones (Section~\ref{sec:limits}), not an open suppression hole.
@@ -93,7 +93,7 @@ Third, the thermal-airplane gap is now \emph{largely closed} by thermal-native f
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig_pipeline_ablation}
-    \caption{Pipeline ablation at a glance, drawn for the reject-class \texttt{robust8} cascade (the strongest-suppression configuration; the shipped no-reject \texttt{robust8-nr} trades part of the confuser suppression for recall, Table~\ref{tab:ablation_confusers}). (a) Drone-positive paired surfaces: the router supplies most of the F1 lift and the filter finishes it; Anti-UAV confirms no-harm. Whiskers are 95\% bootstrap confidence intervals (the central range of the metric over $1{,}000$ resamples of the frames; bars whose whiskers do not overlap differ by more than sampling noise). (b) Confuser surfaces: bare $\to$ patch $\to$ \texttt{mlp\_v5} $\to$ router $\to$ composed frame fire rates, with near-total suppression on RGB ($30.4\% \to 0.11\%$ composed) and thermal-confuser fire now largely suppressed by the thermal-native filter ($29.4\% \to 2.4\%$ composed); the shipped no-reject stack delegates suppression to the filter alone and sits at $1.4\%$ on RGB. Generated from \texttt{tier1\_results.json} by \texttt{thesis\_eval/gen\_ablation\_figure.py}.}
+    \caption{Pipeline ablation at a glance, drawn for the reject-class \texttt{robust8} cascade (the strongest-suppression configuration; the shipped no-reject \texttt{robust8-nr} trades part of the confuser suppression for recall, Table~\ref{tab:ablation_confusers}). (a) Drone-positive paired surfaces: the router supplies most of the F1 lift and the filter finishes it; Anti-UAV confirms no-harm. Whiskers are 95\% bootstrap confidence intervals (the central range of the metric over $1{,}000$ resamples of the frames; bars whose whiskers do not overlap differ by more than sampling noise). (b) Confuser surfaces: bare $\to$ patch $\to$ \texttt{mlp\_v5\_v4} $\to$ router $\to$ composed frame fire rates, with near-total suppression on RGB ($30.4\% \to 0.11\%$ composed) and thermal-confuser fire now largely suppressed by the thermal-native filter ($29.4\% \to 2.4\%$ composed); the shipped no-reject stack delegates suppression to the filter alone and sits at $1.4\%$ on RGB. Generated from \texttt{tier1\_results.json} by \texttt{thesis\_eval/gen\_ablation\_figure.py}.}
     \label{fig:pipeline_ablation}
 \end{figure}
 
@@ -153,7 +153,7 @@ On the deployment-anchor surface it does. On SelCom (full $311$-image val), drop
     \label{tab:lowconf_selcom}
     \begin{tabular}{lcc}
         \toprule
-        detector floor & bare $P/R/F1$ & $+$\texttt{mlp\_v5} $P/R/F1$ \\
+        detector floor & bare $P/R/F1$ & $+$\texttt{mlp\_v5\_v4} $P/R/F1$ \\
         \midrule
         0.25 (default) & 0.858 / 0.451 / 0.591 & 0.950 / 0.451 / 0.612 \\
         0.10           & 0.658 / 0.573 / 0.612 & 0.816 / 0.573 / 0.673 \\
@@ -179,7 +179,7 @@ The mode does \emph{not} generalise to a new global default, and the sweep maps 
         stage & predecessor & production & speedup \\
         \midrule
         trust router    & \texttt{fusion\_no\_fn} 38.3 ms/frame & \texttt{robust8-nr} 0.095 ms/frame & $\sim$404$\times$ \\
-        confuser filter & patch CNN 59--112 ms/det & \texttt{mlp\_v5} 1.3--2.1 ms/det & 37--72$\times$ \\
+        confuser filter & patch CNN 59--112 ms/det & \texttt{mlp\_v5\_v4} 1.3--2.1 ms/det & 37--72$\times$ \\
         \bottomrule
     \end{tabular}}
 \end{table}
@@ -294,7 +294,7 @@ The production filter supersedes a MobileNetV3 \emph{patch} CNN; that predecesso
         \toprule
         & \multicolumn{3}{c}{Drone $F1$} & \multicolumn{3}{c}{Halluc. rate} \\
         \cmidrule(lr){2-4} \cmidrule(lr){5-7}
-        Surface & bare FT4 & + patch v2 & + \texttt{mlp\_v5} & bare & patch v2 & \texttt{mlp\_v5} \\
+        Surface & bare FT4 & + patch v2 & + \texttt{mlp\_v5\_v4} & bare & patch v2 & \texttt{mlp\_v5\_v4} \\
         \midrule
         Svanstr\"om (IoP@0.5)      & 0.596 & 0.768 & \textbf{0.861} & 0.470 & 0.163 & \textbf{0.044} \\
         Anti-UAV (IoU@0.5)         & 0.986 & 0.986 & 0.984          & 0.011 & 0.011 & \textbf{0.012} \\
@@ -317,7 +317,7 @@ That diagnosis prescribed its own fix, and the production filter implements it. 
 % [source: ledger=filter-stack-v4-thermalonly-promoted; provenance=docs/analysis/2026-06-18_filter_provenance_train_heldout.md]
 
 \paragraph{Held-out bird suppression (TEST split).}
-The RGB filter \texttt{mlp\_v5\_v4} is \emph{trained} on the v2 balanced corpus ($19{,}334$ drone / $13{,}597$ confuser: balanced \texttt{rgb\_dataset} drones from \texttt{dataset/\{train,val\}} $+$ Anti-UAV \texttt{val}/RGB; pure-SelCom mined crops with the $311$ \texttt{selcom\_val} files blocklisted; \texttt{rgb\_confusers\_merged/\{train,val\}}) \emph{plus the bird.v1i TRAIN split} ($728$ of $1{,}212$ images, $60/40$ seed-0 name split). It is \emph{evaluated} on the held-out \textbf{bird.v1i TEST split} ($484$ unseen images, $230$ bird fires): \texttt{mlp\_v5\_v4} keeps only $30/230$ ($13\%$) where the shipped \texttt{mlp\_v5} kept $91/230$ ($40\%$), so the production filter \emph{beats} its predecessor on \emph{unseen} birds (AUROC $0.981$). The four cached drone/confuser surfaces above are genuine disjoint test splits (\texttt{rgb\_dataset\_test}, \texttt{antiuav\_rgb}, \texttt{selcom\_val} by blocklist, \texttt{rgb\_confuser}); the Svanstr\"om RGB numbers are read as a shipped-vs-candidate $\Delta$. The single residual cost is $+5$ non-bird FP on the cached \texttt{rgb\_confuser} surface (Table~\ref{tab:ablation_confusers}, $29\to39$).
+The RGB filter \texttt{mlp\_v5\_v4} is \emph{trained} on the v2 balanced corpus ($19{,}334$ drone / $13{,}597$ confuser: balanced \texttt{rgb\_dataset} drones from \texttt{dataset/\{train,val\}} $+$ Anti-UAV \texttt{val}/RGB; pure-SelCom mined crops with the $311$ \texttt{selcom\_val} files blocklisted; \texttt{rgb\_confusers\_merged/\{train,val\}}) \emph{plus the bird.v1i TRAIN split} ($728$ of $1{,}212$ images, $60/40$ seed-0 name split). It is \emph{evaluated} on the held-out \textbf{bird.v1i TEST split} ($484$ unseen images, $230$ bird fires): \texttt{mlp\_v5\_v4} keeps only $30/230$ ($13\%$) where the predecessor \texttt{mlp\_v5\_base} kept $91/230$ ($40\%$), so the production filter \emph{beats} it on \emph{unseen} birds (AUROC $0.981$). The four cached drone/confuser surfaces above are genuine disjoint test splits (\texttt{rgb\_dataset\_test}, \texttt{antiuav\_rgb}, \texttt{selcom\_val} by blocklist, \texttt{rgb\_confuser}); the Svanstr\"om RGB numbers are read as a shipped-vs-candidate $\Delta$. The single residual cost is $+5$ non-bird FP on the cached \texttt{rgb\_confuser} surface (Table~\ref{tab:ablation_confusers}, $29\to39$).
 % [source: provenance=docs/analysis/2026-06-18_filter_provenance_train_heldout.md; eval=eval/eval_birdtest_heldout.py]
 
 % fig:failopen_expanded moved to Appendix~\ref{app:design_history} (design-history consolidation).
