@@ -11,13 +11,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 REPO = Path(__file__).resolve().parent.parent
-R = json.load(open(REPO / "thesis_eval/results/tier1_results.json"))
+R = json.load(open(REPO / "thesis_eval/results_noreject/tier1_results.json"))
 FIGDIR = REPO / "docs/thesis_working_distilling_overleaf/figures"
 
-CELLS_A = [("bare", "bare"), ("clf[robust8]", "+ router"), ("clf->filt[robust8]", "+ filter\n(production)")]
+CELLS_A = [("bare", "bare"), ("clf[robust8_nr_drop]", "+ router"), ("filt->clf[robust8_nr_drop]", "+ filter\n(production)")]
 SURF_A = [("svanstrom", "Svanström (IoP@0.5)"), ("antiuav", "Anti-UAV (IoU@0.5)")]
 CELLS_B = [("bare", "bare"), ("filt_patch", "patch"), ("filt_mlp", "mlp_v5_v4"),
-           ("clf[robust8]", "router"), ("clf->filt[robust8]", "composed")]
+           ("clf[robust8_nr_drop]", "router"), ("filt->clf[robust8_nr_drop]", "composed")]
 SURF_B = [("rgb_confuser", "RGB confusers"), ("ir_confusers", "IR confusers")]
 C = {"bare": "#9e9e9e", "patch": "#7fa8d9", "mlp_v5_v4": "#2e7d32", "router": "#f0a050", "composed": "#1a4e8a",
      "+ router": "#f0a050", "+ filter\n(production)": "#1a4e8a"}
