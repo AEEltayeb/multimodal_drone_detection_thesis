@@ -28,7 +28,7 @@
 \contentsline {section}{\numberline {3.4}Temporal Smoother}{19}{section.3.4}%
 \contentsline {section}{\numberline {3.5}Resolution Dependency}{20}{section.3.5}%
 \contentsline {section}{\numberline {3.6}RGB Drone Detector}{20}{section.3.6}%
-\contentsline {subsection}{\numberline {3.6.1}Three Training Stances}{20}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.1}Three Training Stances}{21}{subsection.3.6.1}%
 \contentsline {subsection}{\numberline {3.6.2}SelCom CCTV Fine-Tune}{22}{subsection.3.6.2}%
 \contentsline {section}{\numberline {3.7}IR Drone Detector}{22}{section.3.7}%
 \contentsline {subsection}{\numberline {3.7.1}Grayscale-RGB Operating Mode}{22}{subsection.3.7.1}%
@@ -46,10 +46,10 @@
 \contentsline {section}{\numberline {3.9}The Confuser Filter}{27}{section.3.9}%
 \contentsline {chapter}{\numberline {4}Experimental Methodology}{30}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Datasets and Their Roles}{30}{section.4.1}%
-\contentsline {subsection}{\numberline {4.1.1}Composite RGB Training Corpus (\texttt {rgb\_dataset})}{32}{subsection.4.1.1}%
-\contentsline {subsection}{\numberline {4.1.2}Confuser Hard-Negative Corpus}{32}{subsection.4.1.2}%
-\contentsline {subsection}{\numberline {4.1.3}IR Detector Corpus (\texttt {ir\_dset\_final})}{35}{subsection.4.1.3}%
-\contentsline {subsection}{\numberline {4.1.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{36}{subsection.4.1.4}%
+\contentsline {subsection}{\numberline {4.1.1}Composite RGB Training Dataset (\texttt {rgb\_dataset})}{32}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Confuser Hard-Negative Dataset}{32}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}IR Detector Dataset (\texttt {ir\_dset\_final})}{35}{subsection.4.1.3}%
+\contentsline {subsection}{\numberline {4.1.4}Thermal Confuser Dataset (\texttt {IR\_confusers})}{36}{subsection.4.1.4}%
 \contentsline {subsection}{\numberline {4.1.5}Svanstr\"om Paired (\texttt {svanstrom})}{36}{subsection.4.1.5}%
 \contentsline {subsection}{\numberline {4.1.6}Anti-UAV RGBT (\texttt {antiuav})}{36}{subsection.4.1.6}%
 \contentsline {subsection}{\numberline {4.1.7}SelCom CCTV (\texttt {selcom\_cctv})}{37}{subsection.4.1.7}%
@@ -127,10 +127,10 @@
 \contentsline {section}{\numberline {7.1}Production Stack}{74}{section.7.1}%
 \contentsline {section}{\numberline {7.2}Outlook}{75}{section.7.2}%
 \contentsline {chapter}{\numberline {A}Datasets in Detail}{76}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Composite RGB Training Corpus}{76}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Corpus}{76}{section.A.2}%
-\contentsline {section}{\numberline {A.3}IR Detector Corpus}{77}{section.A.3}%
-\contentsline {section}{\numberline {A.4}Thermal Confuser Corpus (\texttt {IR\_confusers})}{77}{section.A.4}%
+\contentsline {section}{\numberline {A.1}Composite RGB Training Dataset}{76}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Confuser Hard-Negative Dataset}{76}{section.A.2}%
+\contentsline {section}{\numberline {A.3}IR Detector Dataset}{77}{section.A.3}%
+\contentsline {section}{\numberline {A.4}Thermal Confuser Dataset (\texttt {IR\_confusers})}{77}{section.A.4}%
 \contentsline {section}{\numberline {A.5}Svanstr\"om Paired}{77}{section.A.5}%
 \contentsline {section}{\numberline {A.6}Anti-UAV RGBT}{78}{section.A.6}%
 \contentsline {section}{\numberline {A.7}DUT Anti-UAV}{78}{section.A.7}%

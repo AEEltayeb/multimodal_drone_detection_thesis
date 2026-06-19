@@ -254,7 +254,7 @@ def _ints9(pat):
     return [int(g.replace("{,}", "")) for g in m.groups()] if m else []
 _t9 = _ints9(r"\$(3\d\{,\}\d{3})\$ \\texttt\{ft4\} features \(\$(\d\d\{,\}\d{3})\$ drone / \$(\d\d\{,\}\d{3})\$ confuser")
 _r9 = _ints9(r"in all \$(3\d\{,\}\d{3})\$ detections \(\$(\d\d\{,\}\d{3})\$ drone / \$(\d\d\{,\}\d{3})\$ confuser")
-_b9 = _ints9(r"the \$(3\d\{,\}\d{3})\$ above is that same corpus")
+_b9 = _ints9(r"the \$(3\d\{,\}\d{3})\$ above is that same dataset")
 CHECKS += [
     ("CONSIST table v4 total = drone+confuser",   _t9[0] if _t9 else -1, (_t9[1] + _t9[2]) if _t9 else -2),
     ("CONSIST sec3.9 v4 total = drone+confuser",  _r9[0] if _r9 else -1, (_r9[1] + _r9[2]) if _r9 else -2),

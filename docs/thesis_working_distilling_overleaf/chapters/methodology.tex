@@ -6,7 +6,7 @@ This chapter establishes everything the evaluation consumes: the datasets and th
 \section{Datasets and Their Roles}
 \label{sec:datasets}
 
-The evaluation uses eight labelled corpora and a 19-clip YouTube real-video set, drawn from public benchmarks, Roboflow / Kaggle sources, and the deployment partner's CCTV stream. Each corpus plays one declared role: a training surface, an in-distribution test surface, or an out-of-distribution (OOD) stress surface. Full provenance is in Appendix~\ref{app:datasets}.
+The evaluation uses eight labelled datasets and a 19-clip YouTube real-video set, drawn from public benchmarks, Roboflow / Kaggle sources, and the deployment partner's CCTV stream. Each dataset plays one declared role: a training surface, an in-distribution test surface, or an out-of-distribution (OOD) stress surface. Full provenance is in Appendix~\ref{app:datasets}.
 
 \begin{table}[htbp]
     \centering
@@ -18,7 +18,7 @@ The evaluation uses eight labelled corpora and a 19-clip YouTube real-video set,
         \toprule
         Tag & Frames & Train / val / test & Modality & Role \\
         \midrule
-        \texttt{rgb\_dataset} (composite RGB corpus) & 172,022 & 137{,}506 / 17{,}307 / 17{,}209 & RGB & RGB-detector train + in-distribution test \\
+        \texttt{rgb\_dataset} (composite RGB dataset) & 172,022 & 137{,}506 / 17{,}307 / 17{,}209 & RGB & RGB-detector train + in-distribution test \\
         \texttt{ir\_dset\_final} & 129,130 & 107{,}809 / 11{,}709 / 9{,}612 & IR & IR-detector train + in-distribution test \\
         \texttt{rgb\_confusers\_merged} & 27,024 & 21{,}784 / 2{,}607 / 2{,}633 & RGB & Confuser hard-negative training source + OOD confuser test (test split; see Section~\ref{sec:ds_confusers} for the per-model OOD status) \\
         \texttt{IR\_confusers} & 5,938 & --- (eval-only) & IR & OOD thermal-confuser test (airplane 4{,}281 / bird 1{,}200 / helicopter 457; evaluated split 5{,}237); no training contribution \\
@@ -41,22 +41,22 @@ The evaluation uses eight labelled corpora and a 19-clip YouTube real-video set,
     \label{fig:dataset_montage}
 \end{figure}
 
-\subsection{Composite RGB Training Corpus (\texttt{rgb\_dataset})}
+\subsection{Composite RGB Training Dataset (\texttt{rgb\_dataset})}
 \label{sec:ds_rgb_corpus}
 
-The RGB detector's training and in-distribution test corpus is a composite of nine public sources totalling 172{,}022 frames split 80/10/10 (137{,}506 train, 17{,}307 val, 17{,}209 test), sequence-disjoint. Of these, 134{,}339 (78.1\%) carry at least one drone box and 37{,}683 (21.9\%) are background negatives; the corpus contains 146{,}540 drone-class boxes. Per-source breakdown:
+The RGB detector's training and in-distribution test dataset is a composite of nine public sources totalling 172{,}022 frames split 80/10/10 (137{,}506 train, 17{,}307 val, 17{,}209 test), sequence-disjoint. Of these, 134{,}339 (78.1\%) carry at least one drone box and 37{,}683 (21.9\%) are background negatives; the dataset contains 146{,}540 drone-class boxes. Per-source breakdown:
 % [source: dataset=rgb_dataset; file=rgb_dataset/dataset.yaml (filename-prefix manifest)]
 
 \begin{table}[htbp]
     \centering
-    \caption{Per-source composition of the composite RGB training corpus. Negatives include VIRAT surveillance, UA-DETRAC traffic, and BDD100K driving frames as background contrast.}
+    \caption{Per-source composition of the composite RGB training dataset. Negatives include VIRAT surveillance, UA-DETRAC traffic, and BDD100K driving frames as background contrast.}
     \label{tab:ds_rgb_components}
     \begin{tabular}{lrp{7.2cm}}
         \toprule
         Source prefix & Count & Description \\
         \midrule
         \texttt{anti}                 & 59{,}413 & Anti-UAV benchmark (CVPR 2020 / 2021)~\cite{jiang2021antiuav} RGB frames \\
-        \texttt{wosdetc}              & 53{,}259 & WosDetC drone corpus \\
+        \texttt{wosdetc}              & 53{,}259 & WosDetC drone dataset \\
         \texttt{anti-muav-roboflow}   & 14{,}652 & Anti-mUAV Roboflow community variant \\
         \texttt{AirBird}              & 10{,}000 & AirBird drone-vs-bird dataset (supplies bird negatives at training time) \\
         \texttt{FBD-SV}               &  9{,}754 & Fine-grained Bird Detection (Sky View) \\
@@ -71,17 +71,17 @@ The RGB detector's training and in-distribution test corpus is a composite of ni
     \end{tabular}
 \end{table}
 
-The bird hard negatives that make the baseline meaningful rather than a strawman come from three channels: the dedicated \texttt{AirBird} subset, the bird-focused \texttt{FBD-SV} video frames, and the bird instances of \texttt{WosDetC}, all treated as background during training. \emph{No Svanstr\"om frames of any class appear in this corpus}, nor in any other RGB training corpus of this thesis (the fine-tune chain adds SelCom and non-Svanstr\"om confuser material only, Section~\ref{sec:selcom_finetune}); Svanstr\"om is therefore fully out-of-distribution for every RGB detector variant, drones and confusers alike (Section~\ref{sec:svanstrom_audit}).
+The bird hard negatives that make the baseline meaningful rather than a strawman come from three channels: the dedicated \texttt{AirBird} subset, the bird-focused \texttt{FBD-SV} video frames, and the bird instances of \texttt{WosDetC}, all treated as background during training. \emph{No Svanstr\"om frames of any class appear in this dataset}, nor in any other RGB training dataset of this thesis (the fine-tune chain adds SelCom and non-Svanstr\"om confuser material only, Section~\ref{sec:selcom_finetune}); Svanstr\"om is therefore fully out-of-distribution for every RGB detector variant, drones and confusers alike (Section~\ref{sec:svanstrom_audit}).
 % [source: G:/drone/dataset/dataset/dataset.yaml (source prefixes: no svan); training/dataset_preparation/build_selcom_confuser_ft4.py ("No Svanström data in training"); D:/Downloads/Drone_detection_report.pdf §2.1 (WosDetC birds as background; FBD-SV as FP suppression)]
 
-\subsection[Confuser Hard-Negative Corpus]{Confuser Hard-Negative Corpus (\texttt{rgb\_confusers\allowbreak\_merged})}
+\subsection[Confuser Hard-Negative Dataset]{Confuser Hard-Negative Dataset (\texttt{rgb\_confusers\allowbreak\_merged})}
 \label{sec:ds_confusers}
 
 The hard-negative training source for the hard-negative and aggressively-retrained detectors, and the OOD RGB-confuser test split. 27{,}024 images, all with empty YOLO labels, from seven sources split 80/10/10 (21{,}784 train, 2{,}607 val, 2{,}633 test). Sources without existing splits were divided by video / sequence ID to prevent temporal leakage (per-source split policy in Appendix~\ref{app:datasets}).
 
 \begin{table}[htbp]
     \centering
-    \caption{Per-source composition of the RGB confuser hard-negative corpus. The test split (right column) is the \emph{OOD RGB-confuser} evaluation surface used in Chapter~\ref{ch:hitl}.}
+    \caption{Per-source composition of the RGB confuser hard-negative dataset. The test split (right column) is the \emph{OOD RGB-confuser} evaluation surface used in Chapter~\ref{ch:hitl}.}
     \label{tab:ds_confusers}
     \begin{tabular}{llrrr}
         \toprule
@@ -100,18 +100,18 @@ The hard-negative training source for the hard-negative and aggressively-retrain
     \end{tabular}
 \end{table}
 
-Hard-negative mining for \texttt{retrained\_v2} (Section~\ref{sec:rgb_three_variants}) ran the baseline detector over all 27{,}024 confuser images, retained the 11{,}729 (43.4\%) on which it hallucinated, and merged those with the composite RGB corpus to produce the 183{,}751-image \texttt{retrain\_dataset}.
+Hard-negative mining for \texttt{retrained\_v2} (Section~\ref{sec:rgb_three_variants}) ran the baseline detector over all 27{,}024 confuser images, retained the 11{,}729 (43.4\%) on which it hallucinated, and merged those with the composite RGB dataset to produce the 183{,}751-image \texttt{retrain\_dataset}.
 % [source: dataset=rgb_confusers_merged; file=rgb_confusers_merged/dataset_documentation.md (hard-negative mining stat)]
 
-What ``out-of-distribution'' means on this corpus's test split is \emph{per-model}, and the tally matters. Of the 2{,}633 test frames, 1{,}754 (66.6\%) are Svanstr\"om-sourced (airplane 1{,}034, helicopter 311, bird 409) and 879 (33.4\%) come from the Roboflow/Kaggle sources. For the baseline detector the whole split is fully OOD (its only confuser exposure is bird negatives, Section~\ref{sec:ds_rgb_corpus}). For the hard-negative and aggressively-retrained detectors the corpus is their hard-negative \emph{training} source, so the test split is held-out in-distribution material for them, not OOD. For the production detector, whose confuser hard-negatives explicitly excluded Svanstr\"om (a $\leq$8\% injection mined only from frames it hallucinated on), the Svanstr\"om two-thirds is fully OOD and the remaining third shares source pools with its hard-negative set but is sequence-disjoint. The headline suppression numbers of Chapter~\ref{ch:hitl} are production-detector numbers and carry this status.
+What ``out-of-distribution'' means on this dataset's test split is \emph{per-model}, and the tally matters. Of the 2{,}633 test frames, 1{,}754 (66.6\%) are Svanstr\"om-sourced (airplane 1{,}034, helicopter 311, bird 409) and 879 (33.4\%) come from the Roboflow/Kaggle sources. For the baseline detector the whole split is fully OOD (its only confuser exposure is bird negatives, Section~\ref{sec:ds_rgb_corpus}). For the hard-negative and aggressively-retrained detectors the dataset is their hard-negative \emph{training} source, so the test split is held-out in-distribution material for them, not OOD. For the production detector, whose confuser hard-negatives explicitly excluded Svanstr\"om (a $\leq$8\% injection mined only from frames it hallucinated on), the Svanstr\"om two-thirds is fully OOD and the remaining third shares source pools with its hard-negative set but is sequence-disjoint. The headline suppression numbers of Chapter~\ref{ch:hitl} are production-detector numbers and carry this status.
 % [source: tab:ds_confusers test column (1,034+311+409=1,754 svan of 2,633); training/dataset_preparation/build_selcom_confuser_ft4.py (no-Svanström safeguard, <=8% ratio, mined-only)]
 
-Because the corpora are single-class (drone), confuser images carry no boxes; the category of every confuser frame lives in its \emph{filename} (source prefix), which is how the per-category fire rates of Chapter~\ref{ch:hitl} are computed. Figure~\ref{fig:confuser_examples} shows representative frames from both confuser corpora, picked as the highest-confidence detector-fired frame per category; Figure~\ref{fig:confuser_fp_examples} shows the resulting hallucinations themselves, with the production confuser filter's verdict on each.
+Because the datasets are single-class (drone), confuser images carry no boxes; the category of every confuser frame lives in its \emph{filename} (source prefix), which is how the per-category fire rates of Chapter~\ref{ch:hitl} are computed. Figure~\ref{fig:confuser_examples} shows representative frames from both confuser datasets, picked as the highest-confidence detector-fired frame per category; Figure~\ref{fig:confuser_fp_examples} shows the resulting hallucinations themselves, with the production confuser filter's verdict on each.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig_confuser_examples}
-    \caption{What the confuser corpora look like. Top: \texttt{rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt{New\_Dataset} source, labelled ``other''). Bottom: \texttt{IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples.}
+    \caption{What the confuser datasets look like. Top: \texttt{rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt{New\_Dataset} source, labelled ``other''). Bottom: \texttt{IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples.}
     \label{fig:confuser_examples}
 \end{figure}
 % [source: thesis_eval/gen_dataset_figures.py (fired-frame picks from thesis_eval/cache)]
@@ -119,12 +119,12 @@ Because the corpora are single-class (drone), confuser images carry no boxes; th
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig_confuser_fp_examples}
-    \caption{Representative \texttt{ft4} hallucinations on the OOD confuser corpus (context crops around the detection; red box $=$ false positive). Detector confidences are high ($0.82$--$0.86$) while the confuser filter's $P(\text{drone})$ on the same detections is $0.001$--$0.077$: every example shown is suppressed at the production threshold ($0.25$). This is the per-detection discrimination the detector's decision head cannot express without recall cost.}
+    \caption{Representative \texttt{ft4} hallucinations on the OOD confuser dataset (context crops around the detection; red box $=$ false positive). Detector confidences are high ($0.82$--$0.86$) while the confuser filter's $P(\text{drone})$ on the same detections is $0.001$--$0.077$: every example shown is suppressed at the production threshold ($0.25$). This is the per-detection discrimination the detector's decision head cannot express without recall cost.}
     \label{fig:confuser_fp_examples}
 \end{figure}
 % [source: thesis_eval/gen_dataset_figures.py (cached detections + mlp_v5 probabilities)]
 
-\subsection{IR Detector Corpus (\texttt{ir\_dset\_final})}
+\subsection{IR Detector Dataset (\texttt{ir\_dset\_final})}
 \label{sec:ds_ir}
 
 129{,}130 thermal frames split 83.5 / 9.1 / 7.4 (107{,}809 train, 11{,}709 val, 9{,}612 test); 72.5\% positive / 27.5\% negative (94{,}142 drone-class boxes). Single-class (\texttt{drone}). Sources by filename prefix:
@@ -138,7 +138,7 @@ Because the corpora are single-class (drone), confuser images carry no boxes; th
         \toprule
         Prefix & Count & Description \\
         \midrule
-        \texttt{dv5}    & 53{,}512 & Thermal drone sequences, dataset version 5 (the corpus state graduated by the V5-era HITL round); includes the Anti-UAV-derived material audited in Section~\ref{sec:svanstrom_audit} \\
+        \texttt{dv5}    & 53{,}512 & Thermal drone sequences, dataset version 5 (the dataset state graduated by the V5-era HITL round); includes the Anti-UAV-derived material audited in Section~\ref{sec:svanstrom_audit} \\
         \texttt{cst}    & 22{,}957 & CST thermal captures \\
         \texttt{svan}   & 21{,}637 & Svanstr\"om IR drone partition \\
         \texttt{czoom}  &  9{,}808 & CZoom thermal zoom sequences (train only) \\
@@ -154,14 +154,14 @@ Because the corpora are single-class (drone), confuser images carry no boxes; th
     \end{tabular}
 \end{table}
 
-Bird, airplane, and helicopter thermal frames enter across HITL revisions (Section~\ref{sec:hitl_method}) as the IR detector hallucinates on confuser scenes. The thermal confuser problem is real but differently shaped from the visible one: on the shared Svanstr\"om confuser sequences the production IR detector fires on only $0$--$1.7\%$ of frames where the RGB detector fires on $65$--$74\%$, while on the dedicated thermal confuser corpus its residual fire is $29.4\%$ and airplane-dominated ($35.2\%$ airplanes, $12.2\%$ birds, $0\%$ helicopters; Table~\ref{tab:ablation_confusers}). The \texttt{sea} and sky/building negatives are similarly mined, and they hold: on the $1{,}400$ negative frames of the evaluated test split (the same mined scene types) the production detector fires on $1.6\%$ of frames ($38$ false detections). Source prefixes of the form \texttt{dv$N$} record the \emph{dataset version} at which material entered: the corpus co-evolved with the model, each HITL round graduating a new dataset version alongside its model revision, so \texttt{dv5} is the corpus state assembled in the V5-era round. This table is the state at the production \texttt{v3b} checkpoint; earlier revisions (V2--V5) operated on smaller variants of the same source families.
+Bird, airplane, and helicopter thermal frames enter across HITL revisions (Section~\ref{sec:hitl_method}) as the IR detector hallucinates on confuser scenes. The thermal confuser problem is real but differently shaped from the visible one: on the shared Svanstr\"om confuser sequences the production IR detector fires on only $0$--$1.7\%$ of frames where the RGB detector fires on $65$--$74\%$, while on the dedicated thermal confuser dataset its residual fire is $29.4\%$ and airplane-dominated ($35.2\%$ airplanes, $12.2\%$ birds, $0\%$ helicopters; Table~\ref{tab:ablation_confusers}). The \texttt{sea} and sky/building negatives are similarly mined, and they hold: on the $1{,}400$ negative frames of the evaluated test split (the same mined scene types) the production detector fires on $1.6\%$ of frames ($38$ false detections). Source prefixes of the form \texttt{dv$N$} record the \emph{dataset version} at which material entered: the dataset co-evolved with the model, each HITL round graduating a new dataset version alongside its model revision, so \texttt{dv5} is the dataset state assembled in the V5-era round. This table is the state at the production \texttt{v3b} checkpoint; earlier revisions (V2--V5) operated on smaller variants of the same source families.
 % [source: thesis_eval/results/failure_profile_results.json (svan v3b confuser-seqs); tier1_results.json + notes_round1_results.json (ir_confusers 0.2943; CAT 0.352/0.1217/0.0)]
 % [source: eval=notes_negative_frame_fire; thesis_eval/results/negative_frame_fire.json (1400 neg frames, fire 0.0164, 38 FP)]
 
-\subsection{Thermal Confuser Corpus (\texttt{IR\_confusers})}
+\subsection{Thermal Confuser Dataset (\texttt{IR\_confusers})}
 \label{sec:ds_ir_confusers}
 
-The thermal counterpart of the RGB confuser zoo: a 5{,}938-frame corpus of thermal aerial-confuser frames with no drones (4{,}281 airplane, 1{,}200 bird, 457 helicopter), exported from Roboflow-hosted thermal confuser video; source streams fully disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split contains 5{,}237 frames, sampled to $4{,}000$ by even spread (3{,}043 airplane / 871 bird / 86 helicopter). Every detection on this surface is a false positive by construction. It contributes no training data to any model and serves exactly one purpose: the OOD stress test of the IR branch (the thermal analogue of the \texttt{rgb\_confusers\_merged} test split). It supersedes the 180-frame CBAM probe used during development. CBAM is a Roboflow-hosted thermal aerial-confuser dataset of ${\sim}1{,}775$ frames (bird / drone / airplane; the name comes from the CBAM TF-Net model the dataset ships with), from which a 180-frame confuser probe was sampled. That probe's \texttt{valid} split remains the \emph{held-out} recall-recovery gate for the thermal-native filter's training (\texttt{mlp\_aligned\_thermalonly}, Section~\ref{sec:ir_xmodal_verifier}): \texttt{IR\_confusers} postdates that training, and the CBAM \texttt{valid} split is disjoint from the CBAM \texttt{train} drones the filter is trained on.
+The thermal counterpart of the RGB confuser zoo: a 5{,}938-frame dataset of thermal aerial-confuser frames with no drones (4{,}281 airplane, 1{,}200 bird, 457 helicopter), exported from Roboflow-hosted thermal confuser video; source streams fully disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split contains 5{,}237 frames, sampled to $4{,}000$ by even spread (3{,}043 airplane / 871 bird / 86 helicopter). Every detection on this surface is a false positive by construction. It contributes no training data to any model and serves exactly one purpose: the OOD stress test of the IR branch (the thermal analogue of the \texttt{rgb\_confusers\_merged} test split). It supersedes the 180-frame CBAM probe used during development. CBAM is a Roboflow-hosted thermal aerial-confuser dataset of ${\sim}1{,}775$ frames (bird / drone / airplane; the name comes from the CBAM TF-Net model the dataset ships with), from which a 180-frame confuser probe was sampled. That probe's \texttt{valid} split remains the \emph{held-out} recall-recovery gate for the thermal-native filter's training (\texttt{mlp\_aligned\_thermalonly}, Section~\ref{sec:ir_xmodal_verifier}): \texttt{IR\_confusers} postdates that training, and the CBAM \texttt{valid} split is disjoint from the CBAM \texttt{train} drones the filter is trained on.
 % [source: knowledge/ledger.csv ir_ood_cbam_raw (1,775 train+val frames); dataset G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net*]
 % [source: dataset=IR_confusers; dir=G:/drone/IR_confusers/images/train (5,237 files; Roboflow .rf-hash exports, airplane_train__*_thermal* naming); registry total 5,938 = 4281/1200/457]
 
@@ -173,13 +173,13 @@ The Svanstr\"om dataset~\cite{svanstrom2021real,svanstrom2022dronedataset} is th
 \subsection{Anti-UAV RGBT (\texttt{antiuav})}
 \label{sec:ds_antiuav}
 
-The Anti-UAV RGBT benchmark~\cite{jiang2021antiuav,zhao2023antiuav} provides large-scale paired RGB+IR sequences ($1920{\times}1080$ RGB, $640{\times}512$ IR). Both modalities perform near ceiling on it (Chapter~\ref{ch:hitl}); 59{,}413 Anti-UAV RGB frames also appear in the RGB training corpus. Anti-UAV is therefore used as a \emph{no-harm control}: a strong result here is necessary but not sufficient, and the pipeline must not degrade it. Svanstr\"om and the confuser surfaces do the discriminating work.
+The Anti-UAV RGBT benchmark~\cite{jiang2021antiuav,zhao2023antiuav} provides large-scale paired RGB+IR sequences ($1920{\times}1080$ RGB, $640{\times}512$ IR). Both modalities perform near ceiling on it (Chapter~\ref{ch:hitl}); 59{,}413 Anti-UAV RGB frames also appear in the RGB training dataset. Anti-UAV is therefore used as a \emph{no-harm control}: a strong result here is necessary but not sufficient, and the pipeline must not degrade it. Svanstr\"om and the confuser surfaces do the discriminating work.
 % [source: ledger=antiuav-saturated]
 
 \subsection{SelCom CCTV (\texttt{selcom\_cctv})}
 \label{sec:ds_selcom}
 
-The deployment-partner corpus: a fixed-camera RGB stream ($1920{\times}1080$, 25~fps, $\sim$1:30 source clip) covering an urban perimeter. 2{,}076 frames (1{,}953 drone-positive + 123 true negatives), median drone $\sqrt{\text{area}} \approx 36.8$~px ($\sim$12~px at \texttt{imgsz=640}, $\sim$24~px at 1280). Drones blend into urban clutter, making SelCom a clutter-bound rather than purely pixel-bound regime. The \texttt{selcom\_mixed\_ft2\_val} surface (311 images, 295 GT boxes) is a pure-SelCom 15\% held-out split (seed~0); the SelCom fine-tunes (Section~\ref{sec:selcom_finetune}) train on the remaining frames mixed 20:80 with general RGB. The footage was provided by the partner for development; the system itself is not deployed at the site, and no thermal channel exists there.
+The deployment-partner dataset: a fixed-camera RGB stream ($1920{\times}1080$, 25~fps, $\sim$1:30 source clip) covering an urban perimeter. 2{,}076 frames (1{,}953 drone-positive + 123 true negatives), median drone $\sqrt{\text{area}} \approx 36.8$~px ($\sim$12~px at \texttt{imgsz=640}, $\sim$24~px at 1280). Drones blend into urban clutter, making SelCom a clutter-bound rather than purely pixel-bound regime. The \texttt{selcom\_mixed\_ft2\_val} surface (311 images, 295 GT boxes) is a pure-SelCom 15\% held-out split (seed~0); the SelCom fine-tunes (Section~\ref{sec:selcom_finetune}) train on the remaining frames mixed 20:80 with general RGB. The footage was provided by the partner for development; the system itself is not deployed at the site, and no thermal channel exists there.
 % [source: dataset=selcom_cctv; file=SelCom CCTV manifest (see Section~\ref{sec:ds_selcom})]
 
 \subsection{YouTube Real-Video Diagnostic (19 Clips)}
@@ -190,7 +190,7 @@ The deployment-partner corpus: a fixed-camera RGB stream ($1920{\times}1080$, 25
 \section{Evaluation Protocol}
 \label{sec:eval_protocol}
 
-Every number in this thesis is produced under one declared protocol: a single canonical configuration per dataset, per-modality trust-aware scoring, frame counts printed with every result, and bootstrap confidence intervals on headline cells. Evaluation uses held-out test splits, and the out-of-distribution surfaces (the confuser corpora and the real-video benchmark) are held out of all training. This section states the protocol once so the result tables do not have to re-justify it.
+Every number in this thesis is produced under one declared protocol: a single canonical configuration per dataset, per-modality trust-aware scoring, frame counts printed with every result, and bootstrap confidence intervals on headline cells. Evaluation uses held-out test splits, and the out-of-distribution surfaces (the confuser datasets and the real-video benchmark) are held out of all training. This section states the protocol once so the result tables do not have to re-justify it.
 
 \subsection{Metrics and the IoP Rule}
 \label{sec:metrics}
@@ -224,7 +224,7 @@ The size of the difference is the reason this is protocol rather than a footnote
     \label{fig:drone_size_hist}
 \end{figure}
 
-\textbf{Frame budgets.} Surfaces are evaluated in full when they contain $\leq$4{,}000 frames; larger surfaces are sampled by an \emph{even spread} across the whole corpus (every frame index on a uniform grid, never a truncated prefix, which silently biases toward the alphabetical head of a sorted directory) capped at $\approx$4{,}000 frames. The realised $n$ and the source size are printed with every table.
+\textbf{Frame budgets.} Surfaces are evaluated in full when they contain $\leq$4{,}000 frames; larger surfaces are sampled by an \emph{even spread} across the whole dataset (every frame index on a uniform grid, never a truncated prefix, which silently biases toward the alphabetical head of a sorted directory) capped at $\approx$4{,}000 frames. The realised $n$ and the source size are printed with every table.
 
 \begin{table}[htbp]
     \centering
@@ -261,7 +261,7 @@ The two detectors run once per surface, and every downstream comparison reuses t
 \section{Training--Evaluation Overlap Audit}
 \label{sec:svanstrom_audit}
 
-The two paired evaluation surfaces share data with the training corpora of some pipeline components. This section measures that overlap per component, then evaluates the pipeline on a \emph{held-out clean split} to quantify what the overlap is worth. The headline numbers of this thesis remain the full-surface figures; the clean split is the control that bounds their inflation.
+The two paired evaluation surfaces share data with the training datasets of some pipeline components. This section measures that overlap per component, then evaluates the pipeline on a \emph{held-out clean split} to quantify what the overlap is worth. The headline numbers of this thesis remain the full-surface figures; the clean split is the control that bounds their inflation.
 
 \begin{table}[htbp]
     \centering
@@ -273,7 +273,7 @@ The two paired evaluation surfaces share data with the training corpora of some 
         \toprule
         Component & Svanstr\"om eval & Anti-UAV eval \\
         \midrule
-        RGB detector (\texttt{ft4})  & Clean (no Svanstr\"om in any RGB corpus) & In-distribution: RGB corpus holds material \\
+        RGB detector (\texttt{ft4})  & Clean (no Svanstr\"om in any RGB dataset) & In-distribution: RGB dataset holds material \\
                                      &                                          & from all 91 eval segments (16.0\% exact frames) \\
         IR detector (\texttt{v3b})   & 17{,}314 train frames ($+$1{,}325 zoom-aug.); & 22{,}603 train frames; 30 of 90 eval \\
                                      & 37.3\% of eval frames are exact train images & segments; 6.3\% exact train images \\
@@ -290,7 +290,7 @@ The two paired evaluation surfaces share data with the training corpora of some 
 % [source: runs/clean_split/README.md + thesis_eval/results/leakage_controlled.json derived (svan_full_train_frames 17314, czoom 1325, auv 22603, exact svan 10722/28710=37.3%, auv subset 6.3%, router 214/61); RGB-side check: G:/drone/dataset/dataset train holds 59,226 anti_uav_* frames over 318 segments incl. all 91 eval segments, 13,676 exact visible frames (16.0%)]
 % [source: mri/train_aligned.py GROUPS (thermal head mlp_aligned_thermalonly: svanstrom IR crops in training; Anti-UAV val split, val/test segment overlap = 0); knowledge/models.csv mlp_v5_balanced_v4 (rgb_dataset/rgb_confusers train+val, pure selcom, bird.v1i train)]
 
-\paragraph{The held-out clean split.} The overlap is at \emph{sequence} level, so excluding individual frames is not a sufficient control: the IR training corpus holds stride-sampled siblings of most evaluation frames. The control is therefore a sequence-level split: every evaluation sequence with \emph{zero} frames in IR training, evaluated in full (every frame, no sampling). For Svanstr\"om this gives 54 of 279 sequences ($n=5{,}557$ frames), held out from \emph{both} detectors' training, since no Svanstr\"om frames exist in any RGB corpus. For Anti-UAV it gives 61 of 91 segments ($n=57{,}542$ frames), held out from IR training only: as the table shows, the composite RGB corpus contains material from every Anti-UAV segment, so no RGB-clean Anti-UAV subset exists. The sequence lists, derivation procedure, and frozen results are versioned in the repository (\texttt{runs/clean\_split/}).
+\paragraph{The held-out clean split.} The overlap is at \emph{sequence} level, so excluding individual frames is not a sufficient control: the IR training dataset holds stride-sampled siblings of most evaluation frames. The control is therefore a sequence-level split: every evaluation sequence with \emph{zero} frames in IR training, evaluated in full (every frame, no sampling). For Svanstr\"om this gives 54 of 279 sequences ($n=5{,}557$ frames), held out from \emph{both} detectors' training, since no Svanstr\"om frames exist in any RGB dataset. For Anti-UAV it gives 61 of 91 segments ($n=57{,}542$ frames), held out from IR training only: as the table shows, the composite RGB dataset contains material from every Anti-UAV segment, so no RGB-clean Anti-UAV subset exists. The sequence lists, derivation procedure, and frozen results are versioned in the repository (\texttt{runs/clean\_split/}).
 % [source: thesis_eval/results/clean_split_manifest.json; runs/clean_split/{svanstrom,antiuav}_clean_sequences.txt; build = pipeline_cache_unified.py iter_clean(); replay = pipeline_eval_unified.py --out thesis_eval/results_clean]
 
 \begin{table}[htbp]
@@ -328,7 +328,7 @@ All detectors are YOLO26n (nano) single-class drone detectors; the IR detector's
 
 \begin{table}[htbp]
     \centering
-    \caption{Detector training configurations. The baseline RGB and \texttt{retrained\_v2} share a recipe but differ in training corpus (Section~\ref{sec:rgb_three_variants}). All training was on an NVIDIA RTX 3090 (24~GB VRAM); evaluation was on a GTX 1050 Ti (4~GB VRAM).}
+    \caption{Detector training configurations. The baseline RGB and \texttt{retrained\_v2} share a recipe but differ in training dataset (Section~\ref{sec:rgb_three_variants}). All training was on an NVIDIA RTX 3090 (24~GB VRAM); evaluation was on a GTX 1050 Ti (4~GB VRAM).}
     \label{tab:training_recipes}
     \resizebox{\textwidth}{!}{%
     \begin{tabular}{lcc}
@@ -354,7 +354,7 @@ All detectors are YOLO26n (nano) single-class drone detectors; the IR detector's
 \end{table}
 % [source: verified against the baseline's pre-finetune training report (D:/Downloads/Drone_detection_report.pdf, Table 3.1: YOLOv26n, imgsz 640, batch 48, 70 epochs, lr0 0.001, lrf 0.01, AdamW, wd 0.0005, warmup 3, mosaic off after epoch 50) -- all values match]
 
-At the end of baseline training, the standard held-out validation (\texttt{yolo detect val} on the corpus's own test split) recorded $P=0.978$, $R=0.915$, mAP@50 $=0.951$; these training-time numbers are the model's own acceptance check and predate the canonical evaluation protocol of Section~\ref{sec:eval_protocol}, under which the corresponding Tier-1 figures appear in Chapter~\ref{ch:hitl}.
+At the end of baseline training, the standard held-out validation (\texttt{yolo detect val} on the dataset's own test split) recorded $P=0.978$, $R=0.915$, mAP@50 $=0.951$; these training-time numbers are the model's own acceptance check and predate the canonical evaluation protocol of Section~\ref{sec:eval_protocol}, under which the corresponding Tier-1 figures appear in Chapter~\ref{ch:hitl}.
 % [source: D:/Downloads/Drone_detection_report.pdf §3.3.4 (yolo detect val, test split)]
 
 \paragraph{Backbone-freeze depth in confuser-injection fine-tuning.}
@@ -379,11 +379,11 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
 \end{table}
 % [source: docs/analysis/2026-05-26_classifier_ft4_analysis.md §2.2 (R1 0.898/-19.4pp halluc, R2 selcom F1 -0.023, R3 0.919/45.0% halluc vs 61% bare = -16pp, A1 0.897, A2 selcom fail); ledger=ft4-backbone-freeze]
 
-\paragraph{Downstream learned models.} The two detectors above are YOLO26n; the three learned downstream models, the trust router and the two confuser filters, are configured as in Table~\ref{tab:downstream_configs}. The two filters share one MLP architecture and are trained on cached per-detection features (positives are drone detections, negatives are confuser detections; Section~\ref{sec:distill_verifier}), differing only in training corpus, base detector, and operating threshold.
+\paragraph{Downstream learned models.} The two detectors above are YOLO26n; the three learned downstream models, the trust router and the two confuser filters, are configured as in Table~\ref{tab:downstream_configs}. The two filters share one MLP architecture and are trained on cached per-detection features (positives are drone detections, negatives are confuser detections; Section~\ref{sec:distill_verifier}), differing only in training dataset, base detector, and operating threshold.
 
 \begin{table}[htbp]
     \centering
-    \caption{Downstream learned-model configurations: the trust router and the two confuser filters. All three are trained on cached per-detection features rather than on images. The RGB and IR filters share one MLP architecture (\texttt{mri/classifier.py}); they differ in training corpus, base detector, and deploy threshold.}
+    \caption{Downstream learned-model configurations: the trust router and the two confuser filters. All three are trained on cached per-detection features rather than on images. The RGB and IR filters share one MLP architecture (\texttt{mri/classifier.py}); they differ in training dataset, base detector, and deploy threshold.}
     \label{tab:downstream_configs}
     \footnotesize
     \begin{tabular}{@{}p{3.1cm} l p{8.8cm}@{}}
@@ -406,9 +406,9 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
 \subsection{The Co-Evolution Problem}
 \label{sec:coevolution}
 
-A static-corpus detector has a fixed relationship with its training distribution; deployment surfaces shifts that cannot be anticipated at training time. Making the model's own failure modes the primary driver of corpus expansion concentrates annotation effort where marginal value is highest.
+A static-dataset detector has a fixed relationship with its training distribution; deployment surfaces shifts that cannot be anticipated at training time. Making the model's own failure modes the primary driver of dataset expansion concentrates annotation effort where marginal value is highest.
 
-Dataset and model state are coupled: a model on corpus $k$ generates errors that define corpus $k+1$, and corpus $k+1$ trains model $k+2$. The coupling is productive when the loop is disciplined, since reviewed errors become clean labels or hard negatives. It turns regressive when it is not, and the failure mode is broader than missed labels: incoming source material arrives with un-assessed annotation quality, so un-reviewed batches can carry unlabelled positives (which then train as confuser-class negatives, as the V5 regression in Section~\ref{sec:ir_evolution} illustrates; distinct from the \texttt{mlp\_v5\_v4} filter of Section~\ref{sec:distill_verifier}), ground-truth boxes so oversized they span most of the frame, missing boxes, and inconsistent class conventions. No formal quality assessment of incoming sources was performed in this project; the frame-level review loop below is the mitigation, applied at the point where errors become training data.
+Dataset and model state are coupled: a model on dataset $k$ generates errors that define dataset $k+1$, and dataset $k+1$ trains model $k+2$. The coupling is productive when the loop is disciplined, since reviewed errors become clean labels or hard negatives. It turns regressive when it is not, and the failure mode is broader than missed labels: incoming source material arrives with un-assessed annotation quality, so un-reviewed batches can carry unlabelled positives (which then train as confuser-class negatives, as the V5 regression in Section~\ref{sec:ir_evolution} illustrates; distinct from the \texttt{mlp\_v5\_v4} filter of Section~\ref{sec:distill_verifier}), ground-truth boxes so oversized they span most of the frame, missing boxes, and inconsistent class conventions. No formal quality assessment of incoming sources was performed in this project; the frame-level review loop below is the mitigation, applied at the point where errors become training data.
 
 \subsection{Label Reviewer GUI}
 \label{sec:label_reviewer}
@@ -419,7 +419,7 @@ The label reviewer (\texttt{label\_reviewer/}) is a Tkinter desktop tool for dat
     \item \textbf{Accept GT, reject model}: GT is correct; the model's disagreement is a FP / FN case logged for analysis.
     \item \textbf{Accept model, override GT}: the model is correct; the existing GT is missing a box or contains an over-sized / mis-located one. Common in the IR set, where many "missing" GT boxes correspond to small drones the original annotator missed.
     \item \textbf{Adjust the box geometry}: click-drag editing of corners; addresses the loose-box pattern common in scraped datasets.
-    \item \textbf{Demote to negative}: deleting all drone boxes from a frame turns it into a hard negative; this is both the channel feeding the loop's negative-mining branch and the mechanism used for confuser-corpus cleanup, where a frame initially flagged as ``drone'' is in fact a bird, airplane, or helicopter.
+    \item \textbf{Demote to negative}: deleting all drone boxes from a frame turns it into a hard negative; this is both the channel feeding the loop's negative-mining branch and the mechanism used for confuser-dataset cleanup, where a frame initially flagged as ``drone'' is in fact a bird, airplane, or helicopter.
     \item \textbf{Export to dataset}: at session end, write the reviewed labels back into the dataset layout in YOLO format; the originals are automatically backed up to a timestamped folder before anything is overwritten.
 \end{itemize}
 % [source: label_reviewer/gui.py (Tkinter imports; Export to Dataset + "Create backup before overwriting" default-on, backup dir <dest>_backup_<timestamp>); label_reviewer/core.py keybindings (a:add d:del D:del-img R:del-range s:save)]
@@ -471,7 +471,7 @@ This thesis follows a \emph{statistics-before-training} discipline for its downs
 
 \subsection{What the Instrument Does}
 
-The tool hooks the detector's FPN layers (\texttt{p3}, stride~8; \texttt{p5}, stride~32) and pools each detection's region of those activations into a $517$-feature embedding: $512$ internal pyramid features (\texttt{p3} pooled to a $2{\times}2$ grid, \texttt{p5} to $1{\times}1$) plus $5$ detection-metadata scalars (confidence, log-area, aspect ratio, and box centre). It then emits separability statistics, per-layer rankings, spatial activation overlays, and a \texttt{stats.json} keyed to the weight hash and corpus, written under \texttt{mri/results/<run>/} in the project repository (e.g.\ \texttt{mri/results/v5\_report\_regen/stats.json}). Each statistic answers a specific sub-question; the two alignment diagnostics at the end of the list are produced by the MRI's modality-alignment module (\texttt{mri/modality\_align.py}).
+The tool hooks the detector's FPN layers (\texttt{p3}, stride~8; \texttt{p5}, stride~32) and pools each detection's region of those activations into a $517$-feature embedding: $512$ internal pyramid features (\texttt{p3} pooled to a $2{\times}2$ grid, \texttt{p5} to $1{\times}1$) plus $5$ detection-metadata scalars (confidence, log-area, aspect ratio, and box centre). It then emits separability statistics, per-layer rankings, spatial activation overlays, and a \texttt{stats.json} keyed to the weight hash and dataset, written under \texttt{mri/results/<run>/} in the project repository (e.g.\ \texttt{mri/results/v5\_report\_regen/stats.json}). Each statistic answers a specific sub-question; the two alignment diagnostics at the end of the list are produced by the MRI's modality-alignment module (\texttt{mri/modality\_align.py}).
 
 \begin{description}
     \item[Linear Discriminant Analysis (LDA).] Projects features onto the Fisher axis maximising between- to within-class variance for drone vs.\ confuser. Threshold accuracy on that axis quantifies linear separability; it is also the visualisation axis of the MRI findings in Section~\ref{sec:mri_findings}.
@@ -482,7 +482,7 @@ The tool hooks the detector's FPN layers (\texttt{p3}, stride~8; \texttt{p5}, st
 
 \subsection{From Statistics to a Trained Filter}
 
-The MRI is not only a diagnostic; its output \emph{is} the filter's training pipeline. The same 517-D per-detection embeddings it extracts for analysis become the training matrix for a small multi-layer perceptron (MLP) over two classes (positives are drone detections, negatives are confuser detections), trained with 5-fold cross-validation (\texttt{mri/classifier.py}); held-out evaluation (\texttt{mri/holdout.py}) gates the result on a corpus excluded from training. The production RGB filter (\texttt{mlp\_v5\_v4}) and the thermal-native IR filter (\texttt{mlp\_aligned\_thermalonly}) are both trained this way: measure first, then train the MLP on the MRI's own positive (drone) and negative (confuser) detection embeddings, and verify on a held-out gate.
+The MRI is not only a diagnostic; its output \emph{is} the filter's training pipeline. The same 517-D per-detection embeddings it extracts for analysis become the training matrix for a small multi-layer perceptron (MLP) over two classes (positives are drone detections, negatives are confuser detections), trained with 5-fold cross-validation (\texttt{mri/classifier.py}); held-out evaluation (\texttt{mri/holdout.py}) gates the result on a dataset excluded from training. The production RGB filter (\texttt{mlp\_v5\_v4}) and the thermal-native IR filter (\texttt{mlp\_aligned\_thermalonly}) are both trained this way: measure first, then train the MLP on the MRI's own positive (drone) and negative (confuser) detection embeddings, and verify on a held-out gate.
 % [source: filter train/held-out provenance = docs/analysis/2026-06-18_filter_provenance_train_heldout.md; trainer = mri/classifier.py; held-out gate = mri/holdout.py]
 
 Every run renders a human-readable report. Figure~\ref{fig:mri_report} reproduces the verdict block of the production RGB run verbatim; the full report is in Appendix~\ref{app:mri_report}.
@@ -490,7 +490,7 @@ Every run renders a human-readable report. Figure~\ref{fig:mri_report} reproduce
 \begin{figure}[htbp]
 \begin{quote}\small\ttfamily
 \textbf{Model MRI --- Yolo26n\_selcom\_confuser\_ft4\_1280}\\[2pt]
-Corpus: 19{,}334 drone / 13{,}597 confuser detections\\[4pt]
+Dataset: 19{,}334 drone / 13{,}597 confuser detections\\[4pt]
 \textbf{Verdict: Classifier strongly recommended --- large FP cut at low recall cost.}\\[4pt]
 \begin{tabular}{@{}lll@{}}
 Signal & Value & Meaning \\
@@ -505,6 +505,6 @@ Recall retention & 98.9\% & true drones the classifier keeps \\
 \label{fig:mri_report}
 \end{figure}
 
-Headline IR-filter numbers come from a held-out evaluation with the CBAM probe set (Section~\ref{sec:ds_ir_confusers}) excluded from training. Re-running the MRI on the shipped V5 corpus corrected two figures and one headline claim in an earlier hand-written report: the report had quoted a mis-merged corpus size ($35{,}098$ where the shipped corpus holds $32{,}931$ detections), rendered its evidence figures from a non-shipped sibling corpus, and named the detector's confidence score as the strongest single discriminator ($F\approx 15{,}000$), where the regenerated statistics place a \texttt{p5} channel first ($F = 42{,}346$) with confidence only sixth ($F = 10{,}696$). The instrument audits its own paper trail.
+Headline IR-filter numbers come from a held-out evaluation with the CBAM probe set (Section~\ref{sec:ds_ir_confusers}) excluded from training. Re-running the MRI on the shipped V5 dataset corrected two figures and one headline claim in an earlier hand-written report: the report had quoted a mis-merged dataset size ($35{,}098$ where the shipped dataset holds $32{,}931$ detections), rendered its evidence figures from a non-shipped sibling dataset, and named the detector's confidence score as the strongest single discriminator ($F\approx 15{,}000$), where the regenerated statistics place a \texttt{p5} channel first ($F = 42{,}346$) with confidence only sixth ($F = 10{,}696$). The instrument audits its own paper trail.
 % [source: mri/docs/mlp_v5_report_regen.md §0 (35,098 vs 32,931; figures from _v5_p3p5_ft4_distill) + §1.3 (P5 ch.154 F=42,346; meta:conf F=10,696 rank 6); ledger=mri-v5-report-regen]
 % [source: ledger=mri-v5-report-regen; eval=distill_cv_mlp; run=mri/cli.py; cache=mri/results/v5_report_regen/stats.json; config=distill_cv_5fold]
