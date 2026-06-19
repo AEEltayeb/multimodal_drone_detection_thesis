@@ -261,6 +261,99 @@ CHECKS += [
     ("CONSIST v4 - base = bird add-on (341)",     341, (_t9[0] - _b9[0]) if (_t9 and _b9) else -1),
 ]
 
+# session-9d close two value-vs-source gaps: the abstract + App G state the shipped router's Svanstrom
+# filt->clf recall (0.991) and precision (0.905); tie both to the frozen JSON (4-dp, thesis rounds to 3-dp).
+CHECKS += [
+    ("svan filt->clf R (json 0.9905; thesis 0.991)", 0.9905, round(TN["svanstrom"]["B_pipeline"]["filt->clf[robust8_nr_drop]"]["recall"], 4)),
+    ("svan filt->clf P (json 0.9052; thesis 0.905)", 0.9052, round(TN["svanstrom"]["B_pipeline"]["filt->clf[robust8_nr_drop]"]["precision"], 4)),
+]
+
+# ============================================================================
+# session-9d: CONTEXT / CROSS-REFERENCE CONSISTENCY LAYER ("verify numbers AND context").
+# The cells above prove each number traces to its JSON, but NOT that the thesis states it CONSISTENTLY
+# everywhere it appears -- which is exactly the class check2.txt caught (corpus 33,272 vs 32,931; router
+# seq count), where one quantity carried two values that were each "traceable". For each load-bearing
+# number, extract every prose/table restatement across chapters and assert they AGREE with each other.
+# canon=None (compare thesis-display to thesis-display) sidesteps half-even rounding mismatches; the JSON
+# tie for these is already owned by the value-vs-source cells above. Each entry needs >=2 sites to bite.
+# ============================================================================
+_CHAP = {}
+def _ch(name):
+    if name not in _CHAP:
+        rel = "main.tex" if name == "main" else f"chapters/{name}.tex"
+        _CHAP[name] = (REPO / "docs/thesis_working_distilling_overleaf" / rel).read_text(encoding="utf-8")
+    return _CHAP[name]
+
+# (quantity, [(chapter, regex-with-ONE-group, scale=1.0), ...]) -- every captured value must be equal.
+CONSISTENCY = [
+    ("svan composed F1 (0.946)", [
+        ("main",        r"from \$0\.742\$ to \$(0\.\d{3})\$ while"),
+        ("empirical",   r"\\textbf\{shipped pipeline\} & \\textbf\{(0\.\d{3})\}"),
+        ("appendices",  r"composed F1 \$0\.742 \\to (0\.\d{3})\$"),
+        ("methodology", r"same pattern \(Svanstr\\\"om \$(0\.\d{3}) \\to 0\.913\$"),
+    ]),
+    ("svan composed recall (0.991)", [
+        ("main",        r"\\emph\{raising\} recall \(\$0\.948 \\to (0\.\d{3})\$\)"),
+        ("appendices",  r"& \\textbf\{(0\.\d{3})\} & \\textbf\{0\.946 \[0\.938"),
+    ]),
+    ("antiuav no-harm composed (0.984)", [
+        ("main",        r"does no harm \(\$0\.973 \\to (0\.\d{3})\$\)"),
+        ("empirical",   r"shipped pipeline\} & \\textbf\{0\.946\} & \\textbf\{(0\.\d{3})\}"),
+    ]),
+    ("confuser bare fire (30.4%)", [
+        ("main",        r"fires on \$(\d\d\.\d)\\%\$ of an"),
+        ("main",        r"cuts frame fire from \$(\d\d\.\d)\\%\$ to"),
+        ("appendices",  r"Confuser fire \$(\d\d\.\d)\\% \\to"),
+    ]),
+    ("confuser composed fire (1.4%)", [
+        ("main",        r"cuts frame fire from \$30\.4\\%\$ to \$(\d\.\d)\\%\$"),
+        ("conclusion",  r"frame fire rises to about \$(\d\.\d)\\%\$"),
+        ("appendices",  r"Projected FP rate & \$(\d\.\d)\\%\$"),
+        ("appendices",  r"Confuser fire \$30\.4\\% \\to (\d\.\d)\\%\$"),
+    ]),
+    ("baseline svan RGB recall (0.961)", [
+        ("main",          r"recall \(\$(0\.\d{3}) \\to 0\.306\$\)"),
+        ("system_design", r"P=0\.940, R=(0\.\d{3})\$ on drones"),
+        ("related_work",  r"baseline RGB, S1\)\} & IoP@0\.5, @1280 & 0\.940 & (0\.\d{3}) &"),
+        ("empirical",     r"baseline\s+& 0\.940 & \\textbf\{(0\.\d{3})\}"),
+    ]),
+    ("retrained_v2 recall collapse (0.306)", [
+        ("main",          r"collapses small-drone recall \(\$0\.961 \\to (0\.\d{3})\$\)"),
+        ("system_design", r"collapses with it, to \$R=(0\.\d{3})\$"),
+        ("appendices",    r"drone recall to \$R=(0\.\d{3})\$"),
+        ("empirical",     r"retrained\\_v2\}\s+& 0\.943 & (0\.\d{3}) &"),
+    ]),
+    ("rebuild rgb_test F1 production (0.916)", [
+        ("conclusion", r"F1 from \$0\.792\$ to \$(0\.\d{3})\$"),
+        ("appendices", r"\$F1\\;0\.792\\to(0\.\d{3})\$"),
+        ("empirical",  r"F1 \$0\.792 \\to (0\.\d{3})\$"),
+        ("empirical",  r"rgb\\_dataset\} \(IoU\)& \\textbf\{0\.929\} & 0\.904 & \\textbf\{(0\.\d{3})\}"),
+    ]),
+    ("rebuild rgb_test recall production (0.887)", [
+        ("conclusion", r"\(recall \$0\.691 \\to (0\.\d{3})\$\)"),
+        ("appendices", r"recall \$0\.691\\to(0\.\d{3})\$"),
+        ("empirical",  r"recovers \$0\.691 \\to (0\.\d{3})\$"),
+    ]),
+    ("rebuild rgb_test F1 predecessor (0.792)", [
+        ("conclusion", r"F1 from \$(0\.\d{3})\$ to \$0\.916\$"),
+        ("appendices", r"\$F1\\;(0\.\d{3})\\to0\.916\$"),
+        ("empirical",  r"split to \$F1=(0\.\d{3})\$"),
+    ]),
+]
+for _qty, _sites in CONSISTENCY:
+    _vals, _stale = [], []
+    for _chap, _pat, *_sc in _sites:
+        _scale = _sc[0] if _sc else 1.0
+        _ms = re.findall(_pat, _ch(_chap))
+        if not _ms:
+            _stale.append(_chap)
+        _vals += [round(float(m.replace("{,}", "")) * _scale, 4) for m in _ms]
+    if _stale:
+        CHECKS.append((f"XREF {_qty} [stale regex -> {','.join(_stale)}]", 1, 0))
+    else:
+        _ok = all(abs(v - _vals[0]) < 5e-4 for v in _vals)
+        CHECKS.append((f"XREF {_qty} sites={_vals}", _vals[0], _vals[0] if _ok else -999.0))
+
 # Validate ALL numeric cells in one pass (must run AFTER every `CHECKS +=` block above; a loop
 # placed earlier silently skipped the SWEEP/CLEAN/RES/CBAM cells while still counting them).
 bad = 0
