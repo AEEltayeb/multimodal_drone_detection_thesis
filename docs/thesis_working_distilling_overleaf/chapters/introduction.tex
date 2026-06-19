@@ -48,7 +48,7 @@ A single methodological discipline underpins the downstream stages: \emph{measur
 
 \section{Contributions}
 
-This thesis makes four contributions and reports one finding.
+This thesis makes four contributions and reports one empirical finding:
 
 \begin{enumerate}
     \item \textbf{A deployable dual-modality drone-detection system with an operator GUI.} An RGB and a thermal detector are combined by a learned \emph{trust router} that chooses, per frame, which modality to believe; a per-detection \emph{confuser filter} removes false positives; and a temporal smoother converts per-frame decisions into alerts. Held to one declared evaluation standard (Section~\ref{sec:eval_protocol}), the full pipeline lifts Svanstr\"om drone $F1$ from $0.742$ to $0.946$ \emph{while raising recall}, does no harm on the saturated Anti-UAV control, and cuts out-of-distribution confuser fire by more than an order of magnitude, with every stage running on every frame within budget (Chapter~\ref{ch:hitl}).
@@ -60,10 +60,9 @@ This thesis makes four contributions and reports one finding.
     % [source: ledger=ir-version-progression; eval=ir_final_* (all on config ir_final_640, same split)]
     \item \textbf{A set of curated data artifacts.} The product of the manual review behind the system: a $129{,}130$-frame reviewed thermal corpus; a $27{,}024$-frame RGB confuser corpus with sequence-disjoint splits; the $28{,}710$-frame paired Svanstr\"om conversion to YOLO format; and a $19$-clip real-video benchmark ($2{,}609$ frames, $1{,}234$ annotated drone instances) that is fully out-of-distribution for every component. Licences preclude redistributing the source corpora, so these are claimed as reviewed artifacts; the real-video benchmark's labels are publishable (Appendix~\ref{app:datasets}).
     % [source: tab:ds_ir_components total 129,130; rgb_confusers_merged 27,024; svanstrom_paired 28,710; sec:ds_youtube 19 clips / 2,609 frames / 1,234 GT instances]
+    \item \textbf{An unplanned cross-modal finding: thermal-to-grayscale transfer.} Run zero-shot on grayscale-converted RGB, the thermal-trained detector still detects drones when the visible channel fails, landing within a few points of the dedicated RGB detector on the same frames ($F1$ $0.580$ vs $0.607$ on Svanstr\"om) and tying it on the hardest bird-cluttered clip ($0.837$ vs $0.840$). A raw-RGB control isolates the grayscale conversion itself as the mechanism, and we are not aware of this transfer being reported for this thermal-to-grayscale setup; it gives the system a usable fallback when no thermal camera is present (Section~\ref{sec:grayscale}).
+    % [source: thesis_eval/results/tier1_results.json (D table); ledger=ir-grayscale-fallback (clip + 0.837/0.840); eval=patch_catch_v2_svan,v5_svan_mlp/patch]
 \end{enumerate}
-
-One finding emerged that was not designed. Run zero-shot on grayscale-converted RGB, the thermal-trained detector still detects drones when the visible channel fails: it lands within a few points of the dedicated RGB detector on the same frames ($F1$ $0.580$ vs $0.607$ on Svanstr\"om) and ties it on the hardest bird-cluttered clip ($0.837$ vs $0.840$). It is a usable fallback for when no thermal camera is present (Section~\ref{sec:grayscale}).
-% [source: thesis_eval/results/tier1_results.json (D table); ledger=ir-grayscale-fallback (clip + 0.837/0.840); eval=patch_catch_v2_svan,v5_svan_mlp/patch]
 
 Every number in this thesis is held to one standard: a single canonical configuration per dataset, per-modality trust-aware scoring, frame counts printed alongside, and bootstrap confidence intervals on headline results (Section~\ref{sec:eval_protocol}). Every reported number is also traceable: each is a named cell in a cached results file, regenerable by a one-line command and checked by an automated audit (Appendix~\ref{app:provenance}).
 
