@@ -141,6 +141,7 @@ CHECKS += [
     ("CLEAN svan v3b solo", 0.8674, C["svanstrom_clean"]["A_bare"]["v3b/ir"]["f1"]),
     ("CLEAN svan bare paired", 0.6842, C["svanstrom_clean"]["B_pipeline"]["bare"]["f1"]),
     ("CLEAN svan pipeline", 0.934, C["svanstrom_clean"]["B_pipeline"]["clf->filt[robust8]"]["f1"]),
+    ("CLEAN svan nr filt->clf F1 (thesis shows 0.913)", 0.9126, round(C["svanstrom_clean"]["B_pipeline"]["filt->clf[robust8_nr_drop]"]["f1"], 4)),
     ("CLEAN auv n", 57542, C["antiuav_clean"]["meta"]["n"]),
     ("CLEAN auv ft4 solo", 0.9878, C["antiuav_clean"]["A_bare"]["ft4/rgb"]["f1"]),
     ("CLEAN auv v3b solo", 0.9656, C["antiuav_clean"]["A_bare"]["v3b/ir"]["f1"]),
@@ -287,10 +288,20 @@ def _ch(name):
 # (quantity, [(chapter, regex-with-ONE-group, scale=1.0), ...]) -- every captured value must be equal.
 CONSISTENCY = [
     ("svan composed F1 (0.946)", [
-        ("main",        r"from \$0\.742\$ to \$(0\.\d{3})\$ while"),
+        ("main",        r"from \$0\.742\$ to \$(0\.\d{3})\$ \(full surface"),
         ("empirical",   r"\\textbf\{shipped pipeline\} & \\textbf\{(0\.\d{3})\}"),
         ("appendices",  r"composed F1 \$0\.742 \\to (0\.\d{3})\$"),
         ("methodology", r"same pattern \(Svanstr\\\"om \$(0\.\d{3}) \\to 0\.913\$"),
+    ]),
+    ("svan clean-split composed F1 (0.913)", [
+        ("methodology", r"shows the same pattern \(Svanstr\\\"om \$0\.946 \\to (0\.\d{3})\$"),
+        ("main",        r"\$0\.684 \\to (0\.\d{3})\$ on the held-out clean split"),
+        ("discussion",  r"\$0\.684 \\to (0\.\d{3})\$ on the held-out clean split"),
+    ]),
+    ("svan clean-split bare F1 (0.684)", [
+        ("methodology", r"bare paired\s+& (0\.\d{3}) \[0\.672"),
+        ("main",        r"\$(0\.\d{3}) \\to 0\.913\$ on the held-out clean split"),
+        ("discussion",  r"\$(0\.\d{3}) \\to 0\.913\$ on the held-out clean split"),
     ]),
     ("svan composed recall (0.991)", [
         ("main",        r"\\emph\{raising\} recall \(\$0\.948 \\to (0\.\d{3})\$\)"),
