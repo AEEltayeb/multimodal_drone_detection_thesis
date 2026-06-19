@@ -21,11 +21,11 @@ The evaluation uses eight labelled datasets and a 19-clip YouTube real-video set
         \texttt{rgb\_dataset} (composite RGB dataset) & 172,022 & 137{,}506 / 17{,}307 / 17{,}209 & RGB & RGB-detector train + in-distribution test \\
         \texttt{ir\_dset\_final} & 129,130 & 107{,}809 / 11{,}709 / 9{,}612 & IR & IR-detector train + in-distribution test \\
         \texttt{rgb\_confusers\_merged} & 27,024 & 21{,}784 / 2{,}607 / 2{,}633 & RGB & Confuser hard-negative training source + OOD confuser test (test split; see Section~\ref{sec:ds_confusers} for the per-model OOD status) \\
-        \texttt{IR\_confusers} & 5,938 & --- (eval-only) & IR & OOD thermal-confuser test (airplane 4{,}281 / bird 1{,}200 / helicopter 457; evaluated split 5{,}237); no training contribution \\
-        \texttt{svanstrom} (paired) & 28,710 & --- (eval-only) & RGB+IR & Discriminating benchmark (small drones; labelled confusers); IR-side training overlap audited in Section~\ref{sec:svanstrom_audit} \\
-        \texttt{antiuav} (RGBT) & 85,374 & --- (eval-only) & RGB+IR & Saturated benchmark / no-harm control; training overlap audited in Section~\ref{sec:svanstrom_audit} \\
+        \texttt{IR\_confusers} & 5,938 & eval-only & IR & OOD thermal-confuser test (airplane 4{,}281 / bird 1{,}200 / helicopter 457; evaluated split 5{,}237); no training contribution \\
+        \texttt{svanstrom} (paired) & 28,710 & eval-only & RGB+IR & Discriminating benchmark (small drones; labelled confusers); IR-side training overlap audited in Section~\ref{sec:svanstrom_audit} \\
+        \texttt{antiuav} (RGBT) & 85,374 & eval-only & RGB+IR & Saturated benchmark / no-harm control; training overlap audited in Section~\ref{sec:svanstrom_audit} \\
         \texttt{selcom\_cctv} & 2,076 & 80 / 20 split (val 311 evaluated) & RGB & Deployment-partner CCTV (fine-tune surface + held-out val) \\
-        YouTube real-video diagnostic & 2,609 & --- (eval-only) & RGB & Real-world clips: drone-positive (9) + confuser-only (10); consecutive frames carry the temporal evaluation \\
+        YouTube real-video diagnostic & 2,609 & eval-only & RGB & Real-world clips: drone-positive (9) + confuser-only (10); consecutive frames carry the temporal evaluation \\
         \bottomrule
     \end{tabular}}
     \normalsize
@@ -370,7 +370,7 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
         Variant & Hard negatives & Freeze & Epochs & Svanstr\"om $R$ & Gate \\
         \midrule
         R1 & 600 & 12 & 3 & 0.898 ($-2.9$~pp) & fail (recall) \\
-        R2 & 300 & 12 & 3 & --- & fail (SelCom $F1$, $-0.023$) \\
+        R2 & 300 & 12 & 3 & n/a & fail (SelCom $F1$, $-0.023$) \\
         \textbf{R3 (production)} & \textbf{300} & \textbf{15} & \textbf{3} & \textbf{0.919} ($-0.8$~pp) & \textbf{pass} \\
         A1 & 600 & 15 & 3 & 0.897 ($-3.0$~pp) & fail (recall) \\
         A2 & 600 $+$ 4{,}000 extra positives & 15 & 3 & 0.919 ($-0.8$~pp) & fail (SelCom $F1$) \\
@@ -489,9 +489,9 @@ Every run renders a human-readable report. Figure~\ref{fig:mri_report} reproduce
 
 \begin{figure}[htbp]
 \begin{quote}\small\ttfamily
-\textbf{Model MRI --- Yolo26n\_selcom\_confuser\_ft4\_1280}\\[2pt]
+\textbf{Model MRI: Yolo26n\_selcom\_confuser\_ft4\_1280}\\[2pt]
 Dataset: 19{,}334 drone / 13{,}597 confuser detections\\[4pt]
-\textbf{Verdict: Classifier strongly recommended --- large FP cut at low recall cost.}\\[4pt]
+\textbf{Verdict: Classifier strongly recommended: large FP cut at low recall cost.}\\[4pt]
 \begin{tabular}{@{}lll@{}}
 Signal & Value & Meaning \\
 Raw hallucination rate & 54.4\% & bare detector, FP per confuser image \\
