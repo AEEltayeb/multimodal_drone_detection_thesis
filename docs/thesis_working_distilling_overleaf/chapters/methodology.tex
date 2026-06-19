@@ -406,7 +406,7 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
 \subsection{The Co-Evolution Problem}
 \label{sec:coevolution}
 
-A static-dataset detector has a fixed relationship with its training distribution; deployment surfaces shifts that cannot be anticipated at training time. Making the model's own failure modes the primary driver of dataset expansion concentrates annotation effort where marginal value is highest.
+A static-dataset detector has a fixed relationship with its training distribution; deployment exposes shifts that cannot be anticipated at training time. Making the model's own failure modes the primary driver of dataset expansion concentrates annotation effort where marginal value is highest.
 
 Dataset and model state are coupled: a model on dataset $k$ generates errors that define dataset $k+1$, and dataset $k+1$ trains model $k+2$. The coupling is productive when the loop is disciplined, since reviewed errors become clean labels or hard negatives. It turns regressive when it is not, and the failure mode is broader than missed labels: incoming source material arrives with un-assessed annotation quality, so un-reviewed batches can carry unlabelled positives (which then train as confuser-class negatives, as the V5 regression in Section~\ref{sec:ir_evolution} illustrates; distinct from the \texttt{mlp\_v5\_v4} filter of Section~\ref{sec:distill_verifier}), ground-truth boxes so oversized they span most of the frame, missing boxes, and inconsistent class conventions. No formal quality assessment of incoming sources was performed in this project; the frame-level review loop below is the mitigation, applied at the point where errors become training data.
 
@@ -431,7 +431,7 @@ Batch operations correct a contiguous segment in one step (range deletion, page-
     \begin{subfigure}[b]{0.36\textwidth}\includegraphics[width=\textwidth]{label_reviewer_home}\caption{Setup window}\label{fig:label_reviewer_home}\end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.60\textwidth}\includegraphics[width=\textwidth]{label_reviewer_add}\caption{Review canvas}\label{fig:label_reviewer_launch}\end{subfigure}
-    \caption{The label reviewer. (a) The Tkinter setup window configures the session---what to review, against which model, under which disagreement filter---before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}
+    \caption{The label reviewer. (a) The Tkinter setup window configures the session (what to review, against which model, under which disagreement filter) before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}
     \label{fig:label_reviewer}
 \end{figure}
 
