@@ -212,7 +212,8 @@
     \field{howpublished}{Center for Strategic and International Studies (CSIS),
   event transcript}
     \field{note}{May 28, 2025.
-  \url{https://www.csis.org/analysis/russia-ukraine-drone-war-innovation-frontlines-and-beyond}}
+  \url{https://www.csis.org/analysis/russia-ukraine-drone-war-innovation-frontlines-and-beyond}.
+  Accessed February 2026.}
     \field{title}{The Russia-Ukraine Drone War: Innovation on the Frontlines
   and Beyond}
     \field{year}{2025}
@@ -290,7 +291,7 @@
     \strng{fullhash}{U1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{note}{Accessed: 2024}
+    \field{note}{Accessed: February 2026}
     \field{title}{Ultralytics YOLO Documentation}
     \verb{url}
     \verb https://docs.ultralytics.com/
@@ -1278,6 +1279,7 @@
     \strng{fullhash}{NA1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
+    \field{note}{Accessed: February 2026}
     \field{title}{A Chat with Andrew on MLOps: From Model-centric to
   Data-centric AI}
     \verb{url}
