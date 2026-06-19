@@ -86,7 +86,7 @@ Single-camera source: fixed perimeter installation, $1920{\times}1080$, 25~fps. 
 \end{table}
 % [source: datasets/drone detection video tests/rgb/extraction_manifest.json (IDs from the _Media_ filename marker)]
 
-\noindent Note: the evaluated drone-positive set is the 9-clip / 1{,}359-frame / 1{,}234-GT-instance subset of this table that re-ran cleanly through the corrected-scoring pipeline (\texttt{flock\_of\_birds\_attack\_drone} excluded; some clips hold slightly fewer frames on disk than at extraction time). All Chapter~\ref{ch:hitl} video numbers, including the temporal evaluation, use that evaluated subset.
+\noindent Note: the evaluated drone-positive set is the 9-clip / 1{,}359-frame / 1{,}234-GT-instance subset of this table that re-ran cleanly through the corrected-scoring pipeline (\texttt{flock\_of\_birds\_attack\_drone} excluded; the evaluated count is the subset the author hand-labelled, since not every extracted frame could be manually annotated). All Chapter~\ref{ch:hitl} video numbers, including the temporal evaluation, use that evaluated subset.
 
 \begin{table}[htbp]
     \centering
@@ -201,13 +201,13 @@ The validation precision--recall curves for the two full-training detector runs 
 \chapter{Model MRI Sample Report}
 \label{app:mri_report}
 
-This appendix reproduces the Model MRI's human-readable report for the production RGB filter's corpus (Section~\ref{sec:model_mri}): the statistics-before-training diagnosis that licensed training the filter. The detector is \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280} and the corpus is the feature-only embedding set of $19{,}334$ drone and $13{,}597$ confuser detections. The verdict, the headline diagnostic signals, and the most discriminative features are reproduced below; the same run also writes \texttt{stats.json}, the trained MLP, and nine diagnostic figures (PCA and LDA projections, per-neuron KDEs, AUROC-by-layer, the verifier ROC, and the FP-reduction curve) under \texttt{mri/results/\allowbreak v5\_report\_regen/} in the repository. Figure~\ref{fig:mri_report} reproduces the verdict block in the main text.
+This appendix reproduces the Model MRI's human-readable report for the production RGB filter's base corpus (Section~\ref{sec:model_mri}): the statistics-before-training diagnosis that licensed training the filter. The detector is \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280} and the corpus is the feature-only embedding set of $19{,}334$ drone and $13{,}597$ confuser detections. The verdict, the headline diagnostic signals, and the most discriminative features are reproduced below; the same run also writes \texttt{stats.json}, the trained MLP, and nine diagnostic figures (PCA and LDA projections, per-neuron KDEs, AUROC-by-layer, the verifier ROC, and the FP-reduction curve) under \texttt{mri/results/\allowbreak v5\_report\_regen/} in the repository. Figure~\ref{fig:mri_report} reproduces the verdict block in the main text.
 
 \paragraph{Verdict.} \emph{Classifier strongly recommended: a large false-positive cut at low recall cost.} The recommendation rests on a train-set LDA separability of $0.952$ for a projected $97\%$ false-positive cut at a $1.1\%$ recall cost. The instrument issued this verdict \emph{before any training}; the shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches the projection, and that agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
 
 \begin{table}[htbp]
     \centering
-    \caption{Model MRI diagnostic signals for the production RGB filter's corpus ($19{,}334$ drone / $13{,}597$ confuser detections). The ``projected'' rows are the instrument's pre-training estimates of the trained filter's behaviour.}
+    \caption{Model MRI diagnostic signals for the production RGB filter's base corpus ($19{,}334$ drone / $13{,}597$ confuser detections). The ``projected'' rows are the instrument's pre-training estimates of the trained filter's behaviour.}
     \label{tab:mri_signals}
     \begin{tabular}{l c p{0.5\textwidth}}
         \toprule

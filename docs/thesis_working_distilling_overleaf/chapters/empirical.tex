@@ -383,7 +383,7 @@ The instrument is described in Section~\ref{sec:model_mri}; this section reports
     \centering
     \begin{subfigure}{0.6\textwidth}\includegraphics[width=\textwidth]{fig8_mri_lda}\caption{}\end{subfigure}
     \begin{subfigure}{0.39\textwidth}\includegraphics[width=\textwidth]{fig8_mri_anova}\caption{}\end{subfigure}
-    \caption{Model MRI of the FT4 detector's fused \texttt{p3}+\texttt{p5} features on the shipped $32{,}931$-detection corpus. (a) The linear-discriminant projection separates drone (blue) from confuser (red) into two cleanly-resolved peaks at $\approx 95\%$ single-threshold accuracy. (b) Per-block ANOVA $F$-statistic: \texttt{p5} is the dominant discriminative layer (max $F=42{,}346$, median $657$), ahead of \texttt{p3} and the detection metadata; the confidence scalar ranks only 6th.}
+    \caption{Model MRI of the FT4 detector's fused \texttt{p3}+\texttt{p5} features on the $32{,}931$-detection base corpus (before the bird split; the production \texttt{mlp\_v5\_v4} extends it to $33{,}272$). (a) The linear-discriminant projection separates drone (blue) from confuser (red) into two cleanly-resolved peaks at $\approx 95\%$ single-threshold accuracy. (b) Per-block ANOVA $F$-statistic: \texttt{p5} is the dominant discriminative layer (max $F=42{,}346$, median $657$), ahead of \texttt{p3} and the detection metadata; the confidence scalar ranks only 6th.}
     % [source: ledger=mri-v5-report-regen,v5-lda-separability; eval=distill_cv_mlp; run=mri/cli.py; cache=mri/results/v5_report_regen/stats.json; config=distill_cv_5fold]
     \label{fig:mri_stats}
 \end{figure}
