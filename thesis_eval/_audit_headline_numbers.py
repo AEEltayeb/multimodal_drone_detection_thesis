@@ -237,6 +237,13 @@ CHECKS += [
     ("FIG rgb fire@0.25",    0.011, round(FS["RGB mlp_v5"]["shipped"][1], 3)),
 ]
 
+# session-9: trust router held-out classification (tab:model_overview, fig:cm_router) vs frozen JSON
+RH = json.load(open(REPO / "thesis_eval/results/per_model_heldout/router_heldout.json"))
+CHECKS += [
+    ("ROUTER held-out macro-F1", 0.941, round(RH["macro_f1"], 3)),
+    ("ROUTER held-out accuracy", 0.981, round(RH["accuracy"], 3)),
+]
+
 # Validate ALL numeric cells in one pass (must run AFTER every `CHECKS +=` block above; a loop
 # placed earlier silently skipped the SWEEP/CLEAN/RES/CBAM cells while still counting them).
 bad = 0
@@ -291,6 +298,10 @@ CITED_PATHS = [
     "thesis_eval/results_noreject/temporal_results.json",
     "thesis_eval/results_noreject/notes_round1_results.json",
     "docs/analysis/2026-06-14_robust8_noreject.md",
+    # session-9: per-model held-out evidence (tab:model_overview, fig:cm_router, fig:cm_filters)
+    "thesis_eval/eval_router_heldout.py",
+    "thesis_eval/eval_filter_heldout_cm.py",
+    "thesis_eval/results/per_model_heldout/filter_heldout_cm.json",
 ]
 missing = [p for p in CITED_PATHS if not (REPO / p).exists()]
 for p in missing:
