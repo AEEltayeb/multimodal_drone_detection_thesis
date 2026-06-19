@@ -244,6 +244,23 @@ CHECKS += [
     ("ROUTER held-out accuracy", 0.981, round(RH["accuracy"], 3)),
 ]
 
+# session-9c: CROSS-CONSISTENCY pins -- the "two numbers for the same thing" class that the value-vs-source
+# checks above cannot catch (e.g. the RGB filter corpus once read 33,272 in the model table but 32,931 in
+# sec:distill_verifier). Read the numbers FROM system_design.tex and assert they reconcile and agree.
+_sd9 = (REPO / "docs/thesis_working_distilling_overleaf/chapters/system_design.tex").read_text(encoding="utf-8")
+def _ints9(pat):
+    m = re.search(pat, _sd9)
+    return [int(g.replace("{,}", "")) for g in m.groups()] if m else []
+_t9 = _ints9(r"\$(3\d\{,\}\d{3})\$ \\texttt\{ft4\} features \(\$(\d\d\{,\}\d{3})\$ drone / \$(\d\d\{,\}\d{3})\$ confuser")
+_r9 = _ints9(r"in all \$(3\d\{,\}\d{3})\$ detections \(\$(\d\d\{,\}\d{3})\$ drone / \$(\d\d\{,\}\d{3})\$ confuser")
+_b9 = _ints9(r"the \$(3\d\{,\}\d{3})\$ above is that same corpus")
+CHECKS += [
+    ("CONSIST table v4 total = drone+confuser",   _t9[0] if _t9 else -1, (_t9[1] + _t9[2]) if _t9 else -2),
+    ("CONSIST sec3.9 v4 total = drone+confuser",  _r9[0] if _r9 else -1, (_r9[1] + _r9[2]) if _r9 else -2),
+    ("CONSIST table v4 == sec3.9 v4 (one corpus)", _t9[0] if _t9 else -1, _r9[0] if _r9 else -3),
+    ("CONSIST v4 - base = bird add-on (341)",     341, (_t9[0] - _b9[0]) if (_t9 and _b9) else -1),
+]
+
 # Validate ALL numeric cells in one pass (must run AFTER every `CHECKS +=` block above; a loop
 # placed earlier silently skipped the SWEEP/CLEAN/RES/CBAM cells while still counting them).
 bad = 0
