@@ -296,7 +296,6 @@
     \verb{url}
     \verb https://docs.ultralytics.com/
     \endverb
-    \field{year}{2024}
   \endentry
 
   \entry{ren2015fasterrcnn}{inproceedings}{}{}
@@ -534,7 +533,7 @@
     \field{year}{2017}
   \endentry
 
-  \entry{rozantsev2017detecting}{inproceedings}{}{}
+  \entry{rozantsev2017detecting}{article}{}{}
     \name{author}{3}{}{%
       {{hash=RA}{%
          family={Rozantsev},
@@ -559,12 +558,12 @@
     \strng{fullhash}{RALVFP1}
     \field{labelnamesource}{author}
     \field{labeltitlesource}{title}
-    \field{booktitle}{IEEE Transactions on Pattern Analysis and Machine
-  Intelligence (TPAMI)}
     \field{number}{5}
     \field{pages}{879\bibrangedash 892}
     \field{title}{Detecting Flying Objects Using a Single Moving Camera}
     \field{volume}{39}
+    \field{journaltitle}{IEEE Transactions on Pattern Analysis and Machine
+  Intelligence}
     \field{year}{2017}
   \endentry
 
