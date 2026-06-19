@@ -95,7 +95,7 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
 
 \begin{table}[htbp]
     \centering
-    \caption{Numerical comparison on public benchmarks. \textbf{All comparisons require the caveats below the table.} ``Scoring'' indicates the matching rule used in the cited paper where it can be determined; where it cannot, the cell is marked \texttt{ND} (not disclosed).}
+    \caption{Numerical comparison on public benchmarks. \textbf{All comparisons require the caveats below the table.} ``Scoring'' indicates the matching rule used in the cited paper where it can be determined; where it cannot, the cell is marked \texttt{ND} (not disclosed). The Svanstr\"om $P$/$R$ are means of the paper's per-distance-bin values (it reports per-bin $P$/$R$ and an average $F1$), so they do not exactly satisfy $F1=2PR/(P+R)$.}
     \label{tab:numerical_comparison}
     \footnotesize
     \resizebox{\textwidth}{!}{%
@@ -103,10 +103,10 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
         \toprule
         Dataset & System & Scoring & $P$ & $R$ & F1 \\
         \midrule
-        \multirow{2}{2.6cm}{Svanstr\"om (visible video)} & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @416 & ND & ND & 0.785 \\
+        \multirow{2}{2.6cm}{Svanstr\"om (visible video)} & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @416 & 0.837 & 0.748 & 0.785 \\
                                                    & \textbf{This thesis (baseline RGB, S1)} & IoP@0.5, @1280 & 0.940 & 0.961 & 0.950 \\
         \midrule
-        \multirow{2}{2.6cm}{Svanstr\"om (thermal video)}  & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @256 & ND & ND & 0.760 \\
+        \multirow{2}{2.6cm}{Svanstr\"om (thermal video)}  & Svanstr\"om 2021 (avg.\ over distance bins) & IoU@0.5, det.\ thr.\ 0.5, YOLOv2 @256 & 0.843 & 0.661 & 0.760 \\
                                                    & \textbf{This thesis (IR \texttt{v3b}, \texttt{imgsz=640})} & IoP@0.5 & 0.950 & 0.973 & 0.961 \\
         \midrule
         \multirow{2}{2.6cm}{Anti-UAV (drone, RGB)}    & Anti-UAV baselines (range) & IoU & ND & ND & 0.90--0.97 \\
@@ -125,6 +125,7 @@ Prior work uses either a single detector or a tightly-coupled multi-modal one an
 \end{table}
 % [source: thesis_eval/results/tier1_results.json (ir_confusers C: bare 0.2943, clf->filt[robust6] 0.0192 with thermal-native cbam filter); honest held-out IR_confusers val/test shipped 90 -> 22, see Section~\ref{sec:ir_xmodal_verifier}]
 % [source: svanstrom2021real (arXiv 2007.07396): visible avg F1 0.7849 (close 0.8682), IR avg F1 0.7601 (close 0.8845); YOLOv2, inputs 416x416/256x256, bboxPrecisionRecall IoU 0.5, det thr 0.5; eval set = 120 IR + 120 visible clips (5 per class x distance bin), 240 clips train]
+% [source: svanstrom2021real per-bin P/R verified via ar5iv 2026-06: Vcam P 0.8989/0.8391/0.7726 R 0.7355/0.7306/0.7785; IRcam P 0.9197/0.8282/0.7822 R 0.8737/0.7039/0.4043; filled table P/R = mean over distance bins (Vcam 0.837/0.748, IRcam 0.843/0.661); F1 column = paper avg = mean of per-bin F1]
 
 Three caveats apply to every row of Table~\ref{tab:numerical_comparison}.
 
@@ -132,7 +133,7 @@ Three caveats apply to every row of Table~\ref{tab:numerical_comparison}.
 
 \emph{Dataset split.} The Svanstr\"om paper held out an evaluation set of 120 IR and 120 visible clips (five per class and distance bin), but the clip list is not published with the dataset, so it cannot be adopted here. This thesis instead evaluates the full Svanstr\"om corpus, which is leakage-free on the RGB side (no Svanstr\"om frames of any class appear in any RGB training corpus of this thesis, Section~\ref{sec:svanstrom_audit}) and disclosed as in-distribution on the IR side. One further conversion caveat: the dataset's annotations ship as MATLAB \texttt{groundTruth} objects, and this thesis converted them to YOLO format with its own script, so box geometry may differ marginally from the authors' MATLAB pipeline. Anti-UAV has a more canonical split but uses sequence-level tracking metrics not directly equivalent to per-frame F1.
 
-\emph{Task.} Anti-UAV baselines are tracking systems. Their state-accuracy numbers (0.90--0.97 range across years) include temporal aggregation absent from this thesis's frame-level numbers. The Anti-UAV row is included for orientation only.
+\emph{Task.} Anti-UAV baselines are tracking systems. Their state-accuracy numbers (0.90--0.97 range across years) include temporal aggregation absent from this thesis's frame-level numbers, and no per-frame precision or recall is reported, so those cells stay \texttt{ND}. The Anti-UAV row is included for orientation only.
 % [source: ledger=antiuav-saturated; eval=rgb_antiuav_baseline; run=eval/ablate.py; cache=eval/results/_ablation/2026-05-18T22-48-19/master.csv; config=antiuav_iou_1280_s5]
 % [source: github.com/DroneDetectionThesis/Drone-detection-dataset (no published split; MATLAB groundTruth labels)]
 
