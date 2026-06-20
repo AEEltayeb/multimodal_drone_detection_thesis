@@ -563,7 +563,7 @@ def main():
         if gf:
             L.append(f"| IR-on-gray + aligned_gray filter (clf bypassed) | {gf.get('precision')} | {gf.get('recall')} | {_f1c(gf)} |")
 
-    L.append("\n## SPEED (from knowledge/ledger — NOT this replay)\n")
+    L.append("\n## SPEED (reported separately; NOT from this replay)\n")
     L.append("| component | sad (ms) | happy (ms) | speedup | source |\n|---|---|---|---|---|")
     L.append("| trust classifier | fusion_no_fn 38.3 /frame | robust8 0.095 /frame | ~404× | ledger bench |")
     L.append("| confuser filter | patch 59–112 /det | mlp_v5 1.3–2.1 /det | ~37–72× | ledger bench |")
