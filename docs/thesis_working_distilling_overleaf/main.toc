@@ -84,7 +84,7 @@
 \contentsline {subsection}{\numberline {5.1.6}Runtime Cost}{56}{subsection.5.1.6}%
 \contentsline {section}{\numberline {5.2}Component Deep-Dives}{57}{section.5.2}%
 \contentsline {subsection}{\numberline {5.2.1}RGB Detector}{57}{subsection.5.2.1}%
-\contentsline {paragraph}{Real-video cameo: the three-stance continuum generalises.}{57}{paragraph*.54}%
+\contentsline {paragraph}{Real-video cameo: the three-stance continuum generalizes.}{57}{paragraph*.54}%
 \contentsline {subsection}{\numberline {5.2.2}IR Detector: the Six-Revision HITL Case Study}{58}{subsection.5.2.2}%
 \contentsline {paragraph}{OOD bound.}{59}{paragraph*.57}%
 \contentsline {subsection}{\numberline {5.2.3}Confuser Filter}{59}{subsection.5.2.3}%
