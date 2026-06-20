@@ -129,3 +129,6 @@ docs/gen_models_appendix.py
 *.onnx
 *.engine
 *.rar
+
+# Local production-model export bundle (weights; share privately, do not publish)
+models/_production_export/
