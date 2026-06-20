@@ -24,7 +24,7 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.metrics import precision_recall_fscore_support
 from xgboost import XGBClassifier
 
-REPO = Path(__file__).resolve().parent.parent
+REPO = Path(__file__).resolve().parents[2]   # training/trust_router_robust8nr/<file> -> repo root
 FULL56 = REPO / "models/routers/optimal_v1/fusion_dataset_full56.csv"
 
 # --- mirror eval/compare_routing_pipeline.py exactly (kept local to avoid the ultralytics import web) ---
