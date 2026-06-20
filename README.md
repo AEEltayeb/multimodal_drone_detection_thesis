@@ -56,7 +56,35 @@ trivial.
 | Rebuild | Rebuild the cache from the detectors | a GPU, the weights (committed) | `py thesis_eval/pipeline_cache_unified.py` |
 | Retrain | Retrain a model from data | a GPU, the datasets (not in the repo) | see [training/README.md](training/README.md) |
 
-The audit reads only the committed result JSONs, so it runs on a fresh clone with no cache and no GPU:
+## Evaluate any dataset or table: `eval.py`
+
+`eval.py` is the main entry point for the numbers. By default it reads the frozen result JSONs (the same
+source the audit checks), so it prints the exact thesis values, with frames evaluated, on a fresh clone
+with no cache and no GPU. Pass `--replay` to recompute from the cache instead.
+
+```
+py eval.py --list                  # every dataset and the tables it has
+py eval.py --all                   # print every table in the thesis
+py eval.py svanstrom               # all tables for one dataset
+py eval.py --rgb rgb_test          # RGB detector, bare, on the RGB test set
+py eval.py --ir  antiuav           # IR detector on Anti-UAV
+py eval.py --pipeline svanstrom    # full pipeline ablation table
+py eval.py --confuser rgb_confuser # confuser false-alarm table
+py eval.py --temporal              # segment / video window metrics
+py eval.py --dut                   # DUT Anti-UAV held-out test split
+py eval.py --router-cm             # trust-router held-out confusion matrix
+py eval.py --filter-cm             # confuser-filter held-out confusion matrices
+py eval.py --pipeline svanstrom --replay   # recompute from the cache (needs the cache + requirements.txt)
+```
+
+It covers every surface in `thesis_eval/results/` plus the standalone tables (resolution and filter-operating
+sweeps, clean split, CBAM held-out). It reads the JSONs and never re-implements a metric, so it cannot drift
+from the audited numbers.
+
+## Audit the numbers
+
+The audit reads only the committed result JSONs, so it runs on a fresh clone with no cache and no GPU. It is
+the only audit command in the repository:
 
 ```
 git clone <this repo> && cd <repo>
