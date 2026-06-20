@@ -114,3 +114,6 @@ docs/_ledger_strip_bak_*/
 # The 7 audit-cited result files under the ignored eval/results|mri/results trees
 # are force-added (git add -f) so the audit is reproducible on a fresh clone.
 
+
+# knowledge-dependent appendix generator (reads the private knowledge base)
+docs/gen_models_appendix.py
