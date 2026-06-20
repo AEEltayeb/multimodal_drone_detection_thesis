@@ -60,7 +60,7 @@ Single-camera source: fixed perimeter installation, $1920{\times}1080$, 25~fps. 
 
 \begin{table}[htbp]
     \centering
-    \caption{Drone-positive YouTube clips. ``Extracted'' is the frame count used in evaluation: the subset the author manually labelled by hand, drawing each ground-truth drone box frame by frame (after any stride sampling), which is why it falls below the native total shown for context. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
+    \caption{Drone-positive YouTube clips. ``Total frames'' is the native clip length; ``Extracted'' is the per-clip frame count recorded in the extraction manifest (after any stride sampling, which is why it falls below the native total). The frames actually scored are a smaller hand-labelled subset of these (the author drew each ground-truth drone box by hand, and not every extracted frame could be annotated); that evaluated subset is quantified in the note below. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
     \label{tab:youtube_drone_clips}
     \footnotesize
     \resizebox{\textwidth}{!}{%

@@ -28,7 +28,7 @@ Table~\ref{tab:model_overview} summarises each production model, what it was tra
 
 \begin{table}[htbp]
     \centering
-    \caption{Production models at a glance: training data and held-out test result. Detectors report detection $F1$; the trust router and confuser filters report held-out classification (Figures~\ref{fig:cm_router}, \ref{fig:cm_filters}).}
+    \caption{Production models at a glance: training data and held-out test result. Detectors report detection $F1$; the trust router and confuser filters report held-out classification (Figures~\ref{fig:cm_router}, \ref{fig:cm_filters}). The confuser filters' drone recall is reported \emph{end-to-end} (ground-truth drones kept through the detector \emph{and} the filter), so it reads below the per-detection retention in Figure~\ref{fig:cm_filters}, which conditions on detections the detector already made.}
     \label{tab:model_overview}
     \footnotesize
     \begin{tabular}{@{}p{2.9cm} l p{3.9cm} p{4.4cm}@{}}
