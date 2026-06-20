@@ -1,0 +1,111 @@
+{
+  "separability": {
+    "lda_train_accuracy": 0.9812845862090406,
+    "silhouette": -0.038972288370132446,
+    "median_anova_F": 255.7143941286405,
+    "max_anova_F": 5370.117499959283,
+    "top_feature_indices": [
+      428,
+      275,
+      481,
+      181,
+      216,
+      69,
+      182,
+      492,
+      284,
+      315,
+      430,
+      506,
+      471,
+      188,
+      301,
+      214,
+      274,
+      0,
+      395,
+      508
+    ],
+    "top_feature_labels": [
+      "p5 ch=167",
+      "p5 ch=14",
+      "p5 ch=220",
+      "p3 ch=44 cell=0",
+      "p3 ch=52 cell=3",
+      "p3 ch=16 cell=0",
+      "p3 ch=44 cell=1",
+      "p5 ch=231",
+      "p5 ch=23",
+      "p5 ch=54",
+      "p5 ch=169",
+      "p5 ch=245",
+      "p5 ch=210",
+      "p3 ch=45 cell=3",
+      "p5 ch=40",
+      "p3 ch=52 cell=1",
+      "p5 ch=13",
+      "meta:conf",
+      "p5 ch=134",
+      "p5 ch=247"
+    ],
+    "per_block_F": {
+      "meta": {
+        "mean_F": 847.0125286207689,
+        "max_F": 2202.037797774806,
+        "dim": 5
+      },
+      "p3": {
+        "mean_F": 303.24582172597104,
+        "max_F": 3016.131556925631,
+        "dim": 256
+      },
+      "p5": {
+        "mean_F": 794.3289942532306,
+        "max_F": 5370.117499959283,
+        "dim": 256
+      }
+    },
+    "meta_max_auroc": 0.8198200464248657,
+    "yolo_max_auroc": 0.8562499284744263,
+    "n_drone": 14697,
+    "n_confuser": 1386
+  },
+  "diagnosis": {
+    "raw_halluc_rate": 0.017653167185877467,
+    "raw_drone_prf": {
+      "TP": 14454,
+      "FP": 1527,
+      "FN": 3037,
+      "TN": 0,
+      "precision": 0.9044,
+      "recall": 0.8264,
+      "f1": 0.8636
+    },
+    "lda_separability": 0.9812845862090406,
+    "silhouette": -0.038972288370132446,
+    "n_drone": 14697,
+    "n_confuser": 1386,
+    "meta_max_auroc": 0.8198200464248657,
+    "yolo_max_auroc": 0.8562499284744263,
+    "thresholds": {
+      "fp_rate": 0.05,
+      "separability": 0.9,
+      "recall_cost": 0.1
+    },
+    "classifier_keeps_confuser_frac": 0.11038961038961038,
+    "classifier_recall_retention": 0.9968701095461658,
+    "recall_cost": 0.003129890453834161,
+    "projected_fp_rate": 0.0019487262477916683,
+    "fp_reduction": 0.8896103896103896,
+    "verdict": "not_needed",
+    "verdict_text": "No classifier needed \u2014 the detector is already clean on these confusers.",
+    "rationale": "14697 drones / 1386 confusers; raw hallucination 1.8%/img (thr 5%); LDA separability 0.981 (thr 0.90); recall cost 0.3% (thr 10%); projected FP cut 89%; raw drone F1 0.864"
+  },
+  "cv_results": {
+    "mlp": [
+      0.9932553225310308,
+      0.0008860916811184139,
+      "fused"
+    ]
+  }
+}

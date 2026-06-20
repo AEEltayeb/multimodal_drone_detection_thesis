@@ -1,3 +1,0 @@
-dataset,source,n_images,n_with_label,n_boxes,sqrt_px_p25,sqrt_px_p50,sqrt_px_p75,sqrt_px_p90,rel_w_p50,rel_h_p50,cx_p50,cy_p50
-selcom_cctv,selcom,2076,1953,1968,33.2,40.3,65.2,84.1,3.06,2.7,0.496,0.531
-selcom_cctv,_ALL,2076,1953,1968,33.2,40.3,65.2,84.1,3.06,2.7,0.496,0.531

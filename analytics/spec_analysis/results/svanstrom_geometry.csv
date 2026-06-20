@@ -1,3 +1,0 @@
-dataset,source,n_images,n_with_label,n_boxes,sqrt_px_p25,sqrt_px_p50,sqrt_px_p75,sqrt_px_p90,rel_w_p50,rel_h_p50,cx_p50,cy_p50
-svanstrom,IR,2871,1169,1172,24.3,29.7,35.6,44.6,5.26,4.99,0.57,0.455
-svanstrom,_ALL,2871,1169,1172,24.3,29.7,35.6,44.6,5.26,4.99,0.57,0.455

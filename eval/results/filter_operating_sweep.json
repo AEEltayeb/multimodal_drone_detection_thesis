@@ -1,0 +1,58 @@
+{
+  "RGB mlp_v5_v4": {
+    "slot": "rgb",
+    "drone_surfaces": [
+      "svanstrom",
+      "antiuav",
+      "dut_antiuav_960"
+    ],
+    "confuser_surface": "rgb_confuser",
+    "n_pos": 7106,
+    "n_conf_frames": 2633,
+    "shipped_thr": 0.25,
+    "shipped": [
+      0.949,
+      0.0144
+    ],
+    "t0.05": [
+      0.983,
+      0.0471
+    ],
+    "t0.10": [
+      0.972,
+      0.0258
+    ],
+    "t0.25": [
+      0.949,
+      0.0144
+    ]
+  },
+  "IR-thermal aligned": {
+    "slot": "ir",
+    "drone_surfaces": [
+      "svanstrom",
+      "antiuav",
+      "ir_dset_final"
+    ],
+    "confuser_surface": "ir_confusers",
+    "n_pos": 7949,
+    "n_conf_frames": 4000,
+    "shipped_thr": 0.05,
+    "shipped": [
+      0.997,
+      0.237
+    ],
+    "t0.05": [
+      0.997,
+      0.237
+    ],
+    "t0.10": [
+      0.996,
+      0.2248
+    ],
+    "t0.25": [
+      0.989,
+      0.2105
+    ]
+  }
+}

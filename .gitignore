@@ -32,8 +32,9 @@ dist/
 node_modules/
 bash.exe.stackdump
 
-# --- Claude / local session state (CLAUDE.md stays tracked) ---
+# --- Claude / local session + private dev instructions (now untracked) ---
 .claude/
+CLAUDE.md
 
 # --- Raw datasets (live on G:/drone; not needed to run the GUI/thesis) ---
 datasets/
@@ -89,3 +90,27 @@ docs/analysis/full_pipeline_ablations/raw_results/
 # NOTE: model weights (*.pt / *.joblib), KB/data CSVs, JSON configs, thesis
 # PDFs + figures (docs/**), and Markdown are INTENTIONALLY tracked.
 # Do NOT add blanket *.pt / *.csv / *.pdf ignores here.
+
+# ===========================================================================
+# Publish reorganization (2026-06-20): private / dev / regenerable trees that
+# are kept ON DISK for development but NOT published. The companion repo ships
+# only what the thesis cites + the closure needed to run and audit it.
+# ===========================================================================
+knowledge/                 # private knowledge system (not needed to run/audit)
+archive/                   # old code snapshots
+analytics/                 # legacy exploratory analysis
+notebooks/                 # exploratory Jupyter
+scratch/                   # scratch work
+tests/                     # dev smoke tests (not cited)
+check.txt
+check2.txt
+buildscript.log
+generate_professor_plots.py
+thesis_style.py            # only used by the (untracked) docs/ figure generators
+docs/_appendices_bak_*.tex
+docs/_emdash_bak_*/
+docs/_ledger_strip_bak_*/
+
+# The 7 audit-cited result files under the ignored eval/results|mri/results trees
+# are force-added (git add -f) so the audit is reproducible on a fresh clone.
+

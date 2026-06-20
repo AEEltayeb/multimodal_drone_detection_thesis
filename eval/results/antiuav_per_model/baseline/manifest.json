@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "timestamp_iso": "2026-05-19T15:28:49.165322+00:00",
+  "git": {
+    "commit": "841b4e088de6009e3f8b2173c21283bcd5d847c2",
+    "dirty": true,
+    "repo_root": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection"
+  },
+  "env": {
+    "python": "3.12.1",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "torch": "2.5.1+cu121",
+    "ultralytics": "8.4.16",
+    "numpy": "2.2.6",
+    "opencv": "4.13.0",
+    "cuda": {
+      "available": true,
+      "device_count": 1,
+      "device_name": "NVIDIA GeForce GTX 1050 Ti"
+    }
+  },
+  "args": {
+    "weights": [
+      "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\RGB model\\Yolo26n_trained\\weights\\best.pt"
+    ],
+    "model_name": "baseline",
+    "dataset": "G:/drone/Anti-UAV-RGBT_yolo_converted/test/RGB",
+    "mode": "per-frame",
+    "stride": 18,
+    "limit": 0,
+    "conf": 0.25,
+    "iou_thr": 0.5,
+    "iop_thr": 0.5,
+    "imgsz": 640,
+    "device": "0",
+    "per_source": false,
+    "negatives_only": false,
+    "conf_sweep": "",
+    "grayscale": false,
+    "patch_weights": "",
+    "patch_thr": 0.7,
+    "temporal": false,
+    "drone_classes": "0",
+    "output_dir": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\eval\\results\\antiuav_per_model\\baseline",
+    "plot": false,
+    "_drone_classes": "{0}"
+  },
+  "weights": [
+    {
+      "label": "weights_0",
+      "path": "C:\\Users\\User\\Desktop\\UNISA projects\\Drone detection\\es proj 3 thesis workspace\\ES_Drone_Detection\\RGB model\\Yolo26n_trained\\weights\\best.pt",
+      "sha256_short": "80b41e568b15",
+      "exists": true,
+      "size_bytes": 5390661
+    }
+  ],
+  "caches": [],
+  "datasets": {},
+  "extra": {
+    "dataset": "G:/drone/Anti-UAV-RGBT_yolo_converted/test/RGB",
+    "stage": "eval_model",
+    "mode": "per-frame"
+  }
+}

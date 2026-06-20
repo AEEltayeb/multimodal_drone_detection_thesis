@@ -1,0 +1,46 @@
+{
+  "cbam": {
+    "dataset": "CBAM",
+    "split": "held-out (separate dataset, in no training set)",
+    "n_images": 180,
+    "rule": "iou",
+    "results": {
+      "bare": {
+        "recall": 0.9667,
+        "confuser_FP": 48
+      },
+      "shipped@0.01": {
+        "recall": 0.9667,
+        "confuser_FP": 29
+      },
+      "shipped@0.05": {
+        "recall": 0.9167,
+        "confuser_FP": 15
+      },
+      "native@0.01": {
+        "recall": 0.9667,
+        "confuser_FP": 30
+      },
+      "native@0.05": {
+        "recall": 0.9667,
+        "confuser_FP": 13
+      },
+      "balanced@0.01": {
+        "recall": 0.7167,
+        "confuser_FP": 5
+      },
+      "balanced@0.05": {
+        "recall": 0.6,
+        "confuser_FP": 2
+      },
+      "cbam@0.01": {
+        "recall": 0.9667,
+        "confuser_FP": 30
+      },
+      "cbam@0.05": {
+        "recall": 0.9667,
+        "confuser_FP": 6
+      }
+    }
+  }
+}
