@@ -6,7 +6,7 @@ This chapter establishes everything the evaluation consumes: the datasets and th
 \section{Datasets and Their Roles}
 \label{sec:datasets}
 
-The evaluation uses eight labelled datasets and a 19-clip YouTube real-video set, drawn from public benchmarks, Roboflow / Kaggle sources, and the deployment partner's CCTV stream. Each dataset plays one declared role: a training surface, an in-distribution test surface, or an out-of-distribution (OOD) stress surface. Full provenance is in Appendix~\ref{app:datasets}.
+The evaluation uses eight labeled datasets and a 19-clip YouTube real-video set, drawn from public benchmarks, Roboflow / Kaggle sources, and the deployment partner's CCTV stream. Each dataset plays one declared role: a training surface, an in-distribution test surface, or an out-of-distribution (OOD) stress surface. Full provenance is in Appendix~\ref{app:datasets}.
 
 \begin{table}[htbp]
     \centering
@@ -22,7 +22,7 @@ The evaluation uses eight labelled datasets and a 19-clip YouTube real-video set
         \texttt{ir\_dset\_final} & 129,130 & 107{,}809 / 11{,}709 / 9{,}612 & IR & IR-detector train + in-distribution test \\
         \texttt{rgb\_confusers\_merged} & 27,024 & 21{,}784 / 2{,}607 / 2{,}633 & RGB & Confuser hard-negative training source + OOD confuser test (test split; see Section~\ref{sec:ds_confusers} for the per-model OOD status) \\
         \texttt{IR\_confusers} & 5,938 & eval-only & IR & OOD thermal-confuser test (airplane 4{,}281 / bird 1{,}200 / helicopter 457; evaluated split 5{,}237); no training contribution \\
-        \texttt{svanstrom} (paired) & 28,710 & eval-only & RGB+IR & Discriminating benchmark (small drones; labelled confusers); IR-side training overlap audited in Section~\ref{sec:svanstrom_audit} \\
+        \texttt{svanstrom} (paired) & 28,710 & eval-only & RGB+IR & Discriminating benchmark (small drones; labeled confusers); IR-side training overlap audited in Section~\ref{sec:svanstrom_audit} \\
         \texttt{antiuav} (RGBT) & 85,374 & eval-only & RGB+IR & Saturated benchmark / no-harm control; training overlap audited in Section~\ref{sec:svanstrom_audit} \\
         \texttt{selcom\_cctv} & 2,076 & 80 / 20 split (val 311 evaluated) & RGB & Deployment-partner CCTV (fine-tune surface + held-out val) \\
         YouTube real-video diagnostic & 2,609 & eval-only & RGB & Real-world clips: drone-positive (9) + confuser-only (10); consecutive frames carry the temporal evaluation \\
@@ -111,7 +111,7 @@ Because the datasets are single-class (drone), confuser images carry no boxes; t
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{fig_confuser_examples}
-    \caption{What the confuser datasets look like. Top: \texttt{rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt{New\_Dataset} source, labelled ``other''). Bottom: \texttt{IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples.}
+    \caption{What the confuser datasets look like. Top: \texttt{rgb\_confusers\_merged} (airplane / bird / helicopter / mixed \texttt{New\_Dataset} source, labeled ``other''). Bottom: \texttt{IR\_confusers} thermal frames. Each frame is the highest-confidence frame the bare detector fired on in that category (deterministic pick from the Tier-1 cache), i.e.\ representative hard negatives rather than easy samples.}
     \label{fig:confuser_examples}
 \end{figure}
 % [source: thesis_eval/gen_dataset_figures.py (fired-frame picks from thesis_eval/cache)]
@@ -161,7 +161,7 @@ Bird, airplane, and helicopter thermal frames enter across HITL revisions (Secti
 \subsection{Thermal Confuser Dataset (\texttt{IR\_confusers})}
 \label{sec:ds_ir_confusers}
 
-The thermal counterpart of the RGB confuser zoo: a 5{,}938-frame dataset of thermal aerial-confuser frames with no drones (4{,}281 airplane, 1{,}200 bird, 457 helicopter), exported from Roboflow-hosted thermal confuser video; source streams fully disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split contains 5{,}237 frames, sampled to $4{,}000$ by even spread (3{,}043 airplane / 871 bird / 86 helicopter). Every detection on this surface is a false positive by construction. It contributes no training data to any model and serves exactly one purpose: the OOD stress test of the IR branch (the thermal analogue of the \texttt{rgb\_confusers\_merged} test split). It supersedes the 180-frame CBAM probe used during development. CBAM is a Roboflow-hosted thermal aerial-confuser dataset of ${\sim}1{,}775$ frames (bird / drone / airplane; the name comes from the CBAM TF-Net model the dataset ships with), from which a 180-frame confuser probe was sampled. That probe's \texttt{valid} split remains the \emph{held-out} recall-recovery gate for the thermal-native filter's training (\texttt{mlp\_aligned\_thermalonly}, Section~\ref{sec:ir_xmodal_verifier}): \texttt{IR\_confusers} postdates that training, and the CBAM \texttt{valid} split is disjoint from the CBAM \texttt{train} drones the filter is trained on.
+The thermal counterpart of the RGB confuser zoo: a 5{,}938-frame dataset of thermal aerial-confuser frames with no drones (4{,}281 airplane, 1{,}200 bird, 457 helicopter), exported from Roboflow-hosted thermal confuser video; source streams fully disjoint from every \texttt{ir\_dset\_final} source family. The evaluated split contains 5{,}237 frames, sampled to $4{,}000$ by even spread (3{,}043 airplane / 871 bird / 86 helicopter). Every detection on this surface is a false positive by construction. It contributes no training data to any model and serves exactly one purpose: the OOD stress test of the IR branch (the thermal analog of the \texttt{rgb\_confusers\_merged} test split). It supersedes the 180-frame CBAM probe used during development. CBAM is a Roboflow-hosted thermal aerial-confuser dataset of ${\sim}1{,}775$ frames (bird / drone / airplane; the name comes from the CBAM TF-Net model the dataset ships with), from which a 180-frame confuser probe was sampled. That probe's \texttt{valid} split remains the \emph{held-out} recall-recovery gate for the thermal-native filter's training (\texttt{mlp\_aligned\_thermalonly}, Section~\ref{sec:ir_xmodal_verifier}): \texttt{IR\_confusers} postdates that training, and the CBAM \texttt{valid} split is disjoint from the CBAM \texttt{train} drones the filter is trained on.
 % [source: knowledge/ledger.csv ir_ood_cbam_raw (1,775 train+val frames); dataset G:/drone/Infrared_bird_drone_airplane_CBAM_TF-Net*]
 % [source: dataset=IR_confusers; dir=G:/drone/IR_confusers/images/train (5,237 files; Roboflow .rf-hash exports, airplane_train__*_thermal* naming); registry total 5,938 = 4281/1200/457]
 
@@ -185,7 +185,7 @@ The deployment-partner dataset: a fixed-camera RGB stream ($1920{\times}1080$, 2
 \subsection{YouTube Real-Video Diagnostic (19 Clips)}
 \label{sec:ds_youtube}
 
-19 curated YouTube clips totalling 2{,}609 evaluated frames: 9 drone-positive clips (1{,}359 frames; 1{,}234 GT drone instances, several with concurrent birds) and 10 confuser-only clips (1{,}250 frames; every detection is a false positive). The drone-positive frames were manually labelled by the author, frame by frame, drawing each ground-truth drone box by hand; the evaluated set is therefore the hand-labelled subset of each clip, which is why the extracted frame counts in Appendix~\ref{app:datasets} fall below the clips' native lengths. Within each labelled segment the frames are consecutive, which makes this the surface that carries the \emph{temporal} (segment-level) evaluation. The full per-clip table is in Appendix~\ref{app:datasets}. This is the only fully OOD surface for every pipeline component: no clip appears in any training set; the footage is hobbyist material from handheld or consumer cameras, with unknown optics and codec-level compression, in contrast to the fixed-mount research and surveillance sensors behind every other surface; and the drone-positive clips include bird-vs-drone scenes absent from Svanstr\"om.
+19 curated YouTube clips totalling 2{,}609 evaluated frames: 9 drone-positive clips (1{,}359 frames; 1{,}234 GT drone instances, several with concurrent birds) and 10 confuser-only clips (1{,}250 frames; every detection is a false positive). The drone-positive frames were manually labeled by the author, frame by frame, drawing each ground-truth drone box by hand; the evaluated set is therefore the hand-labeled subset of each clip, which is why the extracted frame counts in Appendix~\ref{app:datasets} fall below the clips' native lengths. Within each labeled segment the frames are consecutive, which makes this the surface that carries the \emph{temporal} (segment-level) evaluation. The full per-clip table is in Appendix~\ref{app:datasets}. This is the only fully OOD surface for every pipeline component: no clip appears in any training set; the footage is hobbyist material from handheld or consumer cameras, with unknown optics and codec-level compression, in contrast to the fixed-mount research and surveillance sensors behind every other surface; and the drone-positive clips include bird-vs-drone scenes absent from Svanstr\"om.
 
 \section{Evaluation Protocol}
 \label{sec:eval_protocol}
@@ -206,7 +206,7 @@ The headline metrics are \emph{precision}, \emph{recall}, and \emph{F1}; mAP50 a
 \subsection{Scoring-Rule Sensitivity (why trust-aware scoring)}
 \label{sec:scoring_audit}
 
-A multi-modal detection can be scored two ways, and the choice is consequential. Under \emph{dual scoring}, each modality is scored independently and FN/FP counts aggregated, so a frame silent on RGB but detected on IR still books an RGB false negative: the system is penalised on a channel it deliberately did not trust. Under \emph{trust-aware scoring}, only the modality the trust classifier chose is scored, each against its \emph{own} ground truth, and the two are never merged into a union. The user sees one per-frame alert; trust-aware scoring matches that.
+A multi-modal detection can be scored two ways, and the choice is consequential. Under \emph{dual scoring}, each modality is scored independently and FN/FP counts aggregated, so a frame silent on RGB but detected on IR still books an RGB false negative: the system is penalized on a channel it deliberately did not trust. Under \emph{trust-aware scoring}, only the modality the trust classifier chose is scored, each against its \emph{own} ground truth, and the two are never merged into a union. The user sees one per-frame alert; trust-aware scoring matches that.
 
 The size of the difference is the reason this is protocol rather than a footnote. On Svanstr\"om, a representative cascade (the reject-class \texttt{robust8}) scored both ways moves by $2.8$~pp ($F1=0.921$ dual vs.\ $0.949$ trust-aware, at identical precision $0.939$, since the predictions are identical and only the booked false negatives differ). The magnitude scales with how often the router rejects a modality: an earlier measurement on the May-10 stack at \texttt{imgsz=640}, where the weak visible channel was rejected on most frames, showed a $27.7$~pp swing ($0.663$ dual vs $0.940$ trust-aware). A scoring choice that can move a result by $3$ to $28$ points, depending on the operating point, is large against most inter-system differences in the literature. All cascade-level F1 in this thesis therefore uses trust-aware scoring, and any cross-paper comparison must state its rule. The same discipline matters for RQ3: the thermal channel's value concentrates on frames where the visible channel fails (night, glare), which a union-based score would mis-attribute.
 % [source: current swing = notes_round1_results.json svanstrom M_modality_ab routed[robust8]+filt (coverage/dual 0.9206, P 0.9388) vs tier1_results.json svanstrom B clf->filt[robust8] (trust-aware 0.9485, P 0.9388)]
@@ -224,11 +224,11 @@ The size of the difference is the reason this is protocol rather than a footnote
     \label{fig:drone_size_hist}
 \end{figure}
 
-\textbf{Frame budgets.} Surfaces are evaluated in full when they contain $\leq$4{,}000 frames; larger surfaces are sampled by an \emph{even spread} across the whole dataset (every frame index on a uniform grid, never a truncated prefix, which silently biases toward the alphabetical head of a sorted directory) capped at $\approx$4{,}000 frames. The realised $n$ and the source size are printed with every table.
+\textbf{Frame budgets.} Surfaces are evaluated in full when they contain $\leq$4{,}000 frames; larger surfaces are sampled by an \emph{even spread} across the whole dataset (every frame index on a uniform grid, never a truncated prefix, which silently biases toward the alphabetical head of a sorted directory) capped at $\approx$4{,}000 frames. The realized $n$ and the source size are printed with every table.
 
 \begin{table}[htbp]
     \centering
-    \caption{Canonical evaluation configuration per surface. Numbers measured at any other configuration are labelled as such and never share a table with canonical numbers.}
+    \caption{Canonical evaluation configuration per surface. Numbers measured at any other configuration are labeled as such and never share a table with canonical numbers.}
     \label{tab:eval_protocol}
     \resizebox{\textwidth}{!}{%
     \begin{tabular}{lrrll}
@@ -340,7 +340,7 @@ All detectors are YOLO26n (nano) single-class drone detectors; the IR detector's
         Patience          & 10                         & 10                                          \\
         Batch size        & 48                         & 4                                           \\
         \texttt{imgsz}    & 640                        & 1280                                        \\
-        Optimiser         & AdamW                      & AdamW                                       \\
+        Optimizer         & AdamW                      & AdamW                                       \\
         Initial LR        & 0.001                      & 0.001                                       \\
         Final LR ratio    & 0.01                       & 0.01                                        \\
         Warmup            & 3 epochs                   & 3 epochs                                    \\
@@ -408,12 +408,12 @@ Injecting hard-negative confuser crops risks catastrophic forgetting. For FT4, t
 
 A static-dataset detector has a fixed relationship with its training distribution; deployment exposes shifts that cannot be anticipated at training time. Making the model's own failure modes the primary driver of dataset expansion concentrates annotation effort where marginal value is highest.
 
-Dataset and model state are coupled: a model on dataset $k$ generates errors that define dataset $k+1$, and dataset $k+1$ trains model $k+2$. The coupling is productive when the loop is disciplined, since reviewed errors become clean labels or hard negatives. It turns regressive when it is not, and the failure mode is broader than missed labels: incoming source material arrives with un-assessed annotation quality, so un-reviewed batches can carry unlabelled positives (which then train as confuser-class negatives, as the V5 regression in Section~\ref{sec:ir_evolution} illustrates; distinct from the \texttt{mlp\_v5\_v4} filter of Section~\ref{sec:distill_verifier}), ground-truth boxes so oversized they span most of the frame, missing boxes, and inconsistent class conventions. No formal quality assessment of incoming sources was performed in this project; the frame-level review loop below is the mitigation, applied at the point where errors become training data.
+Dataset and model state are coupled: a model on dataset $k$ generates errors that define dataset $k+1$, and dataset $k+1$ trains model $k+2$. The coupling is productive when the loop is disciplined, since reviewed errors become clean labels or hard negatives. It turns regressive when it is not, and the failure mode is broader than missed labels: incoming source material arrives with un-assessed annotation quality, so un-reviewed batches can carry unlabeled positives (which then train as confuser-class negatives, as the V5 regression in Section~\ref{sec:ir_evolution} illustrates; distinct from the \texttt{mlp\_v5\_v4} filter of Section~\ref{sec:distill_verifier}), ground-truth boxes so oversized they span most of the frame, missing boxes, and inconsistent class conventions. No formal quality assessment of incoming sources was performed in this project; the frame-level review loop below is the mitigation, applied at the point where errors become training data.
 
 \subsection{Label Reviewer GUI}
 \label{sec:label_reviewer}
 
-The label reviewer (\texttt{label\_reviewer/}) is a Tkinter desktop tool for dataset curation, expanded as the IR-development loop surfaced new failure modes. It is organised as two windows: a setup window where the session is configured (review mode, image/label/model paths, confidence and \texttt{imgsz}, disagreement filters), and the review window proper, an OpenCV canvas where the labels are actually edited. Its working unit is a candidate frame: an image, the existing GT box(es), and the current model's predicted box(es). For each frame, the reviewer can:
+The label reviewer (\texttt{label\_reviewer/}) is a Tkinter desktop tool for dataset curation, expanded as the IR-development loop surfaced new failure modes. It is organized as two windows: a setup window where the session is configured (review mode, image/label/model paths, confidence and \texttt{imgsz}, disagreement filters), and the review window proper, an OpenCV canvas where the labels are actually edited. Its working unit is a candidate frame: an image, the existing GT box(es), and the current model's predicted box(es). For each frame, the reviewer can:
 
 \begin{itemize}
     \item \textbf{Accept GT, reject model}: GT is correct; the model's disagreement is a FP / FN case logged for analysis.
@@ -431,7 +431,7 @@ Batch operations correct a contiguous segment in one step (range deletion, page-
     \begin{subfigure}[b]{0.36\textwidth}\includegraphics[width=\textwidth]{label_reviewer_home}\caption{Setup window}\label{fig:label_reviewer_home}\end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.60\textwidth}\includegraphics[width=\textwidth]{label_reviewer_add}\caption{Review canvas}\label{fig:label_reviewer_launch}\end{subfigure}
-    \caption{The label reviewer. (a) The Tkinter setup window configures the session (what to review, against which model, under which disagreement filter) before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colours, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}
+    \caption{The label reviewer. (a) The Tkinter setup window configures the session (what to review, against which model, under which disagreement filter) before launching. (b) The OpenCV review canvas on a frame where the model fires and the existing ground truth is missing: GT and model boxes in two colors, box-edit handles, and the keybinding bar (add / delete / range-delete / save) turn each disagreement into a corrected label (positive ingest) or a hard negative (negative-mining branch).}
     \label{fig:label_reviewer}
 \end{figure}
 
@@ -443,7 +443,7 @@ Each revision follows the same loop (Figure~\ref{fig:hitl_loop}):
 \begin{enumerate}
     \item \textbf{Train.} Train the next model version on the current dataset state.
     \item \textbf{Predict.} Run the new model on a candidate pool: held-out validation frames, freshly acquired video, and frames the previous model failed on.
-    \item \textbf{Disagree.} Identify model-vs-GT disagreements: (i) model fires on a GT-less frame and is right (missing-annotation FN); (ii) model is silent on a GT frame and is right (spurious-GT FP); (iii) model and GT agree on centre but disagree on box size (loose annotator boxes).
+    \item \textbf{Disagree.} Identify model-vs-GT disagreements: (i) model fires on a GT-less frame and is right (missing-annotation FN); (ii) model is silent on a GT frame and is right (spurious-GT FP); (iii) model and GT agree on center but disagree on box size (loose annotator boxes).
     \item \textbf{Review.} Adjudicate each disagreement via the label reviewer (Section~\ref{sec:label_reviewer}). Accept-correct-defer.
     \item \textbf{Identify negative gaps.} Model firings on non-drone scenes (textured clouds, buildings, hot-pixel rows) are promoted to hard negatives in the next training set.
     \item \textbf{Augment.} Apply the corrected labels, append the new positives and negatives, and emit the next dataset version.
@@ -452,7 +452,7 @@ Each revision follows the same loop (Figure~\ref{fig:hitl_loop}):
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.62\textwidth]{figures/fig_hitl_loop.pdf}
-    \caption{The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow$Review before it is augmented into the next dataset. The V5 regression (Section~\ref{sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabelled drones entered training and were scored as false positives.}
+    \caption{The HITL co-evolution loop. The disciplined path (blue) routes every candidate batch through Disagree$\rightarrow$Review before it is augmented into the next dataset. The V5 regression (Section~\ref{sec:ir_evolution}) took the red shortcut: a large positive batch was ingested directly, bypassing review, so unlabeled drones entered training and were scored as false positives.}
     \label{fig:hitl_loop}
 \end{figure}
 
@@ -471,10 +471,10 @@ This thesis follows a \emph{statistics-before-training} discipline for its downs
 
 \subsection{What the Instrument Does}
 
-The tool hooks the detector's FPN layers (\texttt{p3}, stride~8; \texttt{p5}, stride~32) and pools each detection's region of those activations into a $517$-feature embedding: $512$ internal pyramid features (\texttt{p3} pooled to a $2{\times}2$ grid, \texttt{p5} to $1{\times}1$) plus $5$ detection-metadata scalars (confidence, log-area, aspect ratio, and box centre). It then emits separability statistics, per-layer rankings, spatial activation overlays, and a \texttt{stats.json} keyed to the weight hash and dataset, written under \texttt{mri/results/<run>/} in the project repository (e.g.\ \texttt{mri/results/v5\_report\_regen/stats.json}). Each statistic answers a specific sub-question; the two alignment diagnostics at the end of the list are produced by the MRI's modality-alignment module (\texttt{mri/modality\_align.py}).
+The tool hooks the detector's FPN layers (\texttt{p3}, stride~8; \texttt{p5}, stride~32) and pools each detection's region of those activations into a $517$-feature embedding: $512$ internal pyramid features (\texttt{p3} pooled to a $2{\times}2$ grid, \texttt{p5} to $1{\times}1$) plus $5$ detection-metadata scalars (confidence, log-area, aspect ratio, and box center). It then emits separability statistics, per-layer rankings, spatial activation overlays, and a \texttt{stats.json} keyed to the weight hash and dataset, written under \texttt{mri/results/<run>/} in the project repository (e.g.\ \texttt{mri/results/v5\_report\_regen/stats.json}). Each statistic answers a specific sub-question; the two alignment diagnostics at the end of the list are produced by the MRI's modality-alignment module (\texttt{mri/modality\_align.py}).
 
 \begin{description}
-    \item[Linear Discriminant Analysis (LDA).] Projects features onto the Fisher axis maximising between- to within-class variance for drone vs.\ confuser. Threshold accuracy on that axis quantifies linear separability; it is also the visualisation axis of the MRI findings in Section~\ref{sec:mri_findings}.
+    \item[Linear Discriminant Analysis (LDA).] Projects features onto the Fisher axis maximizing between- to within-class variance for drone vs.\ confuser. Threshold accuracy on that axis quantifies linear separability; it is also the visualization axis of the MRI findings in Section~\ref{sec:mri_findings}.
     \item[ANOVA $F$-statistic.] Per-feature between- to within-class variance ratio; a large $F$ marks a near-binary drone/non-drone switch neuron.
     \item[AUROC.] Probability a random drone outranks a random confuser ($0.5$ chance, $1.0$ perfect); a threshold-free separability measure, used for the IR drone-vs-confuser check of Section~\ref{sec:ir_xmodal_verifier}.
     \item[Leakage ratio.] A second $F$-statistic computed \emph{within} the drone class exposes features that discriminate \emph{which scene} rather than \emph{whether a drone}; the ratio of the two is the feature-selection gate of Section~\ref{sec:feature_selection}.

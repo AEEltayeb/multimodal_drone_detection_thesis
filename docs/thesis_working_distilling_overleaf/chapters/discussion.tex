@@ -34,14 +34,14 @@ Three threats. First, the RGB detector's training stances and the patch filter's
 IoP at 0.5 is more lenient than IoU at 0.5 for small-object detection; numbers here are not directly comparable to IoU-based literature without conversion (Section~\ref{sec:metrics}). Trust-aware scoring is the second construct choice, justified in Section~\ref{sec:scoring_audit}; both rules are declared per table.
 
 \paragraph{External validity.}
-The IR detector and the trust classifier train on frames and sequences that overlap both paired evaluation surfaces; the overlap is quantified per component, and bounded by the held-out clean split, in Section~\ref{sec:svanstrom_audit}: Anti-UAV conclusions are unchanged on $57{,}542$ held-out frames ($0.973 \to 0.977$ bare, $0.984 \to 0.986$ pipeline), the Svanstr\"om IR detector's solo numbers carry at most $7.3$~pp of in-distribution inflation (part of it sequence difficulty, per the leakage-free RGB control), and the cascade leakage bound is small (the reject-capable router moves $-1.4$~pp, $0.948 \to 0.934$; the shipped router $-3.5$~pp, $0.946 \to 0.911$). The deployment evidence is one site (SelCom) and one camera class; generalisation to other CCTV installations is untested.
+The IR detector and the trust classifier train on frames and sequences that overlap both paired evaluation surfaces; the overlap is quantified per component, and bounded by the held-out clean split, in Section~\ref{sec:svanstrom_audit}: Anti-UAV conclusions are unchanged on $57{,}542$ held-out frames ($0.973 \to 0.977$ bare, $0.984 \to 0.986$ pipeline), the Svanstr\"om IR detector's solo numbers carry at most $7.3$~pp of in-distribution inflation (part of it sequence difficulty, per the leakage-free RGB control), and the cascade leakage bound is small (the reject-capable router moves $-1.4$~pp, $0.948 \to 0.934$; the shipped router $-3.5$~pp, $0.946 \to 0.911$). The deployment evidence is one site (SelCom) and one camera class; generalization to other CCTV installations is untested.
 % [source: runs/clean_split/clean_split_results.json]
 
 \paragraph{Sampling and uncertainty.}
 Large surfaces are evaluated on $\approx$4{,}000-frame even-spread samples (Section~\ref{sec:canonical_configs}); all tables print $n$ and the source size, and headline cells carry 95\% bootstrap CIs. Differences within overlapping CIs are treated as ties; this includes the grayscale three-way's $2.7$~pp gap, which is reported as ``slightly behind'', not as parity. Per-clip real-video numbers ($20$--$340$ frames per clip) are indicative; aggregates are the reliable quantities.
 
 \paragraph{Conclusion validity.}
-Single-run point estimates are never compared at sub-CI granularity; the production-stack choices are justified on cost and OOD behaviour where in-domain differences are within noise (Section~\ref{sec:pipeline_ablation}).
+Single-run point estimates are never compared at sub-CI granularity; the production-stack choices are justified on cost and OOD behavior where in-domain differences are within noise (Section~\ref{sec:pipeline_ablation}).
 
 \section{Limitations and Future Work}
 \label{sec:limits}

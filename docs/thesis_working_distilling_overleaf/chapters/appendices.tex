@@ -3,7 +3,7 @@
 \chapter{Datasets in Detail}
 \label{app:datasets}
 
-This appendix consolidates the per-source / per-clip dataset metadata that the methodology chapter summarises. Numbers come from the dataset YAMLs (\texttt{rgb\_dataset/\allowbreak dataset.yaml}, \texttt{IR\_dset\_final/\allowbreak dataset.yaml}), the documentation file shipped with the confuser dataset (\texttt{rgb\_confusers\_merged/\allowbreak dataset\_documentation.md}), the Svanstr\"om paired-dataset meta file, and the YouTube extraction manifests.
+This appendix consolidates the per-source / per-clip dataset metadata that the methodology chapter summarizes. Numbers come from the dataset YAMLs (\texttt{rgb\_dataset/\allowbreak dataset.yaml}, \texttt{IR\_dset\_final/\allowbreak dataset.yaml}), the documentation file shipped with the confuser dataset (\texttt{rgb\_confusers\_merged/\allowbreak dataset\_documentation.md}), the Svanstr\"om paired-dataset meta file, and the YouTube extraction manifests.
 
 \section{Composite RGB Training Dataset}
 
@@ -60,7 +60,7 @@ Single-camera source: fixed perimeter installation, $1920{\times}1080$, 25~fps. 
 
 \begin{table}[htbp]
     \centering
-    \caption{Drone-positive YouTube clips. ``Total frames'' is the native clip length; ``Extracted'' is the per-clip frame count recorded in the extraction manifest (after any stride sampling, which is why it falls below the native total). The frames actually scored are a smaller hand-labelled subset of these (the author drew each ground-truth drone box by hand, and not every extracted frame could be annotated); that evaluated subset is quantified in the note below. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
+    \caption{Drone-positive YouTube clips. ``Total frames'' is the native clip length; ``Extracted'' is the per-clip frame count recorded in the extraction manifest (after any stride sampling, which is why it falls below the native total). The frames actually scored are a smaller hand-labeled subset of these (the author drew each ground-truth drone box by hand, and not every extracted frame could be annotated); that evaluated subset is quantified in the note below. ``Source'' is the YouTube video ID (prepend \texttt{https://youtu.be/}), recovered from the extraction manifest.}
     \label{tab:youtube_drone_clips}
     \footnotesize
     \resizebox{\textwidth}{!}{%
@@ -86,7 +86,7 @@ Single-camera source: fixed perimeter installation, $1920{\times}1080$, 25~fps. 
 \end{table}
 % [source: datasets/drone detection video tests/rgb/extraction_manifest.json (IDs from the _Media_ filename marker)]
 
-\noindent Note: the evaluated drone-positive set is the 9-clip / 1{,}359-frame / 1{,}234-GT-instance subset of this table that re-ran cleanly through the corrected-scoring pipeline (\texttt{flock\_of\_birds\_attack\_drone} excluded; the evaluated count is the subset the author hand-labelled, since not every extracted frame could be manually annotated). All Chapter~\ref{ch:hitl} video numbers, including the temporal evaluation, use that evaluated subset.
+\noindent Note: the evaluated drone-positive set is the 9-clip / 1{,}359-frame / 1{,}234-GT-instance subset of this table that re-ran cleanly through the corrected-scoring pipeline (\texttt{flock\_of\_birds\_attack\_drone} excluded; the evaluated count is the subset the author hand-labeled, since not every extracted frame could be manually annotated). All Chapter~\ref{ch:hitl} video numbers, including the temporal evaluation, use that evaluated subset.
 
 \begin{table}[htbp]
     \centering
@@ -155,7 +155,7 @@ Model & Role & Note \\
 \texttt{robust8-nr} & \textbf{production} & Shipped trust router: the eight \texttt{robust8} features with the \texttt{reject} class dropped (always routes RGB/IR/both; the filter owns false-positive rejection). \\
 \texttt{robust8} & ablation & Four-class router (\texttt{robust6} $+$ two free features $+$ a tuned per-class threshold); recommended on confuser-rich paired streams, retained as the reject-class ablation. \\
 \texttt{robust6} & comparison & Six statistically-selected, leakage-free features; the base extended into \texttt{robust8}/\texttt{robust8-nr}. \\
-\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, but leaks scene statistics so its lead is not trusted to generalise to unseen surfaces; superseded in production by \texttt{robust8-nr}. \\
+\texttt{sa32} & comparison & Strongest hand-engineered (32-feature) classifier; best in-domain on Svanstr\"om, but leaks scene statistics so its lead is not trusted to generalize to unseen surfaces; superseded in production by \texttt{robust8-nr}. \\
 \texttt{control40} & comparison & 40-feature control: best raw drone metrics but the worst confuser rejection. \\
 \texttt{fusion\_no\_fn\_v1.1} & comparison & Open-world fallback; the most conservative variant on the OOD confuser zoo. \\
 \midrule
@@ -173,14 +173,14 @@ Model & Role & Note \\
 % === END app:models ===
 
 \paragraph{Detector confusion matrices.}
-The Ultralytics validation confusion matrices for the full-training detector runs are shown in Figure~\ref{fig:detector_confusion}: the baseline RGB detector (\texttt{Yolo26n\_trained}, 70~epochs on the composite dataset) and the full IR retrain (\texttt{Final}, 70~epochs on \texttt{IR\_dset\_final}). The full-data trainings are shown rather than the short production fine-tunes (\texttt{ft4}, \texttt{v3b}), which adapt these weights over a few epochs on smaller fine-tune sets and so do not exercise the full validation distribution. They report training-time validation behaviour, \emph{not} a thesis-evaluation surface; the canonical per-surface results are in Chapter~\ref{ch:hitl} and the full ablation tables of Appendix~\ref{app:full_ablation}.
+The Ultralytics validation confusion matrices for the full-training detector runs are shown in Figure~\ref{fig:detector_confusion}: the baseline RGB detector (\texttt{Yolo26n\_trained}, 70~epochs on the composite dataset) and the full IR retrain (\texttt{Final}, 70~epochs on \texttt{IR\_dset\_final}). The full-data trainings are shown rather than the short production fine-tunes (\texttt{ft4}, \texttt{v3b}), which adapt these weights over a few epochs on smaller fine-tune sets and so do not exercise the full validation distribution. They report training-time validation behavior, \emph{not} a thesis-evaluation surface; the canonical per-surface results are in Chapter~\ref{ch:hitl} and the full ablation tables of Appendix~\ref{app:full_ablation}.
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{cm_rgb_baseline}\caption{Baseline RGB detector (full training)}\end{subfigure}
     \hfill
     \begin{subfigure}{0.49\textwidth}\includegraphics[width=\textwidth]{cm_ir_final}\caption{IR detector (\texttt{Final}, full training)}\end{subfigure}
-    \caption{Row-normalised validation confusion matrices (Ultralytics) for the full-training detector runs (baseline RGB, full IR retrain). Training-time validation behaviour, not a thesis-evaluation surface.}
+    \caption{Row-normalized validation confusion matrices (Ultralytics) for the full-training detector runs (baseline RGB, full IR retrain). Training-time validation behavior, not a thesis-evaluation surface.}
     % [source: figures/cm_rgb_baseline.png (RGB baseline Yolo26n_trained, 70ep drone_mixed); figures/cm_ir_final.png (IR Final / IR_final_cleaned, 70ep IR_dset_final); Ultralytics val confusion]
     \label{fig:detector_confusion}
 \end{figure}
@@ -203,11 +203,11 @@ The validation precision--recall curves for the two full-training detector runs 
 
 This appendix reproduces the Model MRI's human-readable report for the production RGB filter's base dataset (Section~\ref{sec:model_mri}): the statistics-before-training diagnosis that licensed training the filter. The detector is \texttt{Yolo26n\_selcom\_confuser\_ft4\_1280} and the dataset is the feature-only embedding set of $19{,}334$ drone and $13{,}597$ confuser detections. The verdict, the headline diagnostic signals, and the most discriminative features are reproduced below; the same run also writes \texttt{stats.json}, the trained MLP, and nine diagnostic figures (PCA and LDA projections, per-neuron KDEs, AUROC-by-layer, the verifier ROC, and the FP-reduction curve) under \texttt{mri/results/\allowbreak v5\_report\_regen/} in the repository. Figure~\ref{fig:mri_report} reproduces the verdict block in the main text.
 
-\paragraph{Verdict.} \emph{Classifier strongly recommended: a large false-positive cut at low recall cost.} The recommendation rests on a train-set LDA separability of $0.952$ for a projected $97\%$ false-positive cut at a $1.1\%$ recall cost. The instrument issued this verdict \emph{before any training}; the shipped filter's measured behaviour on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches the projection, and that agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
+\paragraph{Verdict.} \emph{Classifier strongly recommended: a large false-positive cut at low recall cost.} The recommendation rests on a train-set LDA separability of $0.952$ for a projected $97\%$ false-positive cut at a $1.1\%$ recall cost. The instrument issued this verdict \emph{before any training}; the shipped filter's measured behavior on the canonical surfaces (Section~\ref{sec:verifier_results}, Table~\ref{tab:ablation_confusers}) matches the projection, and that agreement between pre-training projection and post-training measurement is itself part of the instrument's validation.
 
 \begin{table}[htbp]
     \centering
-    \caption{Model MRI diagnostic signals for the production RGB filter's base dataset ($19{,}334$ drone / $13{,}597$ confuser detections). The ``projected'' rows are the instrument's pre-training estimates of the trained filter's behaviour.}
+    \caption{Model MRI diagnostic signals for the production RGB filter's base dataset ($19{,}334$ drone / $13{,}597$ confuser detections). The ``projected'' rows are the instrument's pre-training estimates of the trained filter's behavior.}
     \label{tab:mri_signals}
     \begin{tabular}{l c p{0.5\textwidth}}
         \toprule
@@ -287,7 +287,7 @@ The \texttt{runs/} directory additionally holds the production IR detector's com
     \item[robust6] The six-feature trust classifier (per-modality detection confidence $+$ box geometry), its features screened by the scene-fingerprint ratio (Section~\ref{sec:feature_selection}); the base that \texttt{robust8} extends.
     \item[robust8] The four-class trust classifier (Section~\ref{sec:feature_selection}): \texttt{robust6} plus two further free features and a tuned per-class decision threshold; retained as the reject-class ablation and recommended on confuser-rich paired streams.
     \item[robust8-nr] The shipped production trust router (Section~\ref{sec:classifier_results}): the eight \texttt{robust8} features with the \texttt{reject} class dropped, so it always routes RGB/IR/both and the per-frame filter owns false-positive rejection.
-    \item[sa32] \texttt{scene\_aware\_\allowbreak v3more\_\allowbreak 32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalise, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
+    \item[sa32] \texttt{scene\_aware\_\allowbreak v3more\_\allowbreak 32feat}. The strongest hand-engineered comparison trust classifier (32-feature XGBoost); it leaks scene statistics (discriminates \emph{which scene} a frame came from, not \emph{whether} its detections are trustworthy), so its in-domain lead is not trusted to generalize, and it is superseded in production by \texttt{robust8-nr} (Section~\ref{sec:feature_selection}).
     \item[fnfn] \texttt{fusion\_no\_fn\_v1.1}. The open-world fallback trust classifier (40-feature).
     \item[v3b] The production IR detector weights: 2-epoch corrective fine-tune on top of the \texttt{Final} IR checkpoint.
     \item[\texttt{mlp\_v5\_v4}] The production distilled feature-space confuser filter (Section~\ref{sec:distill_verifier}): an MLP on the detector's fused \texttt{p3}+\texttt{p5} features that supersedes the v2 patch filter on confuser-rich surfaces and runs per-frame; the \texttt{v4} bird-split re-mine closes the \texttt{rgb\_dataset\_test} coverage gap.
@@ -331,7 +331,7 @@ The first quantitative router comparison ran the predecessor cascade (baseline R
 % [source: ledger=cascade-confuser-collapse; eval=clfzoo_fnfn,clfzoo_sa32; run=eval/cumulative_halluc.py; config=confuser_zoo_1280 (predecessor configuration)]
 
 \paragraph{The surface reversal.}
-On real video the ranking inverted: \texttt{sa32} led segment drone $F1$ while \texttt{fusion\_no\_fn\_v1.1} accepted only about one in eight of the correct RGB drone true positives. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. This reversal discredited hand-ranking classifiers on single benchmarks and motivated the statistical feature selection behind \texttt{robust6}/\texttt{robust8}; even \texttt{sa32}'s real-video win is not bankable, because its scene-statistic leakage (Section~\ref{sec:feature_selection}) lets it score partly by memorising surface identity. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where a missed drone costs less than a false alarm.
+On real video the ranking inverted: \texttt{sa32} led segment drone $F1$ while \texttt{fusion\_no\_fn\_v1.1} accepted only about one in eight of the correct RGB drone true positives. The Svanstr\"om/zoo ordering does not select the production classifier; the operational surface does. This reversal discredited hand-ranking classifiers on single benchmarks and motivated the statistical feature selection behind \texttt{robust6}/\texttt{robust8}; even \texttt{sa32}'s real-video win is not bankable, because its scene-statistic leakage (Section~\ref{sec:feature_selection}) lets it score partly by memorizing surface identity. \texttt{fusion\_no\_fn\_v1.1} is retained as the open-world fallback for deployments where a missed drone costs less than a false alarm.
 % [source: ledger=three-classifier-realvideo; eval=pipe3clf_sa32,pipe3clf_fnfn; config=pipe_video_drone_iop]
 
 \chapter{Full Per-Surface Ablation Tables}
