@@ -413,7 +413,8 @@ CITED_PATHS = [
     "docs/thesis_working_distilling_overleaf/figures/fig_filter_operating.pdf",
     "docs/thesis_working_distilling_overleaf/figures/fig_pipeline.tex",
     # shipped no-reject router (robust8-nr) artifacts
-    "models/routers/robust8_noreject_drop/model.joblib",
+    # models/routers/robust8_noreject_drop/model.joblib is NOT published (weights are private;
+    # contact the author). Its training script + the numbers it produces remain auditable.
     "training/trust_router_robust8nr/train_robust8_noreject.py",
     "thesis_eval/results_noreject/tier1_results.json",
     "thesis_eval/results_noreject/temporal_results.json",

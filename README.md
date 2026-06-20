@@ -10,9 +10,12 @@ labeling tool, and a model-diagnosis tool (Model MRI).
 
 This repository is **self-contained for reading and auditing the thesis numbers**: clone it and every
 headline number in the dissertation can be re-verified against its frozen source on a CPU, with no
-dataset and no GPU (see [Reproduction tiers](#reproduction-tiers)). Raw datasets, videos, and regenerable
-caches are intentionally excluded (they are large and live outside the repo); the model weights, the
-thesis source and figures, and the code needed to run, audit, and rebuild are all committed.
+dataset and no GPU (see [Reproduction tiers](#reproduction-tiers)). The thesis source and figures, the
+frozen result JSONs, and the full pipeline code are committed.
+
+**Model weights and datasets are not published** (they are large). Contact the author for the trained
+weights and the datasets. Auditing and viewing the numbers (`eval.py`, the audit) need neither; running
+the GUI, replaying from cache, or retraining do.
 
 ## Repository map
 
@@ -43,6 +46,8 @@ thesis source and figures, and the code needed to run, audit, and rebuild are al
 | Grayscale filter | `mlp_aligned_gray_balanced` at 0.25 | `models/verifiers/ir_aligned/mlp_aligned_gray_balanced.pt` |
 | Temporal smoother | 2-of-3 sliding window | (in `gui/` and the eval harness) |
 
+Weight paths are shown for reference; the weight files themselves are not published (contact the author).
+
 ## Reproduction tiers
 
 Each tier needs strictly more than the one above it. The audit tier is the one this repo is built to make
@@ -51,10 +56,10 @@ trivial.
 | Tier | What it does | Needs | Command |
 |---|---|---|---|
 | Read | Read the thesis and the frozen result JSONs | nothing | open `docs/.../main.pdf`, `thesis_eval/results/*.json` |
-| **Audit** | Re-check every headline number against its frozen source | a clone, Python standard library only | `py audit/audit_headline_numbers.py` |
-| Replay | Regenerate the result JSONs from the cached detections | the detect-once cache, `requirements.txt` | `py thesis_eval/pipeline_eval_unified.py` |
-| Rebuild | Rebuild the cache from the detectors | a GPU, the weights (committed) | `py thesis_eval/pipeline_cache_unified.py` |
-| Retrain | Retrain a model from data | a GPU, the datasets (not in the repo) | see [training/README.md](training/README.md) |
+| **Audit / view** | Re-check or print every headline number against its frozen source | a clone, Python standard library only | `py audit/audit_headline_numbers.py`, `py eval.py --all` |
+| Replay | Regenerate the result JSONs from the cached detections | the cache + weights (contact author), `requirements.txt` | `py eval.py --pipeline svanstrom --replay` |
+| Rebuild | Rebuild the cache from the detectors | a GPU + the weights (contact author) | `py thesis_eval/pipeline_cache_unified.py` |
+| Retrain | Retrain a model from data | a GPU + the datasets and weights (contact author) | see [training/README.md](training/README.md) |
 
 ## Evaluate any dataset or table: `eval.py`
 
@@ -89,7 +94,7 @@ the only audit command in the repository:
 ```
 git clone <this repo> && cd <repo>
 py audit/audit_headline_numbers.py
-# -> 204/204 checks pass (161 headline cells + 43 cited paths)
+# -> 203/203 checks pass (161 headline cells + 42 cited paths)
 ```
 
 For the replay and rebuild tiers, install the Python dependencies first (PyTorch is installed separately,
@@ -135,10 +140,16 @@ powershell -ExecutionPolicy Bypass -File docs/build_thesis.ps1
 ![Operator GUI, paired RGB and thermal](docs/thesis_working_distilling_overleaf/figures/gui_paired_thermal.png)
 
 ```
-py gui/pyside_app.py
+py gui/pyside_app.py     # needs the trained weights (contact the author)
 ```
+
+## Datasets and weights
+
+The trained model weights and the raw image / video datasets are not included in this repository (they are
+large). **Contact the author** (Ahmed Eltayeb) for access. Everything needed to read and audit the thesis
+numbers is committed, so the weights and datasets are only required for running the GUI, replaying from the
+cache, rebuilding the cache, or retraining.
 
 ## License
 
-No license file is included yet. Until one is added, all rights are reserved by the author. If you intend
-to reuse this code, add a `LICENSE` of your choice (for example MIT) or contact the author.
+Released under the [MIT License](LICENSE).

@@ -117,3 +117,15 @@ docs/_ledger_strip_bak_*/
 
 # knowledge-dependent appendix generator (reads the private knowledge base)
 docs/gen_models_appendix.py
+
+# ===========================================================================
+# Model weights are NOT published (large). Contact the author for the trained
+# weights and the datasets. Model cards (*.yaml), configs, and the small router
+# feature tables (*.csv) stay tracked so the audit and eval.py work on a clone.
+# ===========================================================================
+*.pt
+*.pth
+*.joblib
+*.onnx
+*.engine
+*.rar

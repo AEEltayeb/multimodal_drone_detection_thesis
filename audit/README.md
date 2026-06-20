@@ -8,7 +8,7 @@ hand-edited away from its evidence.
 
 ```
 py audit/audit_headline_numbers.py
-# -> 204/204 checks pass (161 headline cells + 43 cited paths); 0 failures
+# -> 203/203 checks pass (161 headline cells + 42 cited paths); 0 failures
 ```
 
 It imports only the Python standard library and reads only committed result JSONs, so it runs on a fresh
