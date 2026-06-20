@@ -1,93 +1,116 @@
-# ES Drone Detection — Thesis Workspace
+# Real-Time Multimodal Drone Detection Through Visual and Thermal Sensor Fusion
 
-Dual-modality (RGB + thermal IR) drone detection system with a trust-routing classifier,
-feature-space verifiers, an operator GUI, and a human-in-the-loop data engine — plus the
-MSc thesis built on it. This repo is the curated, **self-contained** thesis workspace —
-all model weights, the thesis source + figures, and the full pipeline code, runnable from a
-fresh clone. Raw image/video datasets and regenerable caches are **excluded** (they live on
-`G:/drone`); everything needed to run the GUI, build the thesis, and regenerate figures is
-committed. (The original heavyweight workspace `ES_Drone_Detection/` is a local archive, not
-required by this repo.)
+Companion code and thesis for the MSc dissertation of the same title (Ahmed Eltayeb, University of
+Salerno). The system pairs an RGB detector and a thermal-IR detector, routes each frame to the modality
+it can trust, suppresses bird / airplane / helicopter false alarms with feature-space filters, and raises
+an alert only when a short sliding window agrees. It ships with an operator GUI, a human-in-the-loop
+labeling tool, and a model-diagnosis tool (Model MRI).
 
-## Where everything is
+![Pipeline](docs/thesis_working_distilling_overleaf/figures/fig_pipeline.png)
 
-| Directory | What's in it |
+This repository is **self-contained for reading and auditing the thesis numbers**: clone it and every
+headline number in the dissertation can be re-verified against its frozen source on a CPU, with no
+dataset and no GPU (see [Reproduction tiers](#reproduction-tiers)). Raw datasets, videos, and regenerable
+caches are intentionally excluded (they are large and live outside the repo); the model weights, the
+thesis source and figures, and the code needed to run, audit, and rebuild are all committed.
+
+## Repository map
+
+| Directory | What is in it |
 |---|---|
-| `docs/` | **The thesis**: `thesis_working.tex` (+ Overleaf split in `thesis_working_distilling_overleaf/`), `figures/`, `references.bib`, `build_thesis.ps1`, dated analyses in `analysis/` |
-| `models/` | **All model weights, by role** — see the production stack table below |
-| `gui/` | **Operator GUI** (PySide6 "TALOS"): `pyside_app.py` + `fusion/` engine, alert-gate temporal logic, `fusion_settings.json` |
-| `label_reviewer/` | **Human-in-the-loop label review tool** (tkinter): `review_labels_gui.py` |
-| `mri/` | **Model MRI** — detector feature-space diagnosis (PCA/LDA/ANOVA, verifier training): `py -m mri` |
-| `thesis_eval/` | **Tier-1 unified eval harness** — detect-once caches + 60 s zero-GPU replay that produces the thesis numbers |
-| `eval/` | Evaluation library + harnesses (metrics, ablations, routing comparison) and `eval/results/` artifacts |
-| `classifier/` | Trust-classifier / verifier / patch-CNN training and feature code |
-| `training/` | RGB detector fine-tuning scripts + `dataset_preparation/` |
-| `scripts/` | Utility scripts: dataset prep, confuser mining (`auto_confuser_ft4.py`), runners (`run_afk_pipeline.py`) |
-| `knowledge/` | **The knowledge base** (CSV database of scripts/models/evals/findings + generated views). Read `knowledge/README.md`; write only via `knowledge/_tools/kb.py` |
-| `datasets/` | Local video eval sets (confuser videos, drone video tests, demo pairs). Big training corpora live on `G:/drone` |
-| `configs/` | Training/eval YAML configs |
-| `analytics/`, `notebooks/`, `tests/` | Spec analyses, result notebooks, smoke tests |
-| `archive/` | Swept legacy scripts (git-tracked, dated subfolders) — nothing is ever deleted |
+| `docs/thesis_working_distilling_overleaf/` | The thesis: LaTeX source, figures, `references.bib`, `build_thesis.ps1` |
+| `models/` | All trained weights by role: `rgb/ ir/ routers/ verifiers/ patches/ pretrained/` |
+| `audit/` | Number-integrity audit: `audit_headline_numbers.py` re-checks every headline cell against its frozen JSON |
+| `thesis_eval/` | The evaluation harness: detect-once cache builder, zero-GPU replay that produces the thesis numbers, and the held-out evaluations |
+| `eval/` | Evaluation library used by the harness (metrics, routing, verifier, dataset utilities) and committed result artifacts |
+| `training/` | One folder per model in the architecture, each holding its trainer (see [training/README.md](training/README.md)) |
+| `classifier/` | Trust-router and verifier model definitions and feature code used by the harness |
+| `mri/` | Model MRI: detector feature-space diagnosis (PCA / LDA / ANOVA) and verifier training |
+| `gui/` | Operator GUI (PySide6, "TALOS"): fused RGB+IR view, alert-gate temporal logic, settings |
+| `label_reviewer/` | Human-in-the-loop label review tool |
+| `runs/` | Frozen result bundles cited by the thesis (clean-split, DUT test split, resolution sweep) |
+| `configs/` | Evaluation and training configuration files |
 
-## Production stack (models/)
+## Production stack
 
-| Role | Weights | Notes |
+| Role | Model | Weight |
 |---|---|---|
-| RGB detector | `models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt` | FT4; imgsz 1280 for Svanström/SelCom, 640 default |
-| IR detector | `models/ir/corrective_finetune/finetune_v3b/weights/best.pt` | v3b |
-| Trust router | `models/routers/robust8_noreject.joblib` (**robust8-nr**) | **shipped** no-reject 3-class, argmax (no τ); per-frame filter owns FP rejection. `robust8` (τ=0.20) / `sa32` / `robust6` kept for comparison |
-| RGB verifier | `models/verifiers/rgb_v5/mlp_v5.pt` | V5 distillation MLP, per-frame, thr 0.15 |
-| IR verifier | `models/verifiers/ir_aligned/mlp_aligned.pt` (+ `mlp_aligned_gray.pt`) | thermal + grayscale scalers |
-| Patch verifier (fallback) | `models/patches/confuser_filter4_{rgb,ir}_v2_backup.pt` | 5-class MobileNetV3, fail-open, thr 0.9 |
-| Comparison RGB detectors | `models/rgb/Yolo26n_*/weights/best.pt` | baseline, retrained_v2, selcom variants… |
-| IR lineage | `models/ir/IR_dsetV4/5/6…` | historical versions |
-| Pretrained | `models/pretrained/yolo11n.pt`, `yolo26n.pt` | training init |
+| RGB detector | `ft4` (YOLO26n, SelCom + confuser fine-tune) | `models/rgb/Yolo26n_selcom_confuser_ft4_1280/weights/best.pt` |
+| IR detector | `v3b` | `models/ir/corrective_finetune/finetune_v3b/weights/best.pt` |
+| Trust router | `robust8-nr` (3-class, no reject) | `models/routers/robust8_noreject_drop/model.joblib` |
+| RGB confuser filter | `mlp_v5_v4` at P(drone) 0.25 | `models/verifiers/rgb_v5/mlp_v5_v4.pt` |
+| IR confuser filter | `mlp_aligned_thermalonly` at 0.05 | `models/verifiers/ir_aligned/mlp_aligned_thermalonly.pt` |
+| Grayscale filter | `mlp_aligned_gray_balanced` at 0.25 | `models/verifiers/ir_aligned/mlp_aligned_gray_balanced.pt` |
+| Temporal smoother | 2-of-3 sliding window | (in `gui/` and the eval harness) |
 
-## Run on a fresh clone
+## Reproduction tiers
 
-```powershell
-git clone https://github.com/AEEltayeb/dorne_thesis.git
-cd dorne_thesis
-py -m venv .venv ; .venv\Scripts\Activate.ps1        # Windows PowerShell
-# install PyTorch first (GPU or CPU — see the requirements.txt header), then:
+Each tier needs strictly more than the one above it. The audit tier is the one this repo is built to make
+trivial.
+
+| Tier | What it does | Needs | Command |
+|---|---|---|---|
+| Read | Read the thesis and the frozen result JSONs | nothing | open `docs/.../main.pdf`, `thesis_eval/results/*.json` |
+| **Audit** | Re-check every headline number against its frozen source | a clone, Python standard library only | `py audit/audit_headline_numbers.py` |
+| Replay | Regenerate the result JSONs from the cached detections | the detect-once cache, `requirements.txt` | `py thesis_eval/pipeline_eval_unified.py` |
+| Rebuild | Rebuild the cache from the detectors | a GPU, the weights (committed) | `py thesis_eval/pipeline_cache_unified.py` |
+| Retrain | Retrain a model from data | a GPU, the datasets (not in the repo) | see [training/README.md](training/README.md) |
+
+The audit reads only the committed result JSONs, so it runs on a fresh clone with no cache and no GPU:
+
+```
+git clone <this repo> && cd <repo>
+py audit/audit_headline_numbers.py
+# -> 204/204 checks pass (161 headline cells + 43 cited paths)
+```
+
+For the replay and rebuild tiers, install the Python dependencies first (PyTorch is installed separately,
+CPU or CUDA, see the comment at the top of `requirements.txt`):
+
+```
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Model weights, the thesis, and all figures are committed, so the **GUI** and **thesis build**
-work immediately. The GUI reads model paths **repo-relative** (resolved in
-`flet_app/settings_dialog.load_settings`), so it finds the weights wherever you cloned. Raw
-datasets and detection caches are not shipped: the zero-GPU eval replay
-(`thesis_eval/pipeline_eval_unified.py`) needs `thesis_eval/cache/`, which you regenerate by
-running detection over the `G:/drone` corpora (or copy the cache across).
+## Trace any number to its source
 
-## Quickstart
+Every headline claim maps to one generating script and one frozen results file. The audit enforces this
+mapping; the table below is the human-readable version.
 
-```powershell
-# Operator GUI
-py gui/pyside_app.py
+| Claim (thesis) | Generating script | Frozen results file |
+|---|---|---|
+| Svanstrom composed F1 0.946, recall 0.991 | `thesis_eval/pipeline_eval_unified.py` | `thesis_eval/results/tier1_results.json` |
+| Anti-UAV composed F1 0.984 | `thesis_eval/pipeline_eval_unified.py` | `thesis_eval/results/tier1_results.json` |
+| Confuser false-alarm rate 30.4% to 1.4% | `thesis_eval/pipeline_eval_unified.py` | `thesis_eval/results/tier1_results.json` |
+| Held-out clean split 0.684 to 0.913 | `thesis_eval/leakage_controlled_replay.py` | `runs/clean_split/clean_split_results.json` |
+| Segment and video window metrics | `thesis_eval/temporal_replay.py` | `thesis_eval/results/temporal_results.json` |
+| Trust-router held-out confusion matrix | `thesis_eval/eval_router_heldout.py` | `thesis_eval/results/per_model_heldout/router_heldout.json` |
+| Confuser-filter held-out confusion matrices | `thesis_eval/eval_filter_heldout_cm.py` | `thesis_eval/results/per_model_heldout/filter_heldout_cm.json` |
+| Resolution sweep (Svanstrom) | `eval/svan_resolution_sweep.py` | `eval/results/svan_resolution_sweep.json` |
+| Filter operating points | `eval/filter_operating_sweep.py` | `eval/results/filter_operating_sweep.json` |
+| CBAM IR held-out filter | `eval/eval_ir_heldout.py` | `eval/results/ir_heldout_results.json` |
 
-# Reproduce the thesis numbers (zero-GPU replay from caches, ~60 s)
-py thesis_eval/pipeline_eval_unified.py
+See [audit/README.md](audit/README.md) for what the audit asserts, and
+[thesis_eval/README.md](thesis_eval/README.md) for how to rebuild the cache and replay a single surface.
 
-# Build the thesis PDF (needs MiKTeX/TeX Live). LIVE thesis = the multi-file Overleaf project:
-cd docs/thesis_working_distilling_overleaf
-pdflatex -interaction=nonstopmode main.tex ; bibtex main ; pdflatex -interaction=nonstopmode main.tex ; pdflatex -interaction=nonstopmode main.tex ; cd ../..
-#   -> main.pdf (146 pp). NOTE: docs/build_thesis.ps1 builds the OLDER single-file
-#      docs/thesis_working.tex snapshot (159 pp) instead.
+## Build the thesis
 
-# Regenerate thesis figures
-py docs/generate_thesis_figures.py   # set PYTHONUTF8=1 on Windows consoles
+MiKTeX with `pdflatex` and `bibtex` (the biblatex backend is `bibtex`, not `biber`):
 
-# Label reviewer (HITL)
-py label_reviewer/review_labels_gui.py
-
-# Knowledge base health
-py knowledge/_tools/kb.py validate
+```
+powershell -ExecutionPolicy Bypass -File docs/build_thesis.ps1
 ```
 
-## Method
+## The operator GUI
 
-Every script/model/eval lives as a row in `knowledge/*.csv` (the source of truth).
-Before writing a new script, search `knowledge/scripts.csv`; after producing a number,
-record it (`/record`). Cleanup goes through lifecycle marks + `/sweep` — files are
-archived to `archive/<date>/`, never deleted. See `CLAUDE.md` and `knowledge/README.md`.
+![Operator GUI, paired RGB and thermal](docs/thesis_working_distilling_overleaf/figures/gui_paired_thermal.png)
+
+```
+py gui/pyside_app.py
+```
+
+## License
+
+No license file is included yet. Until one is added, all rights are reserved by the author. If you intend
+to reuse this code, add a `LICENSE` of your choice (for example MIT) or contact the author.
