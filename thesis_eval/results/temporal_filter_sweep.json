@@ -1,0 +1,155 @@
+{
+  "regime": "grayrgb_paired (ft4 RGB + v3b-on-gray); router=robust8_nr_drop; window 2-of-3",
+  "weights": {
+    "rgb_filter": "mlp_v5_v4",
+    "gray_filter": "mlp_aligned_gray_balanced"
+  },
+  "joint_sweep": {
+    "0.25": {
+      "drone_window_PRF": [
+        0.9537,
+        0.489,
+        0.6465
+      ],
+      "confuser_window_fire": 0.213
+    },
+    "0.20": {
+      "drone_window_PRF": [
+        0.9566,
+        0.5225,
+        0.6758
+      ],
+      "confuser_window_fire": 0.2244
+    },
+    "0.15": {
+      "drone_window_PRF": [
+        0.9577,
+        0.574,
+        0.7178
+      ],
+      "confuser_window_fire": 0.235
+    },
+    "0.12": {
+      "drone_window_PRF": [
+        0.9591,
+        0.5944,
+        0.734
+      ],
+      "confuser_window_fire": 0.2496
+    },
+    "0.10": {
+      "drone_window_PRF": [
+        0.9603,
+        0.6124,
+        0.7479
+      ],
+      "confuser_window_fire": 0.2569
+    },
+    "0.08": {
+      "drone_window_PRF": [
+        0.9602,
+        0.6321,
+        0.7623
+      ],
+      "confuser_window_fire": 0.2626
+    },
+    "0.06": {
+      "drone_window_PRF": [
+        0.9574,
+        0.6615,
+        0.7824
+      ],
+      "confuser_window_fire": 0.2667
+    },
+    "0.05": {
+      "drone_window_PRF": [
+        0.9586,
+        0.6819,
+        0.7969
+      ],
+      "confuser_window_fire": 0.2683
+    },
+    "0.04": {
+      "drone_window_PRF": [
+        0.9572,
+        0.695,
+        0.8053
+      ],
+      "confuser_window_fire": 0.2756
+    },
+    "0.03": {
+      "drone_window_PRF": [
+        0.9575,
+        0.7007,
+        0.8093
+      ],
+      "confuser_window_fire": 0.2894
+    },
+    "0.02": {
+      "drone_window_PRF": [
+        0.9563,
+        0.7163,
+        0.8191
+      ],
+      "confuser_window_fire": 0.3098
+    },
+    "0.01": {
+      "drone_window_PRF": [
+        0.9558,
+        0.7253,
+        0.8247
+      ],
+      "confuser_window_fire": 0.3268
+    }
+  },
+  "channel_isolation": {
+    "rgb@0.25": {
+      "drone_window_PRF": [
+        0.9557,
+        0.4235,
+        0.587
+      ],
+      "confuser_window_fire": 0.1992
+    },
+    "gray@0.25": {
+      "drone_window_PRF": [
+        0.9953,
+        0.1733,
+        0.2953
+      ],
+      "confuser_window_fire": 0.0179
+    },
+    "fused@0.25": {
+      "drone_window_PRF": [
+        0.9537,
+        0.489,
+        0.6465
+      ],
+      "confuser_window_fire": 0.213
+    },
+    "rgb@0.05": {
+      "drone_window_PRF": [
+        0.957,
+        0.5642,
+        0.7099
+      ],
+      "confuser_window_fire": 0.2423
+    },
+    "gray@0.05": {
+      "drone_window_PRF": [
+        0.9753,
+        0.3549,
+        0.5204
+      ],
+      "confuser_window_fire": 0.0415
+    },
+    "fused@0.05": {
+      "drone_window_PRF": [
+        0.9586,
+        0.6819,
+        0.7969
+      ],
+      "confuser_window_fire": 0.2683
+    }
+  }
+}

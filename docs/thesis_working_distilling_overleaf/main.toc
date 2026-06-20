@@ -102,7 +102,7 @@
 \contentsline {paragraph}{Design-evolution evidence (predecessor stack).}{66}{paragraph*.72}%
 \contentsline {section}{\numberline {5.5}The Grayscale Finding}{67}{section.5.5}%
 \contentsline {subsection}{\numberline {5.5.1}The Fair Three-Way Comparison}{67}{subsection.5.5.1}%
-\contentsline {subsection}{\numberline {5.5.2}Mechanism and Bounds}{67}{subsection.5.5.2}%
+\contentsline {subsection}{\numberline {5.5.2}Mechanism and Bounds}{69}{subsection.5.5.2}%
 \contentsline {subsection}{\numberline {5.5.3}The Fallback Value and the Honest Bound}{69}{subsection.5.5.3}%
 \contentsline {chapter}{\numberline {6}Discussion}{70}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Answers to the Research Questions}{70}{section.6.1}%
