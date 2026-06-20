@@ -136,24 +136,22 @@
 \contentsline {section}{\numberline {A.7}DUT Anti-UAV}{78}{section.A.7}%
 \contentsline {section}{\numberline {A.8}SelCom CCTV}{78}{section.A.8}%
 \contentsline {section}{\numberline {A.9}YouTube Real-Video Diagnostic}{78}{section.A.9}%
-\contentsline {section}{\numberline {A.10}Licensing and Ethics}{79}{section.A.10}%
-\contentsline {chapter}{\numberline {B}Models Evaluated}{80}{appendix.B}%
-\contentsline {paragraph}{Detector confusion matrices.}{81}{paragraph*.94}%
-\contentsline {paragraph}{Detector training curves.}{82}{paragraph*.96}%
-\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{83}{appendix.C}%
-\contentsline {paragraph}{Verdict.}{83}{paragraph*.98}%
-\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{84}{paragraph*.100}%
-\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{85}{appendix.D}%
-\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{87}{appendix.E}%
-\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{89}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{89}{section.F.1}%
+\contentsline {section}{\numberline {A.10}Licensing and Ethics}{80}{section.A.10}%
+\contentsline {chapter}{\numberline {B}Models Evaluated}{81}{appendix.B}%
+\contentsline {paragraph}{Detector confusion matrices.}{82}{paragraph*.94}%
+\contentsline {paragraph}{Detector training curves.}{83}{paragraph*.96}%
+\contentsline {chapter}{\numberline {C}Model MRI Sample Report}{84}{appendix.C}%
+\contentsline {paragraph}{Verdict.}{84}{paragraph*.98}%
+\contentsline {paragraph}{Top discriminative features (by ANOVA $F$).}{85}{paragraph*.100}%
+\contentsline {chapter}{\numberline {D}Number Provenance and Reproducibility}{86}{appendix.D}%
+\contentsline {chapter}{\numberline {E}Glossary of Abbreviations and Shorthand}{88}{appendix.E}%
+\contentsline {chapter}{\numberline {F}Superseded Components and Design History}{90}{appendix.F}%
+\contentsline {section}{\numberline {F.1}Patch Filter (Superseded Predecessor)}{90}{section.F.1}%
 \contentsline {section}{\numberline {F.2}Alert-Gate Cascade (superseded patch path)}{90}{section.F.2}%
-\contentsline {section}{\numberline {F.3}Superseded Confuser Filter (Patch CNN)}{91}{section.F.3}%
-\contentsline {paragraph}{The patch generation: useful, gated, and bounded.}{91}{paragraph*.104}%
-\contentsline {section}{\numberline {F.4}Trust-Classifier Design History}{91}{section.F.4}%
-\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{91}{paragraph*.105}%
-\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{91}{paragraph*.106}%
-\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{92}{paragraph*.107}%
-\contentsline {paragraph}{The surface reversal.}{92}{paragraph*.108}%
-\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{93}{appendix.G}%
-\contentsline {chapter}{Bibliography}{96}{appendix*.114}%
+\contentsline {section}{\numberline {F.3}Trust-Classifier Design History}{91}{section.F.3}%
+\contentsline {paragraph}{The grayscale hole, and why the reject class caused it.}{91}{paragraph*.102}%
+\contentsline {paragraph}{A dual-classifier extension (validated, not shipped).}{91}{paragraph*.103}%
+\contentsline {paragraph}{Design evolution: the OOD confuser zoo (predecessor configuration).}{91}{paragraph*.104}%
+\contentsline {paragraph}{The surface reversal.}{91}{paragraph*.105}%
+\contentsline {chapter}{\numberline {G}Full Per-Surface Ablation Tables}{92}{appendix.G}%
+\contentsline {chapter}{Bibliography}{95}{appendix*.111}%
