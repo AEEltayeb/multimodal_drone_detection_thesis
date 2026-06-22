@@ -1,0 +1,19 @@
+# dependencies
+node_modules
+
+# build output
+dist
+dist-ssr
+
+# local / editor / logs
+*.local
+.vercel
+.DS_Store
+*.log
+npm-debug.log*
+
+# keep internal notes OUT of the public site (per request: no .md exposed)
+*.md
+
+# ship the small embedded demo clip (overrides the repo-root *.mp4 ignore)
+!public/media/video/demo_antiuav.mp4

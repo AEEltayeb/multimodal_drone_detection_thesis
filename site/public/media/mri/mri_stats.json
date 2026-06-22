@@ -1,0 +1,16 @@
+{
+  "source": "mri/results/v5_report_regen/features.npz",
+  "n_total": 32931,
+  "n_drone": 19334,
+  "n_confuser": 13597,
+  "lda_train_accuracy": 0.9516577,
+  "silhouette": 0.0672674,
+  "pca_pc1_var": 0.4880388477464247,
+  "pca_pc2_var": 0.09786201765296929,
+  "max_anova_F": 42345.74899900347,
+  "meta_max_auroc": 0.810515284538269,
+  "yolo_max_auroc": 0.8437576293945312,
+  "fp_reduction": 0.9741119364565713,
+  "recall_retention": 0.9894486397020792,
+  "cv_f1": 0.9856759877347321
+}

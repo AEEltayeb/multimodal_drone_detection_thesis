@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply bg-slate-950 text-slate-200 antialiased;
+  }
+  ::selection {
+    @apply bg-cyan-500/30 text-white;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-slate-700/60 bg-slate-900/50 backdrop-blur-sm;
+  }
+  .accent {
+    @apply text-cyan-400;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.2em] text-cyan-400/80;
+  }
+}
+
+/* ---- scrollytelling two-column layout (reference pattern) ---- */
+.scrolly {
+  position: relative;
+}
+.scrolly-step {
+  min-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem 0;
+}
+.scrolly-visual-inline {
+  margin-bottom: 1.5rem;
+}
+.scrolly-sticky {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .scrolly {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    gap: 4rem;
+    /* stretch (not start) so the right column spans the full section height,
+       which is what lets position:sticky stay pinned across all the steps. */
+    align-items: stretch;
+  }
+  .scrolly-visual-inline {
+    display: none;
+  }
+  .scrolly-sticky {
+    display: block;
+  }
+  .scrolly-sticky-inner {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ---- custom scrollbar (ported from the TALOS GUI) ---- */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0f172a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
