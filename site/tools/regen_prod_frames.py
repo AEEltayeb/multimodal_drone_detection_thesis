@@ -90,7 +90,7 @@ def main():
         img = grab_frame(field_video, 444)
         annotate(model, hook, ver, img, "prod_B_drone_detected_field.jpg")
     else:
-        print(f"[field] SKIP — source video not found: {field_video}")
+        print(f"[field] SKIP - source video not found: {field_video}")
 
     # --- (2) SKY frame: source clip GOPR5844_002.mp4 NOT in repo ---
     # If the user supplies it (set SKY_VIDEO env or drop the file), regenerate too.
@@ -100,7 +100,7 @@ def main():
         img = grab_frame(sky_video, 72)
         annotate(model, hook, ver, img, "prod_B_drone_detected_sky.jpg")
     else:
-        print(f"[sky] SKIP — source clip not in repo: {sky_video} "
+        print(f"[sky] SKIP - source clip not in repo: {sky_video} "
               f"(set SKY_VIDEO to its path to regenerate)")
 
 
