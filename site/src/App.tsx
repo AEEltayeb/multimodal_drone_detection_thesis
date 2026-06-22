@@ -13,6 +13,7 @@ import { DatasetsAtAGlance } from './sections/DatasetsAtAGlance'
 import { Ablations } from './sections/Ablations'
 import { Proof } from './sections/Proof'
 import { Conclusion } from './sections/Conclusion'
+import { Analytics } from '@vercel/analytics/react'
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
         <Conclusion />
       </main>
       <Footer />
+      <Analytics />
     </div>
   )
 }
